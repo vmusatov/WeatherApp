@@ -3,6 +3,7 @@
     <dimen name="app_margin">10dp</dimen>
     <dimen name="app_very_small_margin">3dp</dimen>
     <dimen name="app_small_margin">5dp</dimen>
+    <dimen name="app_medium_margin">20dp</dimen>
     <dimen name="app_large_margin">30dp</dimen>
 
     <dimen name="app_small_padding">5dp</dimen>
