@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
-import com.example.weatherapp.databinding.FragmentMenuBinding
+import com.example.weatherapp.databinding.FragmentManageLocationsBinding
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.navigator
@@ -17,7 +17,7 @@ import com.example.weatherapp.ui.viewModelFactory
 
 class ManageLocationsFragment : Fragment() {
 
-    private lateinit var binding: FragmentMenuBinding
+    private lateinit var binding: FragmentManageLocationsBinding
     private val viewModel: ManageLocationsViewModel by activityViewModels { viewModelFactory() }
     private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory() }
 
@@ -28,7 +28,7 @@ class ManageLocationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentMenuBinding.inflate(inflater, container, false)
+        binding = FragmentManageLocationsBinding.inflate(inflater, container, false)
 
         setupToolbar()
         setupUi()

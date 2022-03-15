@@ -1,4 +1,4 @@
-package com.example.weatherapp
+package com.example.weatherapp.ui
 
 import android.os.Bundle
 import android.view.View
@@ -7,10 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
+import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ActivityMainBinding
-import com.example.weatherapp.ui.FragmentAnimation
-import com.example.weatherapp.ui.Navigator
-import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeFragment
 import com.example.weatherapp.ui.locations.AddLocationFragment
 import com.example.weatherapp.ui.locations.ManageLocationsFragment

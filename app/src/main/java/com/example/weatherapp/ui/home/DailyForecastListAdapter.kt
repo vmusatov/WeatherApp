@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.data.remote.model.ForecastDay
-import com.example.weatherapp.databinding.ItemByDayBinding
+import com.example.weatherapp.databinding.ItemDailyForecastBinding
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.util.DateUtils
 import com.squareup.picasso.Picasso
@@ -24,7 +24,7 @@ class DailyForecastListAdapter : RecyclerView.Adapter<DailyForecastListAdapter.V
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemByDayBinding.inflate(inflater, parent, false)
+        val binding = ItemDailyForecastBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
@@ -57,5 +57,6 @@ class DailyForecastListAdapter : RecyclerView.Adapter<DailyForecastListAdapter.V
 
     override fun getItemCount(): Int = data.size
 
-    inner class ViewHolder(val binding: ItemByDayBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(val binding: ItemDailyForecastBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

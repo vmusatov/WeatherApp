@@ -11,6 +11,13 @@ import com.example.weatherapp.model.TempUnit
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
 
+data class LocationInfo(
+    val locationName: String,
+    val tempC: Double,
+    val tempF: Double,
+    val conditionIconUrl: String
+)
+
 class ManageLocationListAdapter(
     private val addLocationListener: AddLocationListener
 ) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>(), View.OnClickListener {
@@ -59,11 +66,6 @@ class ManageLocationListAdapter(
             }
 
             root.setOnClickListener(this@ManageLocationListAdapter)
-            root.setOnLongClickListener {
-
-
-                return@setOnLongClickListener true
-            }
         }
     }
 
