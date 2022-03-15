@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">Weather App</string>
+    
+    <string name="degree">%1$d°</string>
+    <string name="kmh">%1$d km/h</string>
+    <string name="feels_like">Feels like: %1$d°</string>
+
+    <string name="sunday">Sunday</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="undefined_day">Undefined day</string>
+    <string name="today">Today</string>
+
+    <string name="no_data">No Data</string>
+    <string name="options">Options</string>
+    <string name="drawer_item_home">123</string>
+    <string name="about">About</string>
+    <string name="manage_locations">Manage locations</string>
+    <string name="add_location">Add location</string>
+    <string name="enter_location_name">Enter location name</string>
+    <string name="not_found">Not found</string>
+
+    <string name="sunset">Sunset</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind">Wind</string>
+    <string name="uv_index">UV-index</string>
+
+    <string name="air_quality">Air quality (μg/m3)</string>
+    <string name="epa_index">EPA Index</string>
+    <string name="sulphur_dioxide">Sulphur dioxide (so2)</string>
+    <string name="nitrogen_dioxide">Nitrogen dioxide (no2)</string>
+    <string name="ozone">Ozone (o3)</string>
+    <string name="carbon_monoxide">Carbon Monoxide (co)</string>
+    <string name="low">Low</string>
+    <string name="moderate">Moderate</string>
+    <string name="high">High</string>
+    <string name="very_high">Very High</string>
+    <string name="extreme">Extreme</string>
+    <string name="undefined">Undefined</string>
+    <string name="good">Good</string>
+    <string name="unhealthy_for_sensitive_group">Unhealthy for sensitive group</string>
+    <string name="unhealthy">Unhealthy</string>
+    <string name="very_unhealthy">Very Unhealthy</string>
+    <string name="hazardous">Hazardous</string>
+    <string name="powered_by_weatherapi">Powered by WeatherAPI.com</string>
+
+</resources>

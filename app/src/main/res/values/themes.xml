@@ -1,0 +1,37 @@
+<resources>
+    <style name="Theme.WeatherApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/light_gray</item>
+        <item name="colorPrimaryDark">@color/light_gray</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/light_gray</item>
+
+        <item name="colorSecondary">@color/dark_gray</item>
+        <item name="colorSecondaryVariant">@color/gray</item>
+
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
+
+    <style name="contentBlock">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">@dimen/app_large_padding</item>
+        <item name="android:paddingEnd">@dimen/app_large_padding</item>
+        <item name="android:paddingBottom">@dimen/app_large_padding</item>
+    </style>
+
+    <style name="formContentBlock" parent="contentBlock">
+        <item name="android:background">@drawable/form</item>
+        <item name="android:layout_marginTop">@dimen/app_margin</item>
+        <item name="android:padding">@dimen/app_padding</item>
+    </style>
+
+    <style name="mainToolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+</resources>

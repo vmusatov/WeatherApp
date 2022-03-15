@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/refresh_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimary">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/app_margin"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/current"
+                layout="@layout/block_current" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/by_hour_list"
+                style="@style/formContentBlock"
+                android:foreground="@drawable/form_shadow"
+                android:paddingStart="@dimen/app_small_padding"
+                android:paddingEnd="@dimen/app_small_padding" />
+
+            <include
+                android:id="@+id/notifications"
+                layout="@layout/block_notifications" />
+
+            <TextView
+                android:id="@+id/by_hour_list_empty"
+                style="@style/formContentBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/no_data"
+                android:textSize="@dimen/normal_text" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/by_day_list"
+                style="@style/formContentBlock" />
+
+            <include
+                android:id="@+id/additional_weather"
+                layout="@layout/block_additional_weather" />
+
+            <include
+                android:id="@+id/astronomy"
+                layout="@layout/block_astronomy" />
+
+            <include
+                android:id="@+id/air_quality"
+                layout="@layout/block_air_quality" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

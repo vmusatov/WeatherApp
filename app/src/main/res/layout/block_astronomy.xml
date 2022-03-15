@@ -1,0 +1,67 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/formContentBlock"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/sunrise_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sunrise"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/sunrise_text"
+        app:layout_constraintEnd_toEndOf="@+id/sunrise_icon"
+        app:layout_constraintStart_toStartOf="@+id/sunrise_icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/sunrise_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/colorSecondaryVariant"
+        app:layout_constraintBottom_toTopOf="@+id/sunrise_icon"
+        app:layout_constraintEnd_toEndOf="@+id/sunrise_icon"
+        app:layout_constraintStart_toStartOf="@+id/sunrise_icon"
+        app:layout_constraintTop_toBottomOf="@+id/sunset_title" />
+
+    <ImageView
+        android:id="@+id/sunrise_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_sunrise"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/sunset_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sunset"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/sunset_icon"
+        app:layout_constraintStart_toStartOf="@+id/sunset_icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/sunset_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/colorSecondaryVariant"
+        app:layout_constraintBottom_toTopOf="@+id/sunset_icon"
+        app:layout_constraintEnd_toEndOf="@+id/sunset_icon"
+        app:layout_constraintStart_toStartOf="@+id/sunset_icon"
+        app:layout_constraintTop_toBottomOf="@+id/sunset_title" />
+
+    <ImageView
+        android:id="@+id/sunset_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_sunset"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.85"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
