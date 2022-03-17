@@ -5,17 +5,26 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.R
 import com.example.weatherapp.data.remote.model.Hour
 import com.example.weatherapp.data.remote.model.WeatherForecast
 import com.example.weatherapp.model.AstronomyDto
 import com.example.weatherapp.model.LocationDto
 import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.notification.WeatherNotification
+import com.example.weatherapp.notification.*
+import com.example.weatherapp.notification.factory.ExpectPrecipitationsEndFactory
+import com.example.weatherapp.notification.factory.ExpectPrecipitationsFactory
+import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
+import com.example.weatherapp.notification.factory.TempTomorrowFactory
 import com.example.weatherapp.repository.AstronomyRepository
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import com.example.weatherapp.ui.locations.LocationInfo
 import com.example.weatherapp.util.DateUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val weatherRepository: WeatherRepository,
@@ -37,10 +46,20 @@ class HomeViewModel(
     val astronomy: LiveData<AstronomyDto> get() = _astronomy
     private val _astronomy = MutableLiveData<AstronomyDto>()
 
+    val weatherNotifications: LiveData<List<WeatherNotification>> get() = _weatherNotifications
+    private val _weatherNotifications = MutableLiveData<List<WeatherNotification>>()
+
     val isUpdateInProgress: LiveData<Boolean> get() = _isUpdateInProgress
     private val _isUpdateInProgress = MutableLiveData<Boolean>()
 
+    private val weatherNotificationBuilder = WeatherNotificationsBuilder()
+
     init {
+        weatherNotificationBuilder.addFactory(NoPrecipitationsFactory())
+        weatherNotificationBuilder.addFactory(ExpectPrecipitationsFactory())
+        weatherNotificationBuilder.addFactory(ExpectPrecipitationsEndFactory())
+        weatherNotificationBuilder.addFactory(TempTomorrowFactory())
+
         updateAll()
     }
 
@@ -57,7 +76,8 @@ class HomeViewModel(
             weatherRepository.loadForecast("${location.lat}, ${location.lon}",
                 onSuccess = {
                     _weatherForecast.postValue(it)
-                    _hourlyForecast.postValue(parseHourlyForecast(it))
+                    updateHourlyForecast(it)
+                    updateNotifications(it)
                     _isUpdateInProgress.postValue(false)
                 },
                 onError = {
@@ -107,25 +127,34 @@ class HomeViewModel(
         }
     }
 
-    private fun parseHourlyForecast(weatherForecast: WeatherForecast): List<Hour> {
-        val byHour = mutableListOf<Hour>()
-        val forecastDays = weatherForecast.forecast.forecastDay
-
-        if (forecastDays.isNotEmpty()) {
-            val nowHour = DateUtils.getHourFromDate(weatherForecast.location.localtime)
-            val todayByHour = forecastDays.first().hour
-
-            if (todayByHour.size > nowHour) {
-                byHour.addAll(todayByHour.subList(nowHour, todayByHour.size))
-            }
-
-            if (forecastDays.size > 1 && forecastDays[1].hour.size > nowHour) {
-                val tomorrowByHour = forecastDays[1].hour
-                byHour.addAll(tomorrowByHour.subList(0, nowHour))
-            }
+    private fun updateNotifications(forecast: WeatherForecast) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val notifications = weatherNotificationBuilder.buildNotificationsList(forecast)
+            _weatherNotifications.postValue(notifications)
         }
+    }
 
-        return byHour
+    private fun updateHourlyForecast(weatherForecast: WeatherForecast) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val hours = mutableListOf<Hour>()
+            val forecastDays = weatherForecast.forecast.forecastDays
+
+            if (forecastDays.isNotEmpty()) {
+                val nowHourAsInt = DateUtils.getHourFromDate(weatherForecast.location.localtime)
+                val todayHours = forecastDays.first().hours
+
+                if (todayHours.size > nowHourAsInt) {
+                    hours.addAll(todayHours.subList(nowHourAsInt, todayHours.size))
+                }
+
+                if (forecastDays.size > 1 && forecastDays[1].hours.size > nowHourAsInt + 1) {
+                    val tomorrowHours = forecastDays[1].hours
+                    hours.addAll(tomorrowHours.subList(0, nowHourAsInt + 1))
+                }
+            }
+
+            _hourlyForecast.postValue(hours)
+        }
     }
 
     fun getTempUnit(): TempUnit {

@@ -4,15 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.databinding.ItemWeatherNotificationBinding
-import com.example.weatherapp.model.WeatherNotification
+import com.example.weatherapp.notification.WeatherNotification
 
 class NotificationsPagerAdapter : RecyclerView.Adapter<NotificationsPagerAdapter.ViewHolder>() {
 
-    private var data: List<WeatherNotification> = listOf(
-        WeatherNotification("111", "222"),
-        WeatherNotification("333", "444"),
-        WeatherNotification("555", "666"),
-    )
+    private var data: List<WeatherNotification> = listOf()
 
     fun update (data: List<WeatherNotification>) {
         this.data = data

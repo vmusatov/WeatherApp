@@ -9,6 +9,7 @@ import com.example.weatherapp.databinding.ItemDailyForecastBinding
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.util.DateUtils
 import com.squareup.picasso.Picasso
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 class DailyForecastListAdapter : RecyclerView.Adapter<DailyForecastListAdapter.ViewHolder>() {
@@ -46,11 +47,11 @@ class DailyForecastListAdapter : RecyclerView.Adapter<DailyForecastListAdapter.V
             humidityValue.text = "${item.day.humidity}%"
 
             Picasso.get()
-                .load(item.hour[12].condition.icon)
+                .load(item.hours[min(12, item.hours.size)].condition.icon)
                 .into(conditionFrom)
 
             Picasso.get()
-                .load(item.hour[21].condition.icon)
+                .load(item.hours[min(21, item.hours.size)].condition.icon)
                 .into(conditionTo)
         }
     }

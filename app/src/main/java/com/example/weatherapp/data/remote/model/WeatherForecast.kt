@@ -20,13 +20,14 @@ data class Alert(
 
 data class Forecast(
     @SerializedName("forecastday")
-    val forecastDay: List<ForecastDay>
+    val forecastDays: List<ForecastDay>
 )
 
 data class ForecastDay(
     val date: String,
     val day: Day,
-    val hour: List<Hour>
+    @SerializedName("hour")
+    val hours: List<Hour>
 )
 
 data class Day(
@@ -68,12 +69,28 @@ data class Hour(
     @SerializedName("condition")
     val condition: Condition,
 
+    @SerializedName("will_it_rain")
+    val willItRain: Int,
+
     @SerializedName("chance_of_rain")
     val chanceOfRain: Int,
 
     @SerializedName("chance_of_snow")
     val chanceOfSnow: Int,
 
+    @SerializedName("will_it_snow")
+    val willItShow: Int,
+
     @SerializedName("humidity")
     val humidity: Int
-)
+) {
+    fun isRain(): Boolean =
+        willItRain != 0 || chanceOfRain > 50 || condition.text.lowercase().contains("rain")
+
+    fun isSnow(): Boolean =
+        willItShow != 0 || chanceOfSnow > 50 || condition.text.lowercase().contains("snow")
+
+    fun isHavePrecipitation(): Boolean = isRain() || isSnow()
+
+    fun isNotHavePrecipitation(): Boolean = !isHavePrecipitation()
+}

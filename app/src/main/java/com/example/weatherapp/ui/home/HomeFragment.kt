@@ -1,7 +1,6 @@
 package com.example.weatherapp.ui.home
 
 import android.os.Bundle
-import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,13 +9,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
-import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
 import com.example.weatherapp.data.remote.model.WeatherCurrent
-import com.example.weatherapp.data.remote.model.WeatherForecast
 import com.example.weatherapp.databinding.*
 import com.example.weatherapp.model.TempUnit
-import com.example.weatherapp.model.WeatherNotification
+import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.navigator
 import com.example.weatherapp.ui.viewModelFactory
@@ -86,6 +83,7 @@ class HomeFragment : Fragment() {
         viewModel.weatherForecast.observe(viewLifecycleOwner) { updateWeather() }
         viewModel.hourlyForecast.observe(viewLifecycleOwner) { updateHourlyForecast() }
         viewModel.astronomy.observe(viewLifecycleOwner) { updateAstronomy() }
+        viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
         viewModel.isUpdateInProgress.observe(viewLifecycleOwner) { showIsUpdate(it) }
     }
 
@@ -121,12 +119,22 @@ class HomeFragment : Fragment() {
             updateAdditionalWeather(it.current)
             updateAirQuality(it.current)
 
-            dailyForecastAdapter.update(it.forecast.forecastDay, tempUnit)
+            dailyForecastAdapter.update(it.forecast.forecastDays, tempUnit)
         }
     }
 
-    private fun updateNotifications(forecast: WeatherForecast) {
-
+    private fun updateNotifications(notifications: List<WeatherNotification>) {
+        if (notifications.isEmpty()) {
+            blockNotifications.root.visibility = View.GONE
+        } else {
+            notificationsAdapter.update(notifications)
+            blockNotifications.root.visibility = View.VISIBLE
+            if (notifications.size == 1) {
+                blockNotifications.tabLayout.visibility = View.GONE
+            } else {
+                blockNotifications.tabLayout.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun updateCurrentWeather(current: WeatherCurrent, tempUnit: TempUnit) {
