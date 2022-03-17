@@ -30,6 +30,9 @@ data class WeatherCurrent(
     @SerializedName("uv")
     var uvIndex: Int,
 
+    @SerializedName("pressure_mb")
+    var pressureMb: Double,
+
     @SerializedName("air_quality")
     var airQuality: AirQuality
 )

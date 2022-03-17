@@ -156,7 +156,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateAdditionalWeather(current: WeatherCurrent) {
-        blockAdditional.humidityText.text = current.humidity.toString() + "%"
+        blockAdditional.pressureText.text = getString(R.string.mbar, current.pressureMb.toInt())
         blockAdditional.windText.text = getString(R.string.kmh, current.windKph.toInt())
         blockAdditional.uvIndexText.text = viewModel.parseUvIndex(requireContext(), current.uvIndex)
     }

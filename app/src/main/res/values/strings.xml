@@ -3,6 +3,7 @@
     
     <string name="degree">%1$d°</string>
     <string name="kmh">%1$d km/h</string>
+    <string name="mbar">%1$d mbar</string>
     <string name="feels_like">Feels like: %1$d°</string>
 
     <string name="sunday">Sunday</string>
@@ -27,6 +28,7 @@
     <string name="sunset">Sunset</string>
     <string name="sunrise">Sunrise</string>
     <string name="humidity">Humidity</string>
+    <string name="pressure">Pressure</string>
     <string name="wind">Wind</string>
     <string name="uv_index">UV-index</string>
 
