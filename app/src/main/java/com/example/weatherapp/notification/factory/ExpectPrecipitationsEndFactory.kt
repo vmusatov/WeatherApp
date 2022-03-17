@@ -28,9 +28,9 @@ class ExpectPrecipitationsEndFactory : BaseWeatherNotificationFactory() {
 
         val endHourAsInt = DateUtils.getHourFromDate(endHour.time)
         return if (isTodayHour(endHour)) {
-            "${precipitationAsString(nowHour)} ends tomorrow at ${endHourAsInt}:00"
-        } else {
             "${precipitationAsString(nowHour)} ends at ${endHourAsInt}:00"
+        } else {
+            "${precipitationAsString(nowHour)} ends tomorrow at ${endHourAsInt}:00"
         }
     }
 }

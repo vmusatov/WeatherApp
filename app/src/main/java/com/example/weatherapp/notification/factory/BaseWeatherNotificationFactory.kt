@@ -15,8 +15,12 @@ abstract class BaseWeatherNotificationFactory : WeatherNotificationFactory {
     protected lateinit var nowHour: Hour
     protected var nowHourAsInt by notNull<Int>()
 
+    protected lateinit var localTime: String
+
     override fun createNotification(weatherForecast: WeatherForecast): WeatherNotification? {
         val forecast = weatherForecast.forecast
+
+        localTime = weatherForecast.location.localtime
         todayHours = forecast.forecastDays.first().hours
 
         nowHourAsInt = DateUtils.getHourFromDate(weatherForecast.location.localtime)
@@ -31,8 +35,11 @@ abstract class BaseWeatherNotificationFactory : WeatherNotificationFactory {
 
     protected abstract fun create(forecast: WeatherForecast): WeatherNotification?
 
-    protected fun isTodayHour(hour: Hour): Boolean =
-        DateUtils.getHourFromDate(hour.time) < nowHourAsInt
+    protected fun isTodayHour(hour: Hour): Boolean {
+        return hour.time.substring(0, hour.time.indexOf(" ")) ==
+                localTime.substring(0, localTime.indexOf(" "))
+    }
+
 
     protected fun precipitationAsString(hour: Hour): String =
         if (hour.isRain()) "Rain" else "Snow"
