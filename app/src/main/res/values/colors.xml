@@ -7,4 +7,5 @@
     <color name="dark_gray">#181818</color>
 
     <color name="form_stroke">#DFE5F0</color>
+    <color name="transparent">#00FF0000</color>
 </resources>
