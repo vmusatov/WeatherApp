@@ -147,9 +147,9 @@ class HomeViewModel(
                     hours.addAll(todayHours.subList(nowHourAsInt, todayHours.size))
                 }
 
-                if (forecastDays.size > 1 && forecastDays[1].hours.size > nowHourAsInt + 1) {
+                if (forecastDays.size > 1 && forecastDays[1].hours.size > nowHourAsInt) {
                     val tomorrowHours = forecastDays[1].hours
-                    hours.addAll(tomorrowHours.subList(0, nowHourAsInt + 1))
+                    hours.addAll(tomorrowHours.subList(0, nowHourAsInt))
                 }
             }
 
