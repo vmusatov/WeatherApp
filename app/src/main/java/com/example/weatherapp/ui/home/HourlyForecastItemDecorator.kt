@@ -32,6 +32,8 @@ class HourlyForecastItemDecorator(hours: List<Double>, context: Context) :
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDraw(canvas, parent, state)
 
+        val itemsCount = parent.adapter?.itemCount ?: -1
+
         val path = Path()
         var newPath = true
 
@@ -56,7 +58,7 @@ class HourlyForecastItemDecorator(hours: List<Double>, context: Context) :
             }
             path.addCircle(x, y, 5f, Path.Direction.CW)
 
-            if (childIndex == parent.childCount - 1) {
+            if (childIndex == parent.childCount - 1 && dataIndex != itemsCount - 1) {
                 drawPathForNextChildView(
                     dataIndex + 1,
                     childView.right.toFloat(),
