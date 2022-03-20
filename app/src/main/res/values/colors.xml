@@ -8,4 +8,6 @@
 
     <color name="form_stroke">#DFE5F0</color>
     <color name="transparent">#00FF0000</color>
+
+    <color name="selected">#479AFF</color>
 </resources>

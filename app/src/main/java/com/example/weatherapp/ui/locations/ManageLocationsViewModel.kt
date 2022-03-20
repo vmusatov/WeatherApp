@@ -19,4 +19,8 @@ class ManageLocationsViewModel(
     fun setLocationIsSelected(location: LocationDto) {
         locationRepository.setLocationIsSelected(location)
     }
+
+    fun updateLocationPosition(location: LocationDto, position: Int) {
+        locationRepository.updatePosition(location.url, position)
+    }
 }

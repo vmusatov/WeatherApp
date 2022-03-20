@@ -25,4 +25,7 @@ interface LocationsDao {
 
     @Update(entity = LocationEntity::class)
     fun updateLocation(locationEntity: LocationEntity)
+
+    @Query("UPDATE locations SET position = :position WHERE url = :locationUrl")
+    fun updatePosition(locationUrl: String, position: Int)
 }

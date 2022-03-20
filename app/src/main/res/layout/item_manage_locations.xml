@@ -5,32 +5,50 @@
     android:layout_width="match_parent"
     android:layout_height="70dp">
 
-    <TextView
-        android:id="@+id/location_name"
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/normal_text"
+        android:button="@drawable/checkbox_selector"
+        android:visibility="gone"
+        app:backgroundTint="@null"
+        app:buttonTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/location_desc"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="?attr/colorSecondaryVariant"
-        android:maxEms="14"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textSize="@dimen/small_text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/location_name" />
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/checkbox"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/location_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/normal_text" />
+
+        <TextView
+            android:id="@+id/location_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxEms="15"
+            android:maxLines="1"
+            android:textColor="?attr/colorSecondaryVariant"
+            android:textSize="@dimen/small_text" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/location_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/small_text"
         android:layout_marginEnd="@dimen/app_small_margin"
+        android:textSize="@dimen/small_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/location_condition"
         app:layout_constraintTop_toTopOf="parent" />
@@ -39,6 +57,16 @@
         android:id="@+id/location_condition"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/drag_drop_view"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_drag_drop"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentManageLocationsBinding
+import com.example.weatherapp.model.LocationDto
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.navigator
@@ -22,6 +24,7 @@ class ManageLocationsFragment : Fragment() {
     private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory() }
 
     private lateinit var manageLocationAdapter: ManageLocationListAdapter
+    private lateinit var touchHelper: ItemTouchHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,35 +33,46 @@ class ManageLocationsFragment : Fragment() {
     ): View {
         binding = FragmentManageLocationsBinding.inflate(inflater, container, false)
 
-        setupToolbar()
+        setupFields()
         setupUi()
+
+        homeViewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
+            manageLocationAdapter.updateLocationsInfo(it)
+        }
 
         return binding.root
     }
 
+    private fun setupFields() {
+        manageLocationAdapter = ManageLocationListAdapter(LocationsManagerImpl())
+
+        touchHelper = ItemTouchHelper(
+            LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter)
+        )
+    }
+
     private fun setupUi() {
         setupToolbar()
+        setupRecyclerView()
+    }
 
-        manageLocationAdapter = ManageLocationListAdapter {
-            viewModel.setLocationIsSelected(it)
-            homeViewModel.updateForecast()
-            homeViewModel.updateAstronomy()
-            navigator().goBack()
+    private fun setupRecyclerView() {
+        touchHelper.attachToRecyclerView(binding.locationsList)
+
+        binding.delete.setOnClickListener {
+            manageLocationAdapter.deleteSelected()
+        }
+
+        binding.apply.setOnClickListener {
+            manageLocationAdapter.switchEditMode()
         }
 
         manageLocationAdapter.tempUnit = homeViewModel.getTempUnit()
         manageLocationAdapter.update(viewModel.getLocations())
 
-        val lm = LinearLayoutManager(requireContext())
-        lm.orientation = RecyclerView.VERTICAL
-
         with(binding.locationsList) {
             adapter = manageLocationAdapter
-            layoutManager = lm
-        }
-
-        homeViewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
-            manageLocationAdapter.updateLocationsInfo(it)
+            layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
@@ -77,5 +91,37 @@ class ManageLocationsFragment : Fragment() {
                 onAction = { navigator().goToAddLocation() }
             )
         )
+    }
+
+    inner class LocationsManagerImpl : LocationsManager {
+
+        override fun onSelectLocation(location: LocationDto) {
+            viewModel.setLocationIsSelected(location)
+            homeViewModel.updateForecast()
+            homeViewModel.updateAstronomy()
+            navigator().goBack()
+        }
+
+        override fun onSwitchEditMode(editMode: Boolean) {
+            if (editMode) {
+                binding.editBlock.visibility = View.VISIBLE
+            } else {
+                binding.editBlock.visibility = View.GONE
+            }
+        }
+
+        override fun onDeleteLocations(locations: List<LocationDto>) {
+            locations.forEach { viewModel.removeLocation(it) }
+        }
+
+        override fun onApplyChanges(locations: List<LocationDto>) {
+            locations.forEachIndexed { index, location ->
+                viewModel.updateLocationPosition(location, index)
+            }
+        }
+
+        override fun onDragStart(viewHolder: RecyclerView.ViewHolder) {
+            touchHelper.startDrag(viewHolder)
+        }
     }
 }

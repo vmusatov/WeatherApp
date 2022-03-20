@@ -47,4 +47,8 @@ class LocationRepository(
 
         locationsDao.removeByUrl(location.url)
     }
+
+    fun updatePosition(locationUrl: String, position: Int) {
+        locationsDao.updatePosition(locationUrl, position)
+    }
 }
