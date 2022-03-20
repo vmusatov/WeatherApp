@@ -3,14 +3,14 @@ package com.example.weatherapp.model
 import com.example.weatherapp.data.remote.model.SearchLocation
 
 data class LocationDto (
-    val name: String,
-    val region: String,
-    val country: String,
-    val lat: Double,
-    val lon: Double,
-    val url: String,
-    val isSelected: Boolean = false,
-    val position: Int = -1,
+    var name: String,
+    var region: String,
+    var country: String,
+    var lat: Double,
+    var lon: Double,
+    var url: String,
+    var isSelected: Boolean = false,
+    var position: Int = -1,
 ) {
     companion object {
         fun fromSearchLocation(from: SearchLocation): LocationDto {

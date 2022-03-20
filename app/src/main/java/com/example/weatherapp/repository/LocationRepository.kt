@@ -51,4 +51,8 @@ class LocationRepository(
     fun updatePosition(locationUrl: String, position: Int) {
         locationsDao.updatePosition(locationUrl, position)
     }
+
+    fun getLocationsCount(): Int {
+        return locationsDao.getLocationsCount()
+    }
 }

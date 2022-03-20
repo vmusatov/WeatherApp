@@ -38,6 +38,7 @@ class AddLocationViewModel(
     }
 
     fun saveLocation(searchLocation: LocationDto) {
+        searchLocation.position = locationRepository.getLocationsCount()
         locationRepository.addLocation(searchLocation)
     }
 

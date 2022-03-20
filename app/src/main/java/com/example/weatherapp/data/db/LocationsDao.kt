@@ -17,6 +17,9 @@ interface LocationsDao {
     @Query("SELECT * FROM locations WHERE url = :url")
     fun getLocationByUrl(url: String): LocationEntity?
 
+    @Query("SELECT COUNT(*) FROM locations")
+    fun getLocationsCount(): Int
+
     @Insert(entity = LocationEntity::class)
     fun addLocation(locationEntity: LocationEntity)
 
