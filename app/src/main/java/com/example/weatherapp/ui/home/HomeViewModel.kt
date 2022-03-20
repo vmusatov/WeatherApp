@@ -13,7 +13,7 @@ import com.example.weatherapp.model.AstronomyDto
 import com.example.weatherapp.model.LocationDto
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.notification.WeatherNotification
-import com.example.weatherapp.notification.*
+import com.example.weatherapp.notification.WeatherNotificationsBuilder
 import com.example.weatherapp.notification.factory.ExpectPrecipitationsEndFactory
 import com.example.weatherapp.notification.factory.ExpectPrecipitationsFactory
 import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
@@ -40,8 +40,8 @@ class HomeViewModel(
     val hourlyForecast: LiveData<List<Hour>> get() = _hourlyForecast
     private val _hourlyForecast = MutableLiveData<List<Hour>>()
 
-    val locationsWeatherInfo: LiveData<MutableSet<LocationInfo>> get() = _locationsWeatherInfo
-    private val _locationsWeatherInfo = MutableLiveData<MutableSet<LocationInfo>>()
+    val locationsWeatherInfo: LiveData<MutableList<LocationInfo>> get() = _locationsWeatherInfo
+    private val _locationsWeatherInfo = MutableLiveData<MutableList<LocationInfo>>()
 
     val astronomy: LiveData<AstronomyDto> get() = _astronomy
     private val _astronomy = MutableLiveData<AstronomyDto>()
@@ -88,23 +88,20 @@ class HomeViewModel(
     }
 
     fun updateLocationsWeatherInfo() {
-        _locationsWeatherInfo.value = mutableSetOf()
-        weatherRepository.loadForecasts(
-            getLocations().map { it.name },
-            onSuccess = {
-                val locationInfo = LocationInfo(
-                    locationName = it.location.name,
-                    tempC = it.current.tempC,
-                    tempF = it.current.tempF,
-                    conditionIconUrl = it.current.condition.icon
-                )
-                _locationsWeatherInfo.value?.add(locationInfo)
-            },
-            onError = {
-                _isUpdateInProgress.postValue(false)
-                Log.e(it.message, TAG)
-            }
-        )
+        viewModelScope.launch {
+            val query = getLocations().map { it.url }
+            val locationsInfo = weatherRepository.loadForecasts(query)
+                .map {
+                    LocationInfo(
+                        locationName = it.location.name,
+                        tempC = it.current.tempC,
+                        tempF = it.current.tempF,
+                        conditionIconUrl = it.current.condition.icon
+                    )
+                }
+
+            _locationsWeatherInfo.postValue(locationsInfo.toMutableList())
+        }
     }
 
     fun updateAstronomy() {

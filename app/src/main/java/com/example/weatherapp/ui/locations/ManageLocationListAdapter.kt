@@ -25,14 +25,14 @@ class ManageLocationListAdapter(
 ) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>() {
 
     private var data: MutableList<LocationDto> = mutableListOf()
-    private var dataInfo: MutableSet<LocationInfo> = mutableSetOf()
+    private var dataInfo: MutableList<LocationInfo> = mutableListOf()
     var tempUnit: TempUnit = TempUnit.DEFAULT
 
     private var isEditMode = false
     private var selectedItems: MutableList<LocationDto> = mutableListOf()
 
-    fun updateLocationsInfo(info: Collection<LocationInfo>) {
-        dataInfo.addAll(info)
+    fun updateLocationsInfo(info: List<LocationInfo>) {
+        dataInfo = info.toMutableList()
         notifyDataSetChanged()
     }
 

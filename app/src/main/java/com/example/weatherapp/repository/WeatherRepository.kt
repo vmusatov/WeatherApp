@@ -5,11 +5,12 @@ import com.example.weatherapp.data.remote.ForecastApi
 import com.example.weatherapp.data.remote.model.WeatherForecast
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.ui.settings.SettingsFragment
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class WeatherRepository(
     private val appPreferences: SharedPreferences,
@@ -31,22 +32,10 @@ class WeatherRepository(
         disposeBag.add(result)
     }
 
-    fun loadForecasts(
-        q: List<String>,
-        onSuccess: Consumer<WeatherForecast>,
-        onError: Consumer<Throwable>
-    ) {
-        val result = Observable.fromIterable(q.map { forecastApi.getForecast(it) })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                val res = it.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(onSuccess, onError)
-                disposeBag.add(res)
-            }
-
-        disposeBag.add(result)
+    suspend fun loadForecasts(q: List<String>): List<WeatherForecast> {
+        return withContext(Dispatchers.IO) {
+            q.map { forecastApi.getForecast(it).blockingGet() }
+        }
     }
 
     fun getTempUnit(): TempUnit {
