@@ -23,7 +23,7 @@
     <string name="manage_locations">Manage locations</string>
     <string name="add_location">Add location</string>
     <string name="enter_location_name">Enter location name</string>
-    <string name="not_found">Not found</string>
+    <string name="nothing_found">Nothing found</string>
 
     <string name="sunset">Sunset</string>
     <string name="sunrise">Sunrise</string>

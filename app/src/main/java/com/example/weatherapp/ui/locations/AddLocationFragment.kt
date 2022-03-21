@@ -6,6 +6,9 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -16,28 +19,41 @@ import com.example.weatherapp.databinding.FragmentAddLocationBinding
 import com.example.weatherapp.ui.*
 import com.example.weatherapp.ui.home.HomeViewModel
 
-
 class AddLocationFragment : Fragment() {
 
     private lateinit var binding: FragmentAddLocationBinding
     private lateinit var manageLocationAdapter: AddLocationListAdapter
+
+    private lateinit var locationSearchText: EditText
+    private lateinit var locationsList: RecyclerView
+    private lateinit var notFound: TextView
 
     private val viewModel: AddLocationViewModel by viewModels { viewModelFactory() }
     private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory() }
 
     private val searchTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
-            val q = s.toString()
+            val q = s.toString().trim()
             if (q.isEmpty()) {
-                binding.notFound.visibility = View.GONE
-                binding.locationsList.visibility = View.GONE
+                notFound.visibility = View.GONE
+                locationsList.visibility = View.GONE
             } else {
-                viewModel.search(q.trim())
+                viewModel.search(q)
             }
         }
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    }
+
+    private val editorActionListener = TextView.OnEditorActionListener { textView, actionId, _ ->
+        val text = textView.text.toString().trim()
+        if (text.isNotEmpty() && actionId == EditorInfo.IME_ACTION_SEARCH) {
+            viewModel.search(text)
+            hideSoftKeyboard(locationSearchText)
+            return@OnEditorActionListener true
+        }
+        return@OnEditorActionListener false
     }
 
     override fun onCreateView(
@@ -47,32 +63,38 @@ class AddLocationFragment : Fragment() {
     ): View {
         binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
+        setupFields()
         setupUi()
         setupObservers()
 
         return binding.root
     }
 
-    private fun setupUi() {
-        setupToolbar()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        showSoftKeyboard(binding.location)
+    }
+
+    private fun setupFields() {
+        locationSearchText = binding.location
+        locationsList = binding.locationsList
+        notFound = binding.notFound
 
         manageLocationAdapter = AddLocationListAdapter {
             viewModel.saveLocation(it)
             homeViewModel.updateLocationsWeatherInfo()
             navigator().goBack()
         }
+    }
 
-        val lm = LinearLayoutManager(requireContext())
-        lm.orientation = RecyclerView.VERTICAL
+    private fun setupUi() {
+        setupToolbar()
 
-        with(binding.locationsList) {
-            adapter = manageLocationAdapter
-            layoutManager = lm
-        }
+        locationsList.adapter = manageLocationAdapter
+        locationsList.layoutManager = LinearLayoutManager(requireContext())
 
-        binding.location.addTextChangedListener(searchTextWatcher)
-        binding.location.requestFocus()
-
+        locationSearchText.addTextChangedListener(searchTextWatcher)
+        locationSearchText.setOnEditorActionListener(editorActionListener)
     }
 
     private fun setupToolbar() {
@@ -87,14 +109,15 @@ class AddLocationFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.searchResult.observe(viewLifecycleOwner) {
-            if(it.isEmpty()) {
-                binding.locationsList.visibility = View.GONE
-                binding.notFound.visibility = View.VISIBLE
+            if (it.isEmpty()) {
+                locationsList.visibility = View.GONE
+                notFound.visibility = View.VISIBLE
             } else {
                 val result = if (it.size > 10) it.subList(0, 10) else it
                 manageLocationAdapter.update(result)
-                binding.locationsList.visibility = View.VISIBLE
-                binding.notFound.visibility = View.GONE
+                locationsList.visibility = View.VISIBLE
+                notFound.visibility = View.GONE
+                locationsList.requestApplyInsets()
             }
         }
     }

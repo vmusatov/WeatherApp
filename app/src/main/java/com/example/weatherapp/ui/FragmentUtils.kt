@@ -1,5 +1,8 @@
 package com.example.weatherapp.ui
 
+import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AnimRes
 import androidx.annotation.AnimatorRes
 import androidx.fragment.app.Fragment
@@ -17,9 +20,19 @@ class ViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         val viewModel = when (modelClass) {
-            HomeViewModel::class.java -> HomeViewModel(app.weatherRepository, app.locationRepository, app.astronomyRepository)
-            AddLocationViewModel::class.java -> AddLocationViewModel(app.searchApi, app.locationRepository)
+            HomeViewModel::class.java -> HomeViewModel(
+                app.weatherRepository,
+                app.locationRepository,
+                app.astronomyRepository
+            )
+
+            AddLocationViewModel::class.java -> AddLocationViewModel(
+                app.searchApi,
+                app.locationRepository
+            )
+
             ManageLocationsViewModel::class.java -> ManageLocationsViewModel(app.locationRepository)
+
             else -> throw IllegalArgumentException("Unknown view model class " + modelClass.name)
         }
         return viewModel as T
@@ -33,8 +46,22 @@ data class FragmentAnimation(
     @AnimatorRes @AnimRes val popExit: Int
 )
 
-fun Fragment.viewModelFactory() = ViewModelFactory(requireContext().applicationContext as WeatherApp)
+fun Fragment.viewModelFactory() =
+    ViewModelFactory(requireContext().applicationContext as WeatherApp)
 
 fun Fragment.navigator(): Navigator {
     return requireActivity() as Navigator
+}
+
+fun Fragment.showSoftKeyboard(view: View) {
+    if (view.requestFocus()) {
+        val imm =
+            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+    }
+}
+
+fun Fragment.hideSoftKeyboard(view: View) {
+    val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(view.windowToken, 0)
 }
