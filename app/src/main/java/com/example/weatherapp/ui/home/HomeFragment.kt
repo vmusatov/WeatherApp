@@ -9,6 +9,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
 import com.example.weatherapp.data.remote.model.WeatherCurrent
 import com.example.weatherapp.databinding.*
@@ -19,6 +21,7 @@ import com.example.weatherapp.ui.navigator
 import com.example.weatherapp.ui.viewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
+
 
 class HomeFragment : Fragment() {
 
@@ -40,7 +43,7 @@ class HomeFragment : Fragment() {
     private lateinit var hourlyForecastList: RecyclerView
     private lateinit var dailyForecastList: RecyclerView
 
-    private val disableSwipeToUpdateListener = object : RecyclerView.OnScrollListener() {
+    private val disableSwipeToUpdateRVScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             when (newState) {
@@ -49,6 +52,13 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    private val disableSwipeToUpdateVPPageChangeCallback =
+        object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrollStateChanged(state: Int) {
+                binding.refreshLayout.isEnabled = state == ViewPager.SCROLL_STATE_IDLE
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,13 +105,16 @@ class HomeFragment : Fragment() {
 
         hourlyForecastList.adapter = hourlyForecastAdapter
         hourlyForecastList.layoutManager = lm
-        hourlyForecastList.addOnScrollListener(disableSwipeToUpdateListener)
+        hourlyForecastList.addOnScrollListener(disableSwipeToUpdateRVScrollListener)
         hourlyForecastList.scrollToPosition(0)
 
         dailyForecastList.adapter = dailyForecastAdapter
         dailyForecastList.layoutManager = LinearLayoutManager(requireContext())
 
         blockNotifications.notificationsPager.adapter = notificationsAdapter
+        blockNotifications.notificationsPager.registerOnPageChangeCallback(
+            disableSwipeToUpdateVPPageChangeCallback
+        )
 
         TabLayoutMediator(
             blockNotifications.tabLayout,
