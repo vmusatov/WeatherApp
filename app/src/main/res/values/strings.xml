@@ -38,17 +38,27 @@
     <string name="nitrogen_dioxide">Nitrogen dioxide (no2)</string>
     <string name="ozone">Ozone (o3)</string>
     <string name="carbon_monoxide">Carbon Monoxide (co)</string>
+
     <string name="low">Low</string>
     <string name="moderate">Moderate</string>
     <string name="high">High</string>
     <string name="very_high">Very High</string>
     <string name="extreme">Extreme</string>
     <string name="undefined">Undefined</string>
+
     <string name="good">Good</string>
     <string name="unhealthy_for_sensitive_group">Unhealthy for sensitive group</string>
     <string name="unhealthy">Unhealthy</string>
     <string name="very_unhealthy">Very Unhealthy</string>
     <string name="hazardous">Hazardous</string>
+
     <string name="powered_by_weatherapi">Powered by WeatherAPI.com</string>
 
+    <string name="unit">Unit</string>
+    <string name="use_current_location">Use current location</string>
+    <string name="agree">Agree</string>
+    <string name="about_the_app">About the app</string>
+
+    <string name="settings_menu_item_c">°C</string>
+    <string name="settings_menu_item_f">°F</string>
 </resources>

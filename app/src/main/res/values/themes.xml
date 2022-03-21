@@ -13,6 +13,8 @@
         <item name="android:windowLightStatusBar">true</item>
 
         <item name="android:textColor">@color/dark_gray</item>
+
+        <item name="android:popupMenuStyle">@style/popupMenu</item>
     </style>
 
     <style name="contentBlock">
@@ -33,5 +35,9 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">?attr/actionBarSize</item>
         <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
+    <style name="popupMenu" parent="android:Widget.Holo.Light.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/popup_menu_form</item>
     </style>
 </resources>
