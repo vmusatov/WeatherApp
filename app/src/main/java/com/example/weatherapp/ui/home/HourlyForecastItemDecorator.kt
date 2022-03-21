@@ -6,25 +6,38 @@ import android.graphics.Canvas
 import android.graphics.CornerPathEffect
 import android.graphics.Paint
 import android.graphics.Path
-import androidx.core.content.ContextCompat
+import android.util.TypedValue
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapp.R
 
 private const val STROKE_WIDTH = 4f
 private const val PATH_CORNER_RADIUS_IN_DP = 30
 private const val CHILD_HEADER_OR_FOOTER_HEIGHT_IN_DP = 12
 private const val GRAPH_START_HEIGHT_DELTA = 95
 
-class HourlyForecastItemDecorator(hours: List<Double>, context: Context) :
-    RecyclerView.ItemDecoration() {
+class HourlyForecastItemDecorator(
+    hours: List<Double>,
+    private val context: Context
+) : RecyclerView.ItemDecoration() {
 
     private val drawPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         strokeWidth = STROKE_WIDTH
         style = Paint.Style.STROKE
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
-        color = ContextCompat.getColor(context, R.color.light_gray)
+        color = getDrawColor()
         pathEffect = CornerPathEffect(PATH_CORNER_RADIUS_IN_DP.dpToPx)
+    }
+
+    @ColorInt
+    private fun getDrawColor(): Int {
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(
+            com.google.android.material.R.attr.colorSecondaryVariant,
+            typedValue,
+            true
+        )
+        return typedValue.data
     }
 
     private val normalizedHourTempValues = normalizeHourTempValues(hours)
