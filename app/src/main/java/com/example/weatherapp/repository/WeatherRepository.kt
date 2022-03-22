@@ -36,9 +36,15 @@ class WeatherRepository(
         disposeBag.add(result)
     }
 
-    suspend fun loadLocationsCurrentWeather(q: List<String>): List<LocationWeatherCurrent> {
+    suspend fun loadLocationsCurrentWeather(locations: List<String>): List<LocationWeatherCurrent>? {
         return withContext(Dispatchers.IO) {
-            q.map { weatherApi.getCurrent(it).blockingGet() }
+            locations.map {
+                try {
+                    weatherApi.getCurrent(it).blockingGet()
+                } catch (e: Throwable) {
+                    return@withContext null
+                }
+            }
         }
     }
 

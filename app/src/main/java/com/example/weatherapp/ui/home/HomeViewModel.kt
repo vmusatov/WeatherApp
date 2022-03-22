@@ -80,7 +80,6 @@ class HomeViewModel(
                 },
                 onError = {
                     _isUpdateInProgress.postValue(false)
-                    Log.e(it.message, TAG)
                 })
         }
     }
@@ -88,8 +87,8 @@ class HomeViewModel(
     fun updateLocationsWeatherInfo() {
         viewModelScope.launch {
             val query = getLocations().map { it.url }
-            val locationsInfo = weatherRepository.loadLocationsCurrentWeather(query)
-                .map {
+            weatherRepository.loadLocationsCurrentWeather(query)?.let { response ->
+                val locationsInfo = response.map {
                     LocationWeatherInfo(
                         locationName = it.location.name,
                         tempC = it.current.tempC,
@@ -97,28 +96,24 @@ class HomeViewModel(
                         conditionIconUrl = it.current.condition.icon
                     )
                 }
-
-            _locationsWeatherCurrent.postValue(locationsInfo.toMutableList())
+                _locationsWeatherCurrent.postValue(locationsInfo.toMutableList())
+            }
         }
     }
 
     fun updateAstronomy() {
         val location = getSelectedLocation()
         location?.let {
-            _isUpdateInProgress.value = true
             weatherRepository.loadAstronomy("${location.lat}, ${location.lon}",
                 onSuccess = {
-                    _isUpdateInProgress.postValue(false)
                     _astronomy.value = AstronomyDto(
                         it.location.name,
                         it.astronomy.astro.sunrise,
                         it.astronomy.astro.sunset
                     )
                 },
-                onError = {
-                    _isUpdateInProgress.postValue(false)
-                    Log.e(it.message, TAG)
-                })
+                onError = {}
+            )
         }
     }
 
