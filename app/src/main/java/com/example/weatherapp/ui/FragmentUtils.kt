@@ -22,14 +22,10 @@ class ViewModelFactory(
         val viewModel = when (modelClass) {
             HomeViewModel::class.java -> HomeViewModel(
                 app.weatherRepository,
-                app.locationRepository,
-                app.astronomyRepository
-            )
-
-            AddLocationViewModel::class.java -> AddLocationViewModel(
-                app.searchApi,
                 app.locationRepository
             )
+
+            AddLocationViewModel::class.java -> AddLocationViewModel(app.locationRepository)
 
             ManageLocationsViewModel::class.java -> ManageLocationsViewModel(app.locationRepository)
 

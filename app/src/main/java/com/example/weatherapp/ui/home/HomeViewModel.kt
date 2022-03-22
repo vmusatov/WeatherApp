@@ -18,7 +18,6 @@ import com.example.weatherapp.notification.factory.ExpectPrecipitationsEndFactor
 import com.example.weatherapp.notification.factory.ExpectPrecipitationsFactory
 import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
 import com.example.weatherapp.notification.factory.TempTomorrowFactory
-import com.example.weatherapp.repository.AstronomyRepository
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import com.example.weatherapp.ui.locations.LocationInfo
@@ -28,8 +27,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val weatherRepository: WeatherRepository,
-    private val locationRepository: LocationRepository,
-    private val astronomyRepository: AstronomyRepository
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     private val TAG = HomeViewModel::class.java.simpleName
@@ -108,7 +106,7 @@ class HomeViewModel(
         val location = getSelectedLocation()
         location?.let {
             _isUpdateInProgress.value = true
-            astronomyRepository.loadAstronomy("${location.lat}, ${location.lon}",
+            weatherRepository.loadAstronomy("${location.lat}, ${location.lon}",
                 onSuccess = {
                     _isUpdateInProgress.postValue(false)
                     _astronomy.value = AstronomyDto(
@@ -195,7 +193,6 @@ class HomeViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        weatherRepository.dispose()
-        astronomyRepository.dispose()
+        weatherRepository.clear()
     }
 }

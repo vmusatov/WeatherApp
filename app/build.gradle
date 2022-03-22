@@ -4,6 +4,9 @@ plugins {
     id 'kotlin-kapt'
 }
 
+Properties appProperties = new Properties()
+appProperties.load(project.rootProject.file("app.properties").newDataInputStream())
+
 android {
     compileSdk 31
 
@@ -13,6 +16,8 @@ android {
         targetSdk 31
         versionCode 1
         versionName "1.0"
+
+        buildConfigField 'String', 'weatherApiKey', appProperties.getProperty("weatherApiKey")
 
         kapt {
             arguments {

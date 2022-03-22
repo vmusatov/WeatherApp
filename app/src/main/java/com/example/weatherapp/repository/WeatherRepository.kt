@@ -1,20 +1,23 @@
 package com.example.weatherapp.repository
 
 import android.content.SharedPreferences
-import com.example.weatherapp.data.remote.ForecastApi
+import com.example.weatherapp.data.remote.WeatherApi
+import com.example.weatherapp.data.remote.model.Astronomy
 import com.example.weatherapp.data.remote.model.WeatherForecast
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.ui.settings.SettingsFragment
+import com.example.weatherapp.util.DateUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.*
 
 class WeatherRepository(
     private val appPreferences: SharedPreferences,
-    private val forecastApi: ForecastApi,
+    private val weatherApi: WeatherApi,
 ) {
 
     private val disposeBag = CompositeDisposable()
@@ -24,7 +27,7 @@ class WeatherRepository(
         onSuccess: Consumer<WeatherForecast>,
         onError: Consumer<Throwable>
     ) {
-        val result = forecastApi.getForecast(q)
+        val result = weatherApi.getForecast(q)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(onSuccess, onError)
@@ -34,8 +37,21 @@ class WeatherRepository(
 
     suspend fun loadForecasts(q: List<String>): List<WeatherForecast> {
         return withContext(Dispatchers.IO) {
-            q.map { forecastApi.getForecast(it).blockingGet() }
+            q.map { weatherApi.getForecast(it).blockingGet() }
         }
+    }
+
+    fun loadAstronomy(
+        q: String,
+        onSuccess: Consumer<Astronomy>,
+        onError: Consumer<Throwable>
+    ) {
+        val result = weatherApi.getAstronomy(q, DateUtils.dateFormat.format(Date()))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(onSuccess, onError)
+
+        disposeBag.add(result)
     }
 
     fun getTempUnit(): TempUnit {
@@ -50,7 +66,7 @@ class WeatherRepository(
             .apply()
     }
 
-    fun dispose() {
-        disposeBag.dispose()
+    fun clear() {
+        disposeBag.clear()
     }
 }

@@ -2,11 +2,33 @@ package com.example.weatherapp.repository
 
 import com.example.weatherapp.data.db.LocationEntity
 import com.example.weatherapp.data.db.LocationsDao
+import com.example.weatherapp.data.remote.WeatherApi
+import com.example.weatherapp.data.remote.model.SearchLocation
 import com.example.weatherapp.model.LocationDto
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 
 class LocationRepository(
+    private val weatherApi: WeatherApi,
     private val locationsDao: LocationsDao
 ) {
+
+    private val disposeBag = CompositeDisposable()
+
+    fun loadSearchAutocomplete(
+        q: String,
+        onSuccess: Consumer<List<SearchLocation>>,
+        onError: Consumer<Throwable>
+    ) {
+        val result = weatherApi.getSearchResult(q)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(onSuccess, onError)
+
+        disposeBag.add(result)
+    }
 
     fun getSelectedLocation(): LocationDto? {
         return locationsDao.getSelectedLocation()?.toLocationDto()
@@ -54,5 +76,9 @@ class LocationRepository(
 
     fun getLocationsCount(): Int {
         return locationsDao.getLocationsCount()
+    }
+
+    fun clear() {
+        disposeBag.clear()
     }
 }

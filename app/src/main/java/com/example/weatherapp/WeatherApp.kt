@@ -7,10 +7,7 @@ import androidx.room.Room
 import com.example.weatherapp.data.db.AppDatabase
 import com.example.weatherapp.data.db.MIGRATION_1_2
 import com.example.weatherapp.data.db.MIGRATION_2_3
-import com.example.weatherapp.data.remote.AstronomyApi
-import com.example.weatherapp.data.remote.ForecastApi
-import com.example.weatherapp.data.remote.SearchApi
-import com.example.weatherapp.repository.AstronomyRepository
+import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import com.squareup.picasso.Picasso
@@ -23,33 +20,27 @@ import retrofit2.converter.gson.GsonConverterFactory
 class WeatherApp : Application() {
     private lateinit var retrofit: Retrofit
 
-    lateinit var searchApi: SearchApi
-    lateinit var astronomyApi: AstronomyApi
-
     private lateinit var db: AppDatabase
+
+    private lateinit var weatherApi: WeatherApi
 
     lateinit var weatherRepository: WeatherRepository
     lateinit var locationRepository: LocationRepository
-    lateinit var astronomyRepository: AstronomyRepository
 
     private lateinit var appPreferences: SharedPreferences
 
     override fun onCreate() {
         super.onCreate()
-
         appPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
 
         createDb()
         configureRetrofit()
         configurePicasso()
 
-        val forecastApi = retrofit.create(ForecastApi::class.java)
-        searchApi = retrofit.create(SearchApi::class.java)
-        astronomyApi = retrofit.create(AstronomyApi::class.java)
+        weatherApi = retrofit.create(WeatherApi::class.java)
 
-        weatherRepository = WeatherRepository(appPreferences, forecastApi)
-        locationRepository = LocationRepository(db.getLocationsDao())
-        astronomyRepository = AstronomyRepository(astronomyApi)
+        weatherRepository = WeatherRepository(appPreferences, weatherApi)
+        locationRepository = LocationRepository(weatherApi, db.getLocationsDao())
     }
 
     private fun createDb() {
