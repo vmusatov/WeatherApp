@@ -1,7 +1,6 @@
 package com.example.weatherapp.ui.home
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -69,13 +68,14 @@ class HomeViewModel(
 
     fun updateForecast() {
         val location = getSelectedLocation()
-        location?.let {
+        location?.let { selectedLocation ->
             _isUpdateInProgress.value = true
-            weatherRepository.loadForecast("${location.lat}, ${location.lon}",
+            weatherRepository.loadForecast("${selectedLocation.lat}, ${selectedLocation.lon}",
                 onSuccess = {
                     _weatherForecast.postValue(it)
                     updateHourlyForecast(it)
                     updateNotifications(it)
+                    locationRepository.setLastUpdatedIsNow(selectedLocation.url)
                     _isUpdateInProgress.postValue(false)
                 },
                 onError = {

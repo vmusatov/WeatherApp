@@ -5,10 +5,12 @@ import com.example.weatherapp.data.db.LocationsDao
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.SearchLocation
 import com.example.weatherapp.model.LocationDto
+import com.example.weatherapp.util.DateUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 class LocationRepository(
     private val weatherApi: WeatherApi,
@@ -72,6 +74,10 @@ class LocationRepository(
 
     fun updatePosition(locationUrl: String, position: Int) {
         locationsDao.updatePosition(locationUrl, position)
+    }
+
+    fun setLastUpdatedIsNow(locationUrl: String) {
+        locationsDao.locationUpdated(locationUrl, DateUtils.dateTimeToString(Date()))
     }
 
     fun getLocationsCount(): Int {
