@@ -25,7 +25,7 @@ interface WeatherApi {
         @Query("aqi") aqi: String = "yes",
         @Query("alerts") alerts: String = "yes",
         @Query("key") key: String = KEY
-    ): Single<WeatherForecast>
+    ): Single<LocationWeatherForecast>
 
     @GET("astronomy.json")
     fun getAstronomy(

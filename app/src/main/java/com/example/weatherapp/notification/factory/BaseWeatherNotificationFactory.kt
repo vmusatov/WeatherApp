@@ -1,7 +1,7 @@
 package com.example.weatherapp.notification.factory
 
 import com.example.weatherapp.data.remote.model.Hour
-import com.example.weatherapp.data.remote.model.WeatherForecast
+import com.example.weatherapp.data.remote.model.LocationWeatherForecast
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.util.DateUtils
 import kotlin.properties.Delegates.notNull
@@ -17,7 +17,7 @@ abstract class BaseWeatherNotificationFactory : WeatherNotificationFactory {
 
     protected lateinit var localTime: String
 
-    override fun createNotification(weatherForecast: WeatherForecast): WeatherNotification? {
+    override fun createNotification(weatherForecast: LocationWeatherForecast): WeatherNotification? {
         val forecast = weatherForecast.forecast
 
         localTime = weatherForecast.location.localtime
@@ -33,7 +33,7 @@ abstract class BaseWeatherNotificationFactory : WeatherNotificationFactory {
         return create(weatherForecast)
     }
 
-    protected abstract fun create(forecast: WeatherForecast): WeatherNotification?
+    protected abstract fun create(forecast: LocationWeatherForecast): WeatherNotification?
 
     protected fun isTodayHour(hour: Hour): Boolean {
         return hour.time.substring(0, hour.time.indexOf(" ")) ==

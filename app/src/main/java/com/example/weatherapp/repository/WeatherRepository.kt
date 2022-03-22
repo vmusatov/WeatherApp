@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.Astronomy
 import com.example.weatherapp.data.remote.model.LocationWeatherCurrent
-import com.example.weatherapp.data.remote.model.WeatherForecast
+import com.example.weatherapp.data.remote.model.LocationWeatherForecast
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.ui.settings.SettingsFragment
 import com.example.weatherapp.util.DateUtils
@@ -25,7 +25,7 @@ class WeatherRepository(
 
     fun loadForecast(
         q: String,
-        onSuccess: Consumer<WeatherForecast>,
+        onSuccess: Consumer<LocationWeatherForecast>,
         onError: Consumer<Throwable>
     ) {
         val result = weatherApi.getForecast(q)

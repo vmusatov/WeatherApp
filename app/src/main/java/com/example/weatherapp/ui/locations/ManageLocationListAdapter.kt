@@ -13,7 +13,7 @@ import com.example.weatherapp.model.TempUnit
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
 
-data class LocationInfo(
+data class LocationWeatherInfo(
     val locationName: String,
     val tempC: Double,
     val tempF: Double,
@@ -25,13 +25,13 @@ class ManageLocationListAdapter(
 ) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>() {
 
     private var data: MutableList<LocationDto> = mutableListOf()
-    private var dataInfo: MutableList<LocationInfo> = mutableListOf()
+    private var dataInfo: MutableList<LocationWeatherInfo> = mutableListOf()
     var tempUnit: TempUnit = TempUnit.DEFAULT
 
     private var isEditMode = false
     private var selectedItems: MutableList<LocationDto> = mutableListOf()
 
-    fun updateLocationsInfo(info: List<LocationInfo>) {
+    fun updateLocationsInfo(info: List<LocationWeatherInfo>) {
         dataInfo = info.toMutableList()
         notifyDataSetChanged()
     }

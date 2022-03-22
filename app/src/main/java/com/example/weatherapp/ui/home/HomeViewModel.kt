@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.R
 import com.example.weatherapp.data.remote.model.Hour
-import com.example.weatherapp.data.remote.model.WeatherForecast
+import com.example.weatherapp.data.remote.model.LocationWeatherForecast
 import com.example.weatherapp.model.AstronomyDto
 import com.example.weatherapp.model.LocationDto
 import com.example.weatherapp.model.TempUnit
@@ -20,7 +20,7 @@ import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
 import com.example.weatherapp.notification.factory.TempTomorrowFactory
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
-import com.example.weatherapp.ui.locations.LocationInfo
+import com.example.weatherapp.ui.locations.LocationWeatherInfo
 import com.example.weatherapp.util.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,14 +32,14 @@ class HomeViewModel(
 
     private val TAG = HomeViewModel::class.java.simpleName
 
-    val weatherForecast: LiveData<WeatherForecast> get() = _weatherForecast
-    private val _weatherForecast = MutableLiveData<WeatherForecast>()
+    val weatherForecast: LiveData<LocationWeatherForecast> get() = _weatherForecast
+    private val _weatherForecast = MutableLiveData<LocationWeatherForecast>()
 
     val hourlyForecast: LiveData<List<Hour>> get() = _hourlyForecast
     private val _hourlyForecast = MutableLiveData<List<Hour>>()
 
-    val locationsWeatherCurrent: LiveData<MutableList<LocationInfo>> get() = _locationsWeatherCurrent
-    private val _locationsWeatherCurrent = MutableLiveData<MutableList<LocationInfo>>()
+    val locationsWeatherCurrent: LiveData<MutableList<LocationWeatherInfo>> get() = _locationsWeatherCurrent
+    private val _locationsWeatherCurrent = MutableLiveData<MutableList<LocationWeatherInfo>>()
 
     val astronomy: LiveData<AstronomyDto> get() = _astronomy
     private val _astronomy = MutableLiveData<AstronomyDto>()
@@ -90,7 +90,7 @@ class HomeViewModel(
             val query = getLocations().map { it.url }
             val locationsInfo = weatherRepository.loadLocationsCurrentWeather(query)
                 .map {
-                    LocationInfo(
+                    LocationWeatherInfo(
                         locationName = it.location.name,
                         tempC = it.current.tempC,
                         tempF = it.current.tempF,
@@ -122,14 +122,14 @@ class HomeViewModel(
         }
     }
 
-    private fun updateNotifications(forecast: WeatherForecast) {
+    private fun updateNotifications(forecast: LocationWeatherForecast) {
         viewModelScope.launch(Dispatchers.IO) {
             val notifications = weatherNotificationBuilder.buildNotificationsList(forecast)
             _weatherNotifications.postValue(notifications)
         }
     }
 
-    private fun updateHourlyForecast(weatherForecast: WeatherForecast) {
+    private fun updateHourlyForecast(weatherForecast: LocationWeatherForecast) {
         viewModelScope.launch(Dispatchers.IO) {
             val hours = mutableListOf<Hour>()
             val forecastDays = weatherForecast.forecast.forecastDays

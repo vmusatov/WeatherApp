@@ -1,13 +1,13 @@
 package com.example.weatherapp.notification.factory
 
 import com.example.weatherapp.data.remote.model.Hour
-import com.example.weatherapp.data.remote.model.WeatherForecast
+import com.example.weatherapp.data.remote.model.LocationWeatherForecast
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.util.DateUtils
 
 class ExpectPrecipitationsFactory : BaseWeatherNotificationFactory() {
 
-    override fun create(forecast: WeatherForecast): WeatherNotification? {
+    override fun create(forecast: LocationWeatherForecast): WeatherNotification? {
 
         if (nowHour.isHavePrecipitation()) {
             return null

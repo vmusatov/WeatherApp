@@ -1,11 +1,11 @@
 package com.example.weatherapp.notification.factory
 
-import com.example.weatherapp.data.remote.model.WeatherForecast
+import com.example.weatherapp.data.remote.model.LocationWeatherForecast
 import com.example.weatherapp.notification.WeatherNotification
 
 class NoPrecipitationsFactory : BaseWeatherNotificationFactory() {
 
-    override fun create(forecast: WeatherForecast): WeatherNotification? {
+    override fun create(forecast: LocationWeatherForecast): WeatherNotification? {
 
         val hourWithRain = todayRemainingHours.firstOrNull { it.isRain() }
         val hourWithSnow = todayRemainingHours.firstOrNull { it.isSnow() }

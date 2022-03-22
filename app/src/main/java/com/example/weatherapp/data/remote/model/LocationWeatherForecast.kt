@@ -2,7 +2,7 @@ package com.example.weatherapp.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class WeatherForecast(
+data class LocationWeatherForecast(
     val location: Location,
     val current: WeatherCurrent,
     val forecast: Forecast,
