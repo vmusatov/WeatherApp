@@ -36,7 +36,7 @@ class ManageLocationsFragment : Fragment() {
         setupFields()
         setupUi()
 
-        homeViewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
+        homeViewModel.locationsWeatherCurrent.observe(viewLifecycleOwner) {
             manageLocationAdapter.updateLocationsInfo(it)
         }
 

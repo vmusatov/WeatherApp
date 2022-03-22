@@ -38,8 +38,8 @@ class HomeViewModel(
     val hourlyForecast: LiveData<List<Hour>> get() = _hourlyForecast
     private val _hourlyForecast = MutableLiveData<List<Hour>>()
 
-    val locationsWeatherInfo: LiveData<MutableList<LocationInfo>> get() = _locationsWeatherInfo
-    private val _locationsWeatherInfo = MutableLiveData<MutableList<LocationInfo>>()
+    val locationsWeatherCurrent: LiveData<MutableList<LocationInfo>> get() = _locationsWeatherCurrent
+    private val _locationsWeatherCurrent = MutableLiveData<MutableList<LocationInfo>>()
 
     val astronomy: LiveData<AstronomyDto> get() = _astronomy
     private val _astronomy = MutableLiveData<AstronomyDto>()
@@ -88,7 +88,7 @@ class HomeViewModel(
     fun updateLocationsWeatherInfo() {
         viewModelScope.launch {
             val query = getLocations().map { it.url }
-            val locationsInfo = weatherRepository.loadForecasts(query)
+            val locationsInfo = weatherRepository.loadLocationsCurrentWeather(query)
                 .map {
                     LocationInfo(
                         locationName = it.location.name,
@@ -98,7 +98,7 @@ class HomeViewModel(
                     )
                 }
 
-            _locationsWeatherInfo.postValue(locationsInfo.toMutableList())
+            _locationsWeatherCurrent.postValue(locationsInfo.toMutableList())
         }
     }
 

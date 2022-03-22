@@ -3,6 +3,7 @@ package com.example.weatherapp.repository
 import android.content.SharedPreferences
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.Astronomy
+import com.example.weatherapp.data.remote.model.LocationWeatherCurrent
 import com.example.weatherapp.data.remote.model.WeatherForecast
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.ui.settings.SettingsFragment
@@ -35,9 +36,9 @@ class WeatherRepository(
         disposeBag.add(result)
     }
 
-    suspend fun loadForecasts(q: List<String>): List<WeatherForecast> {
+    suspend fun loadLocationsCurrentWeather(q: List<String>): List<LocationWeatherCurrent> {
         return withContext(Dispatchers.IO) {
-            q.map { weatherApi.getForecast(it).blockingGet() }
+            q.map { weatherApi.getCurrent(it).blockingGet() }
         }
     }
 
