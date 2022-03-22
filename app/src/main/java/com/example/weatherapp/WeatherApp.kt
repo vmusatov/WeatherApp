@@ -7,6 +7,7 @@ import androidx.room.Room
 import com.example.weatherapp.data.db.AppDatabase
 import com.example.weatherapp.data.db.MIGRATION_1_2
 import com.example.weatherapp.data.db.MIGRATION_2_3
+import com.example.weatherapp.data.db.MIGRATION_3_4
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
@@ -45,7 +46,7 @@ class WeatherApp : Application() {
 
     private fun createDb() {
         db = Room.databaseBuilder(this, AppDatabase::class.java, "database.db")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .allowMainThreadQueries()
             .build()
     }
