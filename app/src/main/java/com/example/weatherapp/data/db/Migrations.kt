@@ -20,3 +20,9 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         database.execSQL("ALTER TABLE locations ADD COLUMN last_updated TEXT DEFAULT NULL")
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE locations ADD COLUMN localtime TEXT NOT NULL DEFAULT ''")
+    }
+}

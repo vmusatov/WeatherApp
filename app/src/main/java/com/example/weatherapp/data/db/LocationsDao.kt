@@ -33,5 +33,8 @@ interface LocationsDao {
     suspend fun updatePosition(locationUrl: String, position: Int)
 
     @Query("UPDATE locations SET last_updated = :dateTime WHERE url = :locationUrl")
-    suspend fun locationUpdated(locationUrl: String, dateTime: String)
+    suspend fun updateLastUpdated(locationUrl: String, dateTime: String)
+
+    @Query("UPDATE locations SET localtime = :localtime WHERE url = :locationUrl")
+    suspend fun updateLocaltime(locationUrl: String, localtime: String)
 }

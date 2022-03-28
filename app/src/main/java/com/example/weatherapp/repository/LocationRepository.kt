@@ -75,8 +75,12 @@ class LocationRepository(
         locationsDao.updatePosition(locationUrl, position)
     }
 
+    suspend fun updateLocalTime(locationUrl: String, localtime: String) {
+        locationsDao.updateLocaltime(locationUrl, localtime)
+    }
+
     suspend fun setLastUpdatedIsNow(locationUrl: String) {
-        locationsDao.locationUpdated(locationUrl, DateUtils.dateTimeToString(Date()))
+        locationsDao.updateLastUpdated(locationUrl, DateUtils.dateTimeToString(Date()))
     }
 
     suspend fun getLocationsCount(): Int {

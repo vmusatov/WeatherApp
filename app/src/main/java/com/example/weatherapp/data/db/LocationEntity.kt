@@ -14,6 +14,9 @@ data class LocationEntity(
     @ColumnInfo(name = "name")
     var name: String,
 
+    @ColumnInfo(name = "localtime")
+    var localtime: String,
+
     @ColumnInfo(name = "region")
     var region: String,
 

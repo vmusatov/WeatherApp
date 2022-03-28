@@ -6,9 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.R
-import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.model.Astronomy
 import com.example.weatherapp.model.Location
+import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.notification.WeatherNotificationsBuilder
@@ -74,15 +74,16 @@ class HomeViewModel(
                 _weatherData.postValue(data)
                 _isUpdateInProgress.postValue(false)
 
-                setLocationLastIUpdatedIsNow(selectedLocation)
+                updateLocation(selectedLocation.url, data.location)
             },
             onError = {
                 _isUpdateInProgress.postValue(false)
             })
     }
 
-    private fun setLocationLastIUpdatedIsNow(location: Location) = viewModelScope.launch {
-        locationRepository.setLastUpdatedIsNow(location.url)
+    private fun updateLocation(url: String, location: Location) = viewModelScope.launch {
+        locationRepository.setLastUpdatedIsNow(url)
+        locationRepository.updateLocalTime(url, location.localtime)
     }
 
     private fun updateAstronomy(selectedLocation: Location) {

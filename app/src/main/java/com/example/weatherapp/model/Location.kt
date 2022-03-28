@@ -23,6 +23,7 @@ data class Location(
         return LocationEntity(
             id = 0,
             name = name,
+            localtime = localtime,
             region = region,
             country = country,
             lat = lat,
@@ -39,7 +40,7 @@ data class Location(
             val lastUpdated = from.lastUpdated?.let { DateUtils.dateTimeFromString(it) }
             return Location(
                 name = from.name,
-                localtime = "",
+                localtime = from.localtime,
                 region = from.region,
                 country = from.country,
                 lat = from.lat,
