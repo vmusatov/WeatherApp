@@ -10,6 +10,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class LocationRepository(
@@ -18,6 +20,18 @@ class LocationRepository(
 ) {
 
     private val disposeBag = CompositeDisposable()
+
+    suspend fun addLocation(location: LocationDto) {
+        locationsDao.addLocation(LocationEntity.fromLocationDto(location))
+    }
+
+    suspend fun getSelectedLocation(): LocationDto? {
+        return locationsDao.getSelectedLocation()?.toLocationDto()
+    }
+
+    suspend fun getAllLocations(): List<LocationDto> {
+        return locationsDao.getAllLocations().map { it.toLocationDto() }
+    }
 
     fun loadSearchAutocomplete(
         q: String,
@@ -32,59 +46,45 @@ class LocationRepository(
         disposeBag.add(result)
     }
 
-    fun getSelectedLocation(): LocationDto? {
-        return locationsDao.getSelectedLocation()?.toLocationDto()
-    }
-
-    fun getLocations(): List<LocationDto> {
-        return locationsDao.getLocations().map { it.toLocationDto() }
-    }
-
-    fun setLocationIsSelected(location: LocationDto) {
-        val new = locationsDao.getLocationByUrl(location.url)
-        new?.let {
-            val old = locationsDao.getSelectedLocation()
-            old?.let {
-                it.isSelected = 0
-                locationsDao.updateLocation(it)
+    suspend fun setLocationIsSelected(location: LocationDto) {
+        locationsDao.getLocationByUrl(location.url)?.let { new ->
+            locationsDao.getSelectedLocation()?.let { old ->
+                old.isSelected = 0
+                locationsDao.updateLocation(old)
             }
 
-            it.isSelected = 1
-            locationsDao.updateLocation(it)
+            new.isSelected = 1
+            locationsDao.updateLocation(new)
         }
     }
 
-    fun addLocation(location: LocationDto) {
-        locationsDao.addLocation(LocationEntity.fromLocationDto(location))
-    }
+    suspend fun removeLocation(location: LocationDto) {
+        locationsDao.getLocationByUrl(location.url)?.let { entity ->
+            if (entity.isSelected == 1) {
+                val notSelectedLocation =
+                    locationsDao.getAllLocations().firstOrNull { it.isSelected == 0 }
 
-    fun removeLocation(location: LocationDto) {
-        val fromDb = locationsDao.getLocationByUrl(location.url)
-        fromDb?.let {
-            if (it.isSelected == 1) {
-                val lastLocations = locationsDao.getLocations().first { it.isSelected == 0 }
-
-                lastLocations.isSelected = 1
-                locationsDao.updateLocation(lastLocations)
+                notSelectedLocation?.let {
+                    it.isSelected = 1
+                    locationsDao.updateLocation(it)
+                }
             }
         }
 
         locationsDao.removeByUrl(location.url)
     }
 
-    fun updatePosition(locationUrl: String, position: Int) {
+    suspend fun updatePosition(locationUrl: String, position: Int) {
         locationsDao.updatePosition(locationUrl, position)
     }
 
-    fun setLastUpdatedIsNow(locationUrl: String) {
+    suspend fun setLastUpdatedIsNow(locationUrl: String) {
         locationsDao.locationUpdated(locationUrl, DateUtils.dateTimeToString(Date()))
     }
 
-    fun getLocationsCount(): Int {
+    suspend fun getLocationsCount(): Int {
         return locationsDao.getLocationsCount()
     }
 
-    fun clear() {
-        disposeBag.clear()
-    }
+    fun clear() = disposeBag.clear()
 }

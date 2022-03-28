@@ -19,9 +19,9 @@ import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
 import com.example.weatherapp.notification.factory.TempTomorrowFactory
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
-import com.example.weatherapp.ui.locations.LocationWeatherInfo
 import com.example.weatherapp.util.DateUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -31,14 +31,14 @@ class HomeViewModel(
 
     private val TAG = HomeViewModel::class.java.simpleName
 
+    val selectedLocation: LiveData<LocationDto> get() = _selectedLocation
+    private val _selectedLocation = MutableLiveData<LocationDto>()
+
     val weatherForecast: LiveData<LocationWeatherForecast> get() = _weatherForecast
     private val _weatherForecast = MutableLiveData<LocationWeatherForecast>()
 
     val hourlyForecast: LiveData<List<Hour>> get() = _hourlyForecast
     private val _hourlyForecast = MutableLiveData<List<Hour>>()
-
-    val locationsWeatherCurrent: LiveData<MutableList<LocationWeatherInfo>> get() = _locationsWeatherCurrent
-    private val _locationsWeatherCurrent = MutableLiveData<MutableList<LocationWeatherInfo>>()
 
     val astronomy: LiveData<AstronomyDto> get() = _astronomy
     private val _astronomy = MutableLiveData<AstronomyDto>()
@@ -57,94 +57,79 @@ class HomeViewModel(
         weatherNotificationBuilder.addFactory(ExpectPrecipitationsEndFactory())
         weatherNotificationBuilder.addFactory(TempTomorrowFactory())
 
-        updateAll()
+        updateWeather()
     }
 
-    fun updateAll() {
-        updateForecast()
-        updateAstronomy()
-        updateLocationsWeatherInfo()
-    }
-
-    fun updateForecast() {
-        val location = getSelectedLocation()
-        location?.let { selectedLocation ->
-            _isUpdateInProgress.value = true
-            weatherRepository.loadForecast("${selectedLocation.lat}, ${selectedLocation.lon}",
-                onSuccess = {
-                    _weatherForecast.postValue(it)
-                    updateHourlyForecast(it)
-                    updateNotifications(it)
-                    locationRepository.setLastUpdatedIsNow(selectedLocation.url)
-                    _isUpdateInProgress.postValue(false)
-                },
-                onError = {
-                    _isUpdateInProgress.postValue(false)
-                })
-        }
-    }
-
-    fun updateLocationsWeatherInfo() {
-        viewModelScope.launch {
-            val query = getLocations().map { it.url }
-            weatherRepository.loadLocationsCurrentWeather(query)?.let { response ->
-                val locationsInfo = response.map {
-                    LocationWeatherInfo(
-                        locationName = it.location.name,
-                        tempC = it.current.tempC,
-                        tempF = it.current.tempF,
-                        conditionIconUrl = it.current.condition.icon
-                    )
+    fun updateWeather(selectedLocation: LocationDto? = null) = viewModelScope.launch {
+            val location = selectedLocation ?: locationRepository.getSelectedLocation()
+            location?.let {
+                _selectedLocation.postValue(it)
+                if (!it.isSelected) {
+                    locationRepository.setLocationIsSelected(it)
                 }
-                _locationsWeatherCurrent.postValue(locationsInfo.toMutableList())
+
+                updateForecast(location)
+                updateAstronomy(location)
             }
         }
+
+    private fun updateForecast(selectedLocation: LocationDto) {
+        _isUpdateInProgress.postValue(true)
+        weatherRepository.loadForecast("${selectedLocation.lat}, ${selectedLocation.lon}",
+            onSuccess = {
+                updateHourlyForecast(it)
+                updateNotifications(it)
+                _weatherForecast.postValue(it)
+                _isUpdateInProgress.postValue(false)
+
+                setLocationLastIUpdatedIsNow(selectedLocation)
+            },
+            onError = {
+                _isUpdateInProgress.postValue(false)
+            })
     }
 
-    fun updateAstronomy() {
-        val location = getSelectedLocation()
-        location?.let {
-            weatherRepository.loadAstronomy("${location.lat}, ${location.lon}",
-                onSuccess = {
-                    _astronomy.value = AstronomyDto(
-                        it.location.name,
-                        it.astronomy.astro.sunrise,
-                        it.astronomy.astro.sunset
-                    )
-                },
-                onError = {}
-            )
-        }
+    private fun setLocationLastIUpdatedIsNow(location: LocationDto) = viewModelScope.launch {
+        locationRepository.setLastUpdatedIsNow(location.url)
+    }
+
+    private fun updateAstronomy(selectedLocation: LocationDto) {
+        weatherRepository.loadAstronomy("${selectedLocation.lat}, ${selectedLocation.lon}",
+            onSuccess = {
+                _astronomy.value = AstronomyDto(
+                    it.location.name,
+                    it.astronomy.astro.sunrise,
+                    it.astronomy.astro.sunset
+                )
+            },
+            onError = {}
+        )
     }
 
     private fun updateNotifications(forecast: LocationWeatherForecast) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val notifications = weatherNotificationBuilder.buildNotificationsList(forecast)
-            _weatherNotifications.postValue(notifications)
-        }
+        val notifications = weatherNotificationBuilder.buildNotificationsList(forecast)
+        _weatherNotifications.postValue(notifications)
     }
 
     private fun updateHourlyForecast(weatherForecast: LocationWeatherForecast) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val hours = mutableListOf<Hour>()
-            val forecastDays = weatherForecast.forecast.forecastDays
+        val hours = mutableListOf<Hour>()
+        val forecastDays = weatherForecast.forecast.forecastDays
 
-            if (forecastDays.isNotEmpty()) {
-                val nowHourAsInt = DateUtils.getHourFromDate(weatherForecast.location.localtime)
-                val todayHours = forecastDays.first().hours
+        if (forecastDays.isNotEmpty()) {
+            val nowHourAsInt = DateUtils.getHourFromDate(weatherForecast.location.localtime)
+            val todayHours = forecastDays.first().hours
 
-                if (todayHours.size > nowHourAsInt) {
-                    hours.addAll(todayHours.subList(nowHourAsInt, todayHours.size))
-                }
-
-                if (forecastDays.size > 1 && forecastDays[1].hours.size > nowHourAsInt) {
-                    val tomorrowHours = forecastDays[1].hours
-                    hours.addAll(tomorrowHours.subList(0, nowHourAsInt))
-                }
+            if (todayHours.size > nowHourAsInt) {
+                hours.addAll(todayHours.subList(nowHourAsInt, todayHours.size))
             }
 
-            _hourlyForecast.postValue(hours)
+            if (forecastDays.size > 1 && forecastDays[1].hours.size > nowHourAsInt) {
+                val tomorrowHours = forecastDays[1].hours
+                hours.addAll(tomorrowHours.subList(0, nowHourAsInt))
+            }
         }
+
+        _hourlyForecast.postValue(hours)
     }
 
     fun getTempUnit(): TempUnit {
@@ -153,14 +138,6 @@ class HomeViewModel(
 
     fun saveTempUnit(tempUnit: TempUnit) {
         weatherRepository.saveTempUnit(tempUnit)
-    }
-
-    fun getSelectedLocation(): LocationDto? {
-        return locationRepository.getSelectedLocation()
-    }
-
-    private fun getLocations(): List<LocationDto> {
-        return locationRepository.getLocations()
     }
 
     fun parseUvIndex(context: Context, index: Int): String {

@@ -27,7 +27,10 @@ class ViewModelFactory(
 
             AddLocationViewModel::class.java -> AddLocationViewModel(app.locationRepository)
 
-            ManageLocationsViewModel::class.java -> ManageLocationsViewModel(app.locationRepository)
+            ManageLocationsViewModel::class.java -> ManageLocationsViewModel(
+                app.weatherRepository,
+                app.locationRepository
+            )
 
             else -> throw IllegalArgumentException("Unknown view model class " + modelClass.name)
         }

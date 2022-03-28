@@ -9,29 +9,29 @@ import androidx.room.Update
 interface LocationsDao {
 
     @Query("SELECT * FROM locations")
-    fun getLocations(): List<LocationEntity>
+    suspend fun getAllLocations(): List<LocationEntity>
 
     @Query("SELECT * FROM locations WHERE is_selected = 1")
-    fun getSelectedLocation(): LocationEntity?
+    suspend fun getSelectedLocation(): LocationEntity?
 
     @Query("SELECT * FROM locations WHERE url = :url")
-    fun getLocationByUrl(url: String): LocationEntity?
+    suspend fun getLocationByUrl(url: String): LocationEntity?
 
     @Query("SELECT COUNT(*) FROM locations")
-    fun getLocationsCount(): Int
+    suspend fun getLocationsCount(): Int
 
     @Insert(entity = LocationEntity::class)
-    fun addLocation(locationEntity: LocationEntity)
+    suspend fun addLocation(locationEntity: LocationEntity)
 
     @Query("DELETE FROM locations WHERE url = :url")
-    fun removeByUrl(url: String)
+    suspend fun removeByUrl(url: String)
 
     @Update(entity = LocationEntity::class)
-    fun updateLocation(locationEntity: LocationEntity)
+    suspend fun updateLocation(locationEntity: LocationEntity)
 
     @Query("UPDATE locations SET position = :position WHERE url = :locationUrl")
-    fun updatePosition(locationUrl: String, position: Int)
+    suspend fun updatePosition(locationUrl: String, position: Int)
 
     @Query("UPDATE locations SET last_updated = :dateTime WHERE url = :locationUrl")
-    fun locationUpdated(locationUrl: String, dateTime: String)
+    suspend fun locationUpdated(locationUrl: String, dateTime: String)
 }

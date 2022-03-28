@@ -47,7 +47,6 @@ class WeatherApp : Application() {
     private fun createDb() {
         db = Room.databaseBuilder(this, AppDatabase::class.java, "database.db")
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
-            .allowMainThreadQueries()
             .build()
     }
 

@@ -95,6 +95,7 @@ class HomeFragment : Fragment() {
         viewModel.astronomy.observe(viewLifecycleOwner) { updateAstronomy() }
         viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
         viewModel.isUpdateInProgress.observe(viewLifecycleOwner) { showIsUpdate(it) }
+        viewModel.selectedLocation.observe(viewLifecycleOwner) { navigator().setToolbarTitle(it.name) }
     }
 
     private fun setupUi() {
@@ -121,7 +122,7 @@ class HomeFragment : Fragment() {
             blockNotifications.notificationsPager
         ) { _, _ -> }.attach()
 
-        binding.refreshLayout.setOnRefreshListener { viewModel.updateAll() }
+        binding.refreshLayout.setOnRefreshListener { viewModel.updateWeather() }
     }
 
     private fun updateWeather() {
@@ -207,7 +208,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        navigator().setToolbarTitle(viewModel.getSelectedLocation()?.name ?: "")
         navigator().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_hamburger_menu,

@@ -29,7 +29,7 @@ class AddLocationFragment : Fragment() {
     private lateinit var notFound: TextView
 
     private val viewModel: AddLocationViewModel by viewModels { viewModelFactory() }
-    private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory() }
+    private val manageViewModel: ManageLocationsViewModel by activityViewModels { viewModelFactory() }
 
     private val searchTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
@@ -81,8 +81,7 @@ class AddLocationFragment : Fragment() {
         notFound = binding.notFound
 
         manageLocationAdapter = AddLocationListAdapter {
-            viewModel.saveLocation(it)
-            homeViewModel.updateLocationsWeatherInfo()
+            manageViewModel.addLocation(it)
             navigator().goBack()
         }
     }

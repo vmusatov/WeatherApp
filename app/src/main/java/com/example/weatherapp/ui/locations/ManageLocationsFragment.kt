@@ -35,10 +35,9 @@ class ManageLocationsFragment : Fragment() {
 
         setupFields()
         setupUi()
+        setupObservers()
 
-        homeViewModel.locationsWeatherCurrent.observe(viewLifecycleOwner) {
-            manageLocationAdapter.updateLocationsInfo(it)
-        }
+        viewModel.updateLocations()
 
         return binding.root
     }
@@ -56,6 +55,15 @@ class ManageLocationsFragment : Fragment() {
         setupRecyclerView()
     }
 
+    private fun setupObservers() {
+        viewModel.locations.observe(viewLifecycleOwner) {
+            manageLocationAdapter.update(it)
+        }
+        viewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
+            manageLocationAdapter.updateLocationsInfo(it)
+        }
+    }
+
     private fun setupRecyclerView() {
         touchHelper.attachToRecyclerView(binding.locationsList)
 
@@ -68,7 +76,6 @@ class ManageLocationsFragment : Fragment() {
         }
 
         manageLocationAdapter.tempUnit = homeViewModel.getTempUnit()
-        manageLocationAdapter.update(viewModel.getLocations())
 
         with(binding.locationsList) {
             adapter = manageLocationAdapter
@@ -81,7 +88,10 @@ class ManageLocationsFragment : Fragment() {
         navigator().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
-                onAction = { navigator().goBack() }
+                onAction = {
+                    homeViewModel.updateWeather()
+                    navigator().goBack()
+                }
             )
         )
 
@@ -96,9 +106,7 @@ class ManageLocationsFragment : Fragment() {
     inner class LocationsManagerImpl : LocationsManager {
 
         override fun onSelectLocation(location: LocationDto) {
-            viewModel.setLocationIsSelected(location)
-            homeViewModel.updateForecast()
-            homeViewModel.updateAstronomy()
+            homeViewModel.updateWeather(location)
             navigator().goBack()
         }
 

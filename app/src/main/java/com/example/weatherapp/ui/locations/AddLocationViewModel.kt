@@ -18,15 +18,10 @@ class AddLocationViewModel(
 
     fun search(q: String) {
         locationRepository.loadSearchAutocomplete(q, {
-                _searchResult.postValue(it.map { LocationDto.fromSearchLocation(it) })
-            }, {
-                Log.e(it.message, TAG)
-            })
-    }
-
-    fun saveLocation(searchLocation: LocationDto) {
-        searchLocation.position = locationRepository.getLocationsCount()
-        locationRepository.addLocation(searchLocation)
+            _searchResult.postValue(it.map { LocationDto.fromSearchLocation(it) })
+        }, {
+            Log.e(it.message, TAG)
+        })
     }
 
     override fun onCleared() {
