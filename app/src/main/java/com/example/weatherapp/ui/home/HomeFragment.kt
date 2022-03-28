@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
-import com.example.weatherapp.data.remote.model.WeatherCurrent
 import com.example.weatherapp.databinding.*
 import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.model.Astronomy
+import com.example.weatherapp.model.CurrentWeather
+import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.navigator
@@ -90,9 +92,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.weatherForecast.observe(viewLifecycleOwner) { updateWeather() }
-        viewModel.hourlyForecast.observe(viewLifecycleOwner) { updateHourlyForecast() }
-        viewModel.astronomy.observe(viewLifecycleOwner) { updateAstronomy() }
+        viewModel.weatherData.observe(viewLifecycleOwner) {
+            updateWeather(it)
+            updateHourlyForecast(it)
+        }
+        viewModel.astronomy.observe(viewLifecycleOwner) { updateAstronomy(it) }
         viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
         viewModel.isUpdateInProgress.observe(viewLifecycleOwner) { showIsUpdate(it) }
         viewModel.selectedLocation.observe(viewLifecycleOwner) { navigator().setToolbarTitle(it.name) }
@@ -125,16 +129,14 @@ class HomeFragment : Fragment() {
         binding.refreshLayout.setOnRefreshListener { viewModel.updateWeather() }
     }
 
-    private fun updateWeather() {
-        viewModel.weatherForecast.value?.let {
-            val tempUnit = viewModel.getTempUnit()
+    private fun updateWeather(data: WeatherData) {
+        val tempUnit = viewModel.getTempUnit()
 
-            updateCurrentWeather(it.current, tempUnit)
-            updateAdditionalWeather(it.current)
-            updateAirQuality(it.current)
+        updateCurrentWeather(data.current, tempUnit)
+        updateAdditionalWeather(data.current)
+        updateAirQuality(data.current)
 
-            dailyForecastAdapter.update(it.forecast.forecastDays, tempUnit)
-        }
+        dailyForecastAdapter.update(data.daysForecast, tempUnit)
     }
 
     private fun updateNotifications(notifications: List<WeatherNotification>) {
@@ -151,11 +153,11 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun updateCurrentWeather(current: WeatherCurrent, tempUnit: TempUnit) {
-        blockCurrent.conditionText.text = current.condition.text
+    private fun updateCurrentWeather(current: CurrentWeather, tempUnit: TempUnit) {
+        blockCurrent.conditionText.text = current.conditionText
 
         Picasso.get()
-            .load(current.condition.icon)
+            .load(current.conditionIcon)
             .into(blockCurrent.currentConditionImage)
 
         if (tempUnit == TempUnit.C) {
@@ -169,42 +171,43 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun updateAdditionalWeather(current: WeatherCurrent) {
+    private fun updateAdditionalWeather(current: CurrentWeather) {
         blockAdditional.pressureText.text = getString(R.string.mbar, current.pressureMb.toInt())
         blockAdditional.windText.text = getString(R.string.kmh, current.windKph.toInt())
         blockAdditional.uvIndexText.text = viewModel.parseUvIndex(requireContext(), current.uvIndex)
     }
 
-    private fun updateAirQuality(current: WeatherCurrent) {
-        blockAirQuality.coValue.text = current.airQuality.co.toInt().toString()
-        blockAirQuality.no2Value.text = current.airQuality.no2.toInt().toString()
-        blockAirQuality.o3Value.text = current.airQuality.o3.toInt().toString()
-        blockAirQuality.so2Value.text = current.airQuality.so2.toInt().toString()
+    private fun updateAirQuality(current: CurrentWeather) {
+        blockAirQuality.coValue.text = current.co.toInt().toString()
+        blockAirQuality.no2Value.text = current.no2.toInt().toString()
+        blockAirQuality.o3Value.text = current.o3.toInt().toString()
+        blockAirQuality.so2Value.text = current.so2.toInt().toString()
         blockAirQuality.usEpaIndexValue.text =
-            viewModel.parseEpaIndex(requireContext(), current.airQuality.usEpaIndex)
+            viewModel.parseEpaIndex(requireContext(), current.usEpaIndex)
     }
 
-    private fun updateHourlyForecast() {
+    private fun updateHourlyForecast(data: WeatherData) {
         graphDecorator?.let { hourlyForecastList.removeItemDecoration(it) }
 
-        viewModel.hourlyForecast.value?.let {
-            if (it.isEmpty()) {
-                hourlyForecastList.visibility = View.GONE
-                binding.byHourListEmpty.visibility = View.VISIBLE
-            } else {
-                graphDecorator = HourlyForecastItemDecorator(it.map { it.tempF }, requireContext())
-                hourlyForecastList.addItemDecoration(graphDecorator as HourlyForecastItemDecorator)
-                hourlyForecastAdapter.update(it, viewModel.getTempUnit())
+        val hours = data.hoursForecast
 
-                hourlyForecastList.visibility = View.VISIBLE
-                binding.byHourListEmpty.visibility = View.GONE
-            }
+        if (hours.isEmpty()) {
+            hourlyForecastList.visibility = View.GONE
+            binding.byHourListEmpty.visibility = View.VISIBLE
+        } else {
+            graphDecorator = HourlyForecastItemDecorator(hours.map { it.tempF }, requireContext())
+            hourlyForecastList.addItemDecoration(graphDecorator as HourlyForecastItemDecorator)
+            hourlyForecastAdapter.update(hours, viewModel.getTempUnit())
+
+            hourlyForecastList.visibility = View.VISIBLE
+            binding.byHourListEmpty.visibility = View.GONE
         }
+
     }
 
-    private fun updateAstronomy() {
-        blockAstronomy.sunriseText.text = viewModel.astronomy.value?.sunrise
-        blockAstronomy.sunsetText.text = viewModel.astronomy.value?.sunset
+    private fun updateAstronomy(astronomy: Astronomy) {
+        blockAstronomy.sunriseText.text = astronomy.sunrise
+        blockAstronomy.sunsetText.text = astronomy.sunset
     }
 
     private fun setupToolbar() {
@@ -225,7 +228,7 @@ class HomeFragment : Fragment() {
     private fun showIsUpdate(isUpdateInProgress: Boolean) {
         if (isUpdateInProgress) {
             binding.refreshLayout.isRefreshing = true
-            if (viewModel.weatherForecast.value == null) {
+            if (viewModel.weatherData.value == null) {
                 binding.content.visibility = View.INVISIBLE
             }
         } else {

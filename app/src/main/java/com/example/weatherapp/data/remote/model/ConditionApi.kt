@@ -1,6 +1,6 @@
 package com.example.weatherapp.data.remote.model
 
-data class Condition(
+data class ConditionApi(
     val text: String,
     val code: Int
 ) {

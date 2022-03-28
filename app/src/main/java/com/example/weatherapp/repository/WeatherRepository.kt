@@ -2,9 +2,9 @@ package com.example.weatherapp.repository
 
 import android.content.SharedPreferences
 import com.example.weatherapp.data.remote.WeatherApi
-import com.example.weatherapp.data.remote.model.Astronomy
-import com.example.weatherapp.data.remote.model.LocationWeatherCurrent
-import com.example.weatherapp.data.remote.model.LocationWeatherForecast
+import com.example.weatherapp.data.remote.model.AstronomyApi
+import com.example.weatherapp.data.remote.model.LocationWeatherCurrentApi
+import com.example.weatherapp.data.remote.model.LocationWeatherForecastApi
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.ui.settings.SettingsFragment
 import com.example.weatherapp.util.DateUtils
@@ -25,7 +25,7 @@ class WeatherRepository(
 
     fun loadForecast(
         q: String,
-        onSuccess: Consumer<LocationWeatherForecast>,
+        onSuccess: Consumer<LocationWeatherForecastApi>,
         onError: Consumer<Throwable>
     ) {
         val result = weatherApi.getForecast(q)
@@ -36,7 +36,7 @@ class WeatherRepository(
         disposeBag.add(result)
     }
 
-    suspend fun loadLocationsCurrentWeather(locations: List<String>): List<LocationWeatherCurrent>? {
+    suspend fun loadLocationsCurrentWeather(locations: List<String>): List<LocationWeatherCurrentApi>? {
         return withContext(Dispatchers.IO) {
             locations.map {
                 try {
@@ -50,7 +50,7 @@ class WeatherRepository(
 
     fun loadAstronomy(
         q: String,
-        onSuccess: Consumer<Astronomy>,
+        onSuccess: Consumer<AstronomyApi>,
         onError: Consumer<Throwable>
     ) {
         val result = weatherApi.getAstronomy(q, DateUtils.dateFormat.format(Date()))

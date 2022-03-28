@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentManageLocationsBinding
-import com.example.weatherapp.model.LocationDto
+import com.example.weatherapp.model.Location
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.navigator
@@ -105,7 +105,7 @@ class ManageLocationsFragment : Fragment() {
 
     inner class LocationsManagerImpl : LocationsManager {
 
-        override fun onSelectLocation(location: LocationDto) {
+        override fun onSelectLocation(location: Location) {
             homeViewModel.updateWeather(location)
             navigator().goBack()
         }
@@ -118,11 +118,11 @@ class ManageLocationsFragment : Fragment() {
             }
         }
 
-        override fun onDeleteLocations(locations: List<LocationDto>) {
+        override fun onDeleteLocations(locations: List<Location>) {
             locations.forEach { viewModel.removeLocation(it) }
         }
 
-        override fun onApplyChanges(locations: List<LocationDto>) {
+        override fun onApplyChanges(locations: List<Location>) {
             locations.forEachIndexed { index, location ->
                 viewModel.updateLocationPosition(location, index)
             }

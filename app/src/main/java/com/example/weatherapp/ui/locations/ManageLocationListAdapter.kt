@@ -8,35 +8,29 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemManageLocationsBinding
-import com.example.weatherapp.model.LocationDto
+import com.example.weatherapp.model.Location
 import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.model.LocationWeatherInfo
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
-
-data class LocationWeatherInfo(
-    val locationName: String,
-    val tempC: Double,
-    val tempF: Double,
-    val conditionIconUrl: String
-)
 
 class ManageLocationListAdapter(
     private val locationsManager: LocationsManager,
 ) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>() {
 
-    private var data: MutableList<LocationDto> = mutableListOf()
+    private var data: MutableList<Location> = mutableListOf()
     private var dataInfo: MutableList<LocationWeatherInfo> = mutableListOf()
     var tempUnit: TempUnit = TempUnit.DEFAULT
 
     private var isEditMode = false
-    private var selectedItems: MutableList<LocationDto> = mutableListOf()
+    private var selectedItems: MutableList<Location> = mutableListOf()
 
     fun updateLocationsInfo(info: List<LocationWeatherInfo>) {
         dataInfo = info.toMutableList()
         notifyDataSetChanged()
     }
 
-    fun update(data: List<LocationDto>) {
+    fun update(data: List<Location>) {
         this.data = data.sortedBy { it.position }.toMutableList()
         notifyDataSetChanged()
     }
@@ -62,7 +56,7 @@ class ManageLocationListAdapter(
     }
 
     fun onItemMove(fromPosition: Int, toPosition: Int) {
-        val prev: LocationDto = data.removeAt(fromPosition)
+        val prev: Location = data.removeAt(fromPosition)
         data.add(toPosition, prev)
         notifyItemMoved(fromPosition, toPosition)
     }
@@ -79,7 +73,7 @@ class ManageLocationListAdapter(
         setupListeners(holder, item)
     }
 
-    private fun setupUi(holder: ViewHolder, item: LocationDto) {
+    private fun setupUi(holder: ViewHolder, item: Location) {
         with(holder.binding) {
             root.tag = item
 
@@ -114,11 +108,11 @@ class ManageLocationListAdapter(
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setupListeners(holder: ViewHolder, item: LocationDto) {
+    private fun setupListeners(holder: ViewHolder, item: Location) {
         with(holder.binding) {
             root.setOnClickListener {
                 if (!isEditMode) {
-                    locationsManager.onSelectLocation(it.tag as LocationDto)
+                    locationsManager.onSelectLocation(it.tag as Location)
                 } else {
                     checkbox.performClick()
                 }

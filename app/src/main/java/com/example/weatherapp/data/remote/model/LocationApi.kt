@@ -1,6 +1,6 @@
 package com.example.weatherapp.data.remote.model
 
-data class Location(
+data class LocationApi(
     val name: String,
     val region: String,
     val country: String,
@@ -9,7 +9,7 @@ data class Location(
     val localtime: String
 )
 
-data class SearchLocation(
+data class SearchLocationApi(
     val name: String,
     val region: String,
     val country: String,

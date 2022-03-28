@@ -1,13 +1,13 @@
 package com.example.weatherapp.notification.factory
 
-import com.example.weatherapp.data.remote.model.Hour
-import com.example.weatherapp.data.remote.model.LocationWeatherForecast
+import com.example.weatherapp.model.Hour
+import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.util.DateUtils
 
 class ExpectPrecipitationsFactory : BaseWeatherNotificationFactory() {
 
-    override fun create(forecast: LocationWeatherForecast): WeatherNotification? {
+    override fun create(data: WeatherData): WeatherNotification? {
 
         if (nowHour.isHavePrecipitation()) {
             return null
@@ -23,7 +23,7 @@ class ExpectPrecipitationsFactory : BaseWeatherNotificationFactory() {
     }
 
     private fun precipitationsStartAt(startHour: Hour): String {
-        val startHourAsInt = DateUtils.getHourFromDate(startHour.time)
+        val startHourAsInt = DateUtils.getHourFromDate(startHour.dateTime)
 
         return if (isTodayHour(startHour)) {
             "${precipitationAsString(startHour)} expected at $startHourAsInt:00"

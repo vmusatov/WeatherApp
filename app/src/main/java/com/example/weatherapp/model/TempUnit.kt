@@ -7,10 +7,6 @@ enum class TempUnit(
     C("°C", 0),
     F("°F", 1);
 
-    fun invert(): TempUnit {
-        return if (this == C) F else C
-    }
-
     companion object {
         val DEFAULT = C
 

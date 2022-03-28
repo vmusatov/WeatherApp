@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
-import com.example.weatherapp.data.remote.model.Hour
 import com.example.weatherapp.databinding.ItemHourlyForecastBinding
 import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.model.Hour
 import com.example.weatherapp.util.DateUtils
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
@@ -34,7 +34,7 @@ class HourlyForecastListAdapter : RecyclerView.Adapter<HourlyForecastListAdapter
             val res = holder.itemView.resources
             root.tag = item
 
-            hour.text = "${DateUtils.getHourFromDate(item.time)}:00"
+            hour.text = "${DateUtils.getHourFromDate(item.dateTime)}:00"
             hourTemp.text = if (tempUnit == TempUnit.C) {
                 res.getString(R.string.degree, item.tempC.roundToInt())
             } else {
@@ -44,7 +44,7 @@ class HourlyForecastListAdapter : RecyclerView.Adapter<HourlyForecastListAdapter
             humidityValue.text = "${item.humidity}%"
 
             Picasso.get()
-                .load(item.condition.icon)
+                .load(item.conditionIcon)
                 .into(conditionIcon)
         }
     }

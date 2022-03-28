@@ -1,17 +1,17 @@
 package com.example.weatherapp.ui.locations
 
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapp.model.LocationDto
+import com.example.weatherapp.model.Location
 
 interface LocationsManager {
 
-    fun onSelectLocation(location: LocationDto)
+    fun onSelectLocation(location: Location)
 
     fun onSwitchEditMode(editMode: Boolean)
 
-    fun onDeleteLocations(locations: List<LocationDto>)
+    fun onDeleteLocations(locations: List<Location>)
 
-    fun onApplyChanges(locations: List<LocationDto>)
+    fun onApplyChanges(locations: List<Location>)
 
     fun onDragStart(viewHolder: RecyclerView.ViewHolder)
 }

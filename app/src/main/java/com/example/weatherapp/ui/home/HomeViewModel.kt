@@ -6,11 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.R
-import com.example.weatherapp.data.remote.model.Hour
-import com.example.weatherapp.data.remote.model.LocationWeatherForecast
-import com.example.weatherapp.model.AstronomyDto
-import com.example.weatherapp.model.LocationDto
 import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.model.Astronomy
+import com.example.weatherapp.model.Location
+import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.notification.WeatherNotificationsBuilder
 import com.example.weatherapp.notification.factory.ExpectPrecipitationsEndFactory
@@ -19,9 +18,6 @@ import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
 import com.example.weatherapp.notification.factory.TempTomorrowFactory
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
-import com.example.weatherapp.util.DateUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -31,17 +27,14 @@ class HomeViewModel(
 
     private val TAG = HomeViewModel::class.java.simpleName
 
-    val selectedLocation: LiveData<LocationDto> get() = _selectedLocation
-    private val _selectedLocation = MutableLiveData<LocationDto>()
+    val selectedLocation: LiveData<Location> get() = _selectedLocation
+    private val _selectedLocation = MutableLiveData<Location>()
 
-    val weatherForecast: LiveData<LocationWeatherForecast> get() = _weatherForecast
-    private val _weatherForecast = MutableLiveData<LocationWeatherForecast>()
+    val weatherData: LiveData<WeatherData> get() = _weatherData
+    private val _weatherData = MutableLiveData<WeatherData>()
 
-    val hourlyForecast: LiveData<List<Hour>> get() = _hourlyForecast
-    private val _hourlyForecast = MutableLiveData<List<Hour>>()
-
-    val astronomy: LiveData<AstronomyDto> get() = _astronomy
-    private val _astronomy = MutableLiveData<AstronomyDto>()
+    val astronomy: LiveData<Astronomy> get() = _astronomy
+    private val _astronomy = MutableLiveData<Astronomy>()
 
     val weatherNotifications: LiveData<List<WeatherNotification>> get() = _weatherNotifications
     private val _weatherNotifications = MutableLiveData<List<WeatherNotification>>()
@@ -60,26 +53,25 @@ class HomeViewModel(
         updateWeather()
     }
 
-    fun updateWeather(selectedLocation: LocationDto? = null) = viewModelScope.launch {
-            val location = selectedLocation ?: locationRepository.getSelectedLocation()
-            location?.let {
-                _selectedLocation.postValue(it)
-                if (!it.isSelected) {
-                    locationRepository.setLocationIsSelected(it)
-                }
-
-                updateForecast(location)
-                updateAstronomy(location)
+    fun updateWeather(selectedLocation: Location? = null) = viewModelScope.launch {
+        val location = selectedLocation ?: locationRepository.getSelectedLocation()
+        location?.let {
+            _selectedLocation.postValue(it)
+            if (!it.isSelected) {
+                locationRepository.setLocationIsSelected(it)
             }
+            updateForecast(location)
+            updateAstronomy(location)
         }
+    }
 
-    private fun updateForecast(selectedLocation: LocationDto) {
+    private fun updateForecast(selectedLocation: Location) {
         _isUpdateInProgress.postValue(true)
         weatherRepository.loadForecast("${selectedLocation.lat}, ${selectedLocation.lon}",
             onSuccess = {
-                updateHourlyForecast(it)
-                updateNotifications(it)
-                _weatherForecast.postValue(it)
+                val data = WeatherData.from(it)
+                updateNotifications(data)
+                _weatherData.postValue(data)
                 _isUpdateInProgress.postValue(false)
 
                 setLocationLastIUpdatedIsNow(selectedLocation)
@@ -89,47 +81,22 @@ class HomeViewModel(
             })
     }
 
-    private fun setLocationLastIUpdatedIsNow(location: LocationDto) = viewModelScope.launch {
+    private fun setLocationLastIUpdatedIsNow(location: Location) = viewModelScope.launch {
         locationRepository.setLastUpdatedIsNow(location.url)
     }
 
-    private fun updateAstronomy(selectedLocation: LocationDto) {
-        weatherRepository.loadAstronomy("${selectedLocation.lat}, ${selectedLocation.lon}",
-            onSuccess = {
-                _astronomy.value = AstronomyDto(
-                    it.location.name,
-                    it.astronomy.astro.sunrise,
-                    it.astronomy.astro.sunset
-                )
-            },
+    private fun updateAstronomy(selectedLocation: Location) {
+        weatherRepository.loadAstronomy(
+            "${selectedLocation.lat}, ${selectedLocation.lon}",
+            onSuccess = { _astronomy.postValue(Astronomy.from(it)) },
             onError = {}
         )
     }
 
-    private fun updateNotifications(forecast: LocationWeatherForecast) {
-        val notifications = weatherNotificationBuilder.buildNotificationsList(forecast)
-        _weatherNotifications.postValue(notifications)
-    }
-
-    private fun updateHourlyForecast(weatherForecast: LocationWeatherForecast) {
-        val hours = mutableListOf<Hour>()
-        val forecastDays = weatherForecast.forecast.forecastDays
-
-        if (forecastDays.isNotEmpty()) {
-            val nowHourAsInt = DateUtils.getHourFromDate(weatherForecast.location.localtime)
-            val todayHours = forecastDays.first().hours
-
-            if (todayHours.size > nowHourAsInt) {
-                hours.addAll(todayHours.subList(nowHourAsInt, todayHours.size))
-            }
-
-            if (forecastDays.size > 1 && forecastDays[1].hours.size > nowHourAsInt) {
-                val tomorrowHours = forecastDays[1].hours
-                hours.addAll(tomorrowHours.subList(0, nowHourAsInt))
-            }
-        }
-
-        _hourlyForecast.postValue(hours)
+    private fun updateNotifications(data: WeatherData) {
+        _weatherNotifications.postValue(
+            weatherNotificationBuilder.buildNotificationsList(data)
+        )
     }
 
     fun getTempUnit(): TempUnit {

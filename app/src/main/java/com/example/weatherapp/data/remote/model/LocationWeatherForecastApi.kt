@@ -2,35 +2,25 @@ package com.example.weatherapp.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class LocationWeatherForecast(
-    val location: Location,
-    val current: WeatherCurrent,
-    val forecast: Forecast,
-    val alerts: Alerts
+data class LocationWeatherForecastApi(
+    val location: LocationApi,
+    val current: WeatherCurrentApi,
+    val forecast: ForecastApi,
 )
 
-data class Alerts(
-    val alert: List<Alert>
-)
-
-data class Alert(
-    val desc: String,
-    val event: String
-)
-
-data class Forecast(
+data class ForecastApi(
     @SerializedName("forecastday")
-    val forecastDays: List<ForecastDay>
+    val forecastDays: List<ForecastDayApi>
 )
 
-data class ForecastDay(
+data class ForecastDayApi(
     val date: String,
-    val day: Day,
+    val day: DayApi,
     @SerializedName("hour")
-    val hours: List<Hour>
+    val hours: List<HourApi>
 )
 
-data class Day(
+data class DayApi(
     @SerializedName("maxtemp_c")
     val maxTempC: Double,
 
@@ -44,7 +34,7 @@ data class Day(
     val minTempF: Double,
 
     @SerializedName("condition")
-    val condition: Condition,
+    val condition: ConditionApi,
 
     @SerializedName("daily_chance_of_rain")
     val dailyChanceOfRain: Int,
@@ -56,7 +46,7 @@ data class Day(
     val humidity: Int
 )
 
-data class Hour(
+data class HourApi(
     @SerializedName("time")
     val time: String,
 
@@ -67,7 +57,7 @@ data class Hour(
     val tempF: Double,
 
     @SerializedName("condition")
-    val condition: Condition,
+    val condition: ConditionApi,
 
     @SerializedName("will_it_rain")
     val willItRain: Int,
@@ -83,14 +73,4 @@ data class Hour(
 
     @SerializedName("humidity")
     val humidity: Int
-) {
-    fun isRain(): Boolean =
-        willItRain != 0 || chanceOfRain > 50 || condition.text.lowercase().contains("rain")
-
-    fun isSnow(): Boolean =
-        willItShow != 0 || chanceOfSnow > 50 || condition.text.lowercase().contains("snow")
-
-    fun isHavePrecipitation(): Boolean = isRain() || isSnow()
-
-    fun isNotHavePrecipitation(): Boolean = !isHavePrecipitation()
-}
+)

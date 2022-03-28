@@ -1,7 +1,7 @@
 package com.example.weatherapp.data.remote.model
 
-data class Astronomy(
-    val location: Location,
+data class AstronomyApi(
+    val location: LocationApi,
     val astronomy: AstronomyData
 )
 

@@ -1,13 +1,13 @@
 package com.example.weatherapp.notification.factory
 
-import com.example.weatherapp.data.remote.model.Hour
-import com.example.weatherapp.data.remote.model.LocationWeatherForecast
+import com.example.weatherapp.model.Hour
+import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.util.DateUtils
 
 class ExpectPrecipitationsEndFactory : BaseWeatherNotificationFactory() {
 
-    override fun create(forecast: LocationWeatherForecast): WeatherNotification? {
+    override fun create(data: WeatherData): WeatherNotification? {
 
         if (nowHour.isNotHavePrecipitation()) {
             return null
@@ -26,7 +26,7 @@ class ExpectPrecipitationsEndFactory : BaseWeatherNotificationFactory() {
             return "The ${precipitationAsString(nowHour).lowercase()} won't end anytime soon"
         }
 
-        val endHourAsInt = DateUtils.getHourFromDate(endHour.time)
+        val endHourAsInt = DateUtils.getHourFromDate(endHour.dateTime)
         return if (isTodayHour(endHour)) {
             "${precipitationAsString(nowHour)} ends at ${endHourAsInt}:00"
         } else {

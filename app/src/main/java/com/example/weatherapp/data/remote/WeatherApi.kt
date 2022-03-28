@@ -16,7 +16,7 @@ interface WeatherApi {
         @Query("q") q: String,
         @Query("aqi") aqi: String = "yes",
         @Query("key") key: String = KEY,
-    ): Single<LocationWeatherCurrent>
+    ): Single<LocationWeatherCurrentApi>
 
     @GET("forecast.json")
     fun getForecast(
@@ -25,18 +25,18 @@ interface WeatherApi {
         @Query("aqi") aqi: String = "yes",
         @Query("alerts") alerts: String = "yes",
         @Query("key") key: String = KEY
-    ): Single<LocationWeatherForecast>
+    ): Single<LocationWeatherForecastApi>
 
     @GET("astronomy.json")
     fun getAstronomy(
         @Query("q") q: String,
         @Query("dt") dt: String,
         @Query("key") key: String = KEY,
-    ): Single<Astronomy>
+    ): Single<AstronomyApi>
 
     @GET("search.json")
     fun getSearchResult(
         @Query("q") q: String,
         @Query("key") key: String = KEY,
-    ): Single<List<SearchLocation>>
+    ): Single<List<SearchLocationApi>>
 }

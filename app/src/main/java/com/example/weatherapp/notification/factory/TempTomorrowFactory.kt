@@ -1,11 +1,11 @@
 package com.example.weatherapp.notification.factory
 
-import com.example.weatherapp.data.remote.model.LocationWeatherForecast
+import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 
 class TempTomorrowFactory : BaseWeatherNotificationFactory() {
 
-    override fun create(forecast: LocationWeatherForecast): WeatherNotification? {
+    override fun create(data: WeatherData): WeatherNotification? {
         if (nowHourAsInt < 16) {
             return null
         }

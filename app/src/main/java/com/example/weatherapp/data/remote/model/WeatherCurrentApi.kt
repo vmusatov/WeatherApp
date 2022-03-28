@@ -2,7 +2,7 @@ package com.example.weatherapp.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class WeatherCurrent(
+data class WeatherCurrentApi(
     @SerializedName("last_updated")
     var lastUpdated: String,
 
@@ -19,7 +19,7 @@ data class WeatherCurrent(
     var feelsLikeTempF: Double,
 
     @SerializedName("condition")
-    var condition: Condition,
+    var condition: ConditionApi,
 
     @SerializedName("wind_kph")
     var windKph: Double,
@@ -34,10 +34,10 @@ data class WeatherCurrent(
     var pressureMb: Double,
 
     @SerializedName("air_quality")
-    var airQuality: AirQuality
+    var airQuality: AirQualityApi
 )
 
-data class AirQuality(
+data class AirQualityApi(
     val co: Double,
     val no2: Double,
     val o3: Double,

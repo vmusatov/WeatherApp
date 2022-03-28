@@ -1,7 +1,7 @@
 package com.example.weatherapp.notification.factory
 
-import com.example.weatherapp.data.remote.model.Hour
-import com.example.weatherapp.data.remote.model.LocationWeatherForecast
+import com.example.weatherapp.model.Hour
+import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.util.DateUtils
 import kotlin.properties.Delegates.notNull
@@ -17,29 +17,27 @@ abstract class BaseWeatherNotificationFactory : WeatherNotificationFactory {
 
     protected lateinit var localTime: String
 
-    override fun createNotification(weatherForecast: LocationWeatherForecast): WeatherNotification? {
-        val forecast = weatherForecast.forecast
+    override fun createNotification(data: WeatherData): WeatherNotification? {
 
-        localTime = weatherForecast.location.localtime
-        todayHours = forecast.forecastDays.first().hours
+        localTime = data.location.localtime
+        todayHours = data.daysForecast.first().hours
 
-        nowHourAsInt = DateUtils.getHourFromDate(weatherForecast.location.localtime)
+        nowHourAsInt = DateUtils.getHourFromDate(data.location.localtime)
         nowHour = todayHours[nowHourAsInt]
 
         todayRemainingHours = todayHours.subList(nowHourAsInt, todayHours.size)
-        tomorrowHours = forecast.forecastDays[1].hours
+        tomorrowHours = data.daysForecast[1].hours
         createTodayWithTomorrowHours()
 
-        return create(weatherForecast)
+        return create(data)
     }
 
-    protected abstract fun create(forecast: LocationWeatherForecast): WeatherNotification?
+    protected abstract fun create(data: WeatherData): WeatherNotification?
 
     protected fun isTodayHour(hour: Hour): Boolean {
-        return hour.time.substring(0, hour.time.indexOf(" ")) ==
+        return hour.dateTime.substring(0, hour.dateTime.indexOf(" ")) ==
                 localTime.substring(0, localTime.indexOf(" "))
     }
-
 
     protected fun precipitationAsString(hour: Hour): String =
         if (hour.isRain()) "Rain" else "Snow"

@@ -1,6 +1,6 @@
 package com.example.weatherapp.notification
 
-import com.example.weatherapp.data.remote.model.LocationWeatherForecast
+import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.factory.WeatherNotificationFactory
 
 class WeatherNotificationsBuilder {
@@ -11,11 +11,11 @@ class WeatherNotificationsBuilder {
         this.factories.add(factory)
     }
 
-    fun buildNotificationsList(forecast: LocationWeatherForecast): List<WeatherNotification> {
+    fun buildNotificationsList(data: WeatherData): List<WeatherNotification> {
         val notifications = mutableListOf<WeatherNotification>()
 
         factories.forEach { factory ->
-            factory.createNotification(forecast)?.let { notifications.add(it) }
+            factory.createNotification(data)?.let { notifications.add(it) }
         }
 
         return notifications

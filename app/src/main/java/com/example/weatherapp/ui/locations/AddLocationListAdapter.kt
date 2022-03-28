@@ -5,17 +5,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.databinding.ItemLocationSearchBinding
-import com.example.weatherapp.model.LocationDto
+import com.example.weatherapp.model.Location
 
-typealias AddLocationListener = (location: LocationDto) -> Unit
+typealias AddLocationListener = (location: Location) -> Unit
 
 class AddLocationListAdapter(
     private val addLocationListener: AddLocationListener
 ) : RecyclerView.Adapter<AddLocationListAdapter.ViewHolder>(), View.OnClickListener {
 
-    private var data: MutableList<LocationDto> = mutableListOf()
+    private var data: MutableList<Location> = mutableListOf()
 
-    fun update(data: List<LocationDto>) {
+    fun update(data: List<Location>) {
         this.data = data.toMutableList()
         notifyDataSetChanged()
     }
@@ -45,7 +45,7 @@ class AddLocationListAdapter(
     class ViewHolder(val binding: ItemLocationSearchBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onClick(v: View) {
-        val location = v.tag as LocationDto
+        val location = v.tag as Location
         addLocationListener.invoke(location)
     }
 }

@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
-import com.example.weatherapp.data.remote.model.ForecastDay
 import com.example.weatherapp.databinding.ItemDailyForecastBinding
 import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.model.Day
 import com.example.weatherapp.util.DateUtils
 import com.squareup.picasso.Picasso
 import kotlin.math.min
@@ -14,10 +14,10 @@ import kotlin.math.roundToInt
 
 class DailyForecastListAdapter : RecyclerView.Adapter<DailyForecastListAdapter.ViewHolder>() {
 
-    private var data: List<ForecastDay> = emptyList()
+    private var data: List<Day> = emptyList()
     private var tempUnit: TempUnit = TempUnit.DEFAULT
 
-    fun update(data: List<ForecastDay>, tempUnit: TempUnit) {
+    fun update(data: List<Day>, tempUnit: TempUnit) {
         this.data = data
         this.tempUnit = tempUnit
         notifyDataSetChanged()
@@ -37,21 +37,21 @@ class DailyForecastListAdapter : RecyclerView.Adapter<DailyForecastListAdapter.V
             day.text = res.getString(DateUtils.getDayName(item.date))
 
             if (tempUnit == TempUnit.C) {
-                tempMax.text = res.getString(R.string.degree, item.day.maxTempC.roundToInt())
-                tempMin.text = res.getString(R.string.degree, item.day.minTempC.roundToInt())
+                tempMax.text = res.getString(R.string.degree, item.maxTempC.roundToInt())
+                tempMin.text = res.getString(R.string.degree, item.minTempC.roundToInt())
             } else {
-                tempMax.text = res.getString(R.string.degree, item.day.maxTempF.roundToInt())
-                tempMin.text = res.getString(R.string.degree, item.day.minTempF.roundToInt())
+                tempMax.text = res.getString(R.string.degree, item.maxTempF.roundToInt())
+                tempMin.text = res.getString(R.string.degree, item.minTempF.roundToInt())
             }
 
-            humidityValue.text = "${item.day.humidity}%"
+            humidityValue.text = "${item.humidity}%"
 
             Picasso.get()
-                .load(item.hours[min(12, item.hours.size)].condition.icon)
+                .load(item.hours[min(12, item.hours.size)].conditionIcon)
                 .into(conditionFrom)
 
             Picasso.get()
-                .load(item.hours[min(21, item.hours.size)].condition.icon)
+                .load(item.hours[min(21, item.hours.size)].conditionIcon)
                 .into(conditionTo)
         }
     }

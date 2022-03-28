@@ -1,17 +1,14 @@
 package com.example.weatherapp.repository
 
-import com.example.weatherapp.data.db.LocationEntity
 import com.example.weatherapp.data.db.LocationsDao
 import com.example.weatherapp.data.remote.WeatherApi
-import com.example.weatherapp.data.remote.model.SearchLocation
-import com.example.weatherapp.model.LocationDto
+import com.example.weatherapp.data.remote.model.SearchLocationApi
+import com.example.weatherapp.model.Location
 import com.example.weatherapp.util.DateUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.*
 
 class LocationRepository(
@@ -21,21 +18,21 @@ class LocationRepository(
 
     private val disposeBag = CompositeDisposable()
 
-    suspend fun addLocation(location: LocationDto) {
-        locationsDao.addLocation(LocationEntity.fromLocationDto(location))
+    suspend fun addLocation(location: Location) {
+        locationsDao.addLocation(location.toEntity())
     }
 
-    suspend fun getSelectedLocation(): LocationDto? {
-        return locationsDao.getSelectedLocation()?.toLocationDto()
+    suspend fun getSelectedLocation(): Location? {
+        return locationsDao.getSelectedLocation()?.let { Location.from(it) }
     }
 
-    suspend fun getAllLocations(): List<LocationDto> {
-        return locationsDao.getAllLocations().map { it.toLocationDto() }
+    suspend fun getAllLocations(): List<Location> {
+        return locationsDao.getAllLocations().map { Location.from(it) }
     }
 
     fun loadSearchAutocomplete(
         q: String,
-        onSuccess: Consumer<List<SearchLocation>>,
+        onSuccess: Consumer<List<SearchLocationApi>>,
         onError: Consumer<Throwable>
     ) {
         val result = weatherApi.getSearchResult(q)
@@ -46,7 +43,7 @@ class LocationRepository(
         disposeBag.add(result)
     }
 
-    suspend fun setLocationIsSelected(location: LocationDto) {
+    suspend fun setLocationIsSelected(location: Location) {
         locationsDao.getLocationByUrl(location.url)?.let { new ->
             locationsDao.getSelectedLocation()?.let { old ->
                 old.isSelected = 0
@@ -58,7 +55,7 @@ class LocationRepository(
         }
     }
 
-    suspend fun removeLocation(location: LocationDto) {
+    suspend fun removeLocation(location: Location) {
         locationsDao.getLocationByUrl(location.url)?.let { entity ->
             if (entity.isSelected == 1) {
                 val notSelectedLocation =
