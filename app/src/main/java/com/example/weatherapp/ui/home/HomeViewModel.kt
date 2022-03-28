@@ -134,5 +134,6 @@ class HomeViewModel(
     override fun onCleared() {
         super.onCleared()
         weatherRepository.clear()
+        locationRepository.clear()
     }
 }

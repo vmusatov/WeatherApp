@@ -1,6 +1,6 @@
 package com.example.weatherapp.repository
 
-import com.example.weatherapp.data.db.LocationsDao
+import com.example.weatherapp.data.db.dao.LocationsDao
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.SearchLocationApi
 import com.example.weatherapp.model.Location
@@ -21,7 +21,7 @@ class LocationRepository(
     private val disposeBag = CompositeDisposable()
 
     suspend fun addLocation(location: Location) = withContext(Dispatchers.IO) {
-        locationsDao.addLocation(location.toEntity())
+        locationsDao.insert(location.toEntity())
     }
 
     suspend fun getSelectedLocation(): Location? = withContext(Dispatchers.IO) {
@@ -49,11 +49,11 @@ class LocationRepository(
         locationsDao.getLocationByUrl(location.url)?.let { new ->
             locationsDao.getSelectedLocation()?.let { old ->
                 old.isSelected = 0
-                locationsDao.updateLocation(old)
+                locationsDao.update(old)
             }
 
             new.isSelected = 1
-            locationsDao.updateLocation(new)
+            locationsDao.update(new)
         }
     }
 
@@ -65,12 +65,12 @@ class LocationRepository(
 
                 notSelectedLocation?.let {
                     it.isSelected = 1
-                    locationsDao.updateLocation(it)
+                    locationsDao.update(it)
                 }
             }
         }
 
-        locationsDao.removeByUrl(location.url)
+        locationsDao.deleteByUrl(location.url)
     }
 
     suspend fun updatePosition(locationUrl: String, position: Int) = withContext(Dispatchers.IO) {

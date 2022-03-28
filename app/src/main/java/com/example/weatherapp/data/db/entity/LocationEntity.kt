@@ -1,4 +1,4 @@
-package com.example.weatherapp.data.db
+package com.example.weatherapp.data.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -40,5 +40,4 @@ data class LocationEntity(
 
     @ColumnInfo(name = "last_updated")
     var lastUpdated: String?
-
 )

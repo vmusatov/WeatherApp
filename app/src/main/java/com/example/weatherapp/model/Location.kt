@@ -1,6 +1,6 @@
 package com.example.weatherapp.model
 
-import com.example.weatherapp.data.db.LocationEntity
+import com.example.weatherapp.data.db.entity.LocationEntity
 import com.example.weatherapp.data.remote.model.LocationApi
 import com.example.weatherapp.data.remote.model.SearchLocationApi
 import com.example.weatherapp.util.DateUtils

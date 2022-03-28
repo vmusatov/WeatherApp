@@ -1,12 +1,15 @@
-package com.example.weatherapp.data.db
+package com.example.weatherapp.data.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
+import com.example.weatherapp.data.db.entity.LocationEntity
+import com.example.weatherapp.data.db.entity.LocationWithWeatherTuple
 
 @Dao
 interface LocationsDao {
+
+    @Transaction
+    @Query("SELECT * FROM locations WHERE url = :url")
+    suspend fun getLocationByUrlWithWeather(url: String): LocationWithWeatherTuple?
 
     @Query("SELECT * FROM locations")
     suspend fun getAllLocations(): List<LocationEntity>
@@ -21,13 +24,13 @@ interface LocationsDao {
     suspend fun getLocationsCount(): Int
 
     @Insert(entity = LocationEntity::class)
-    suspend fun addLocation(locationEntity: LocationEntity)
+    suspend fun insert(locationEntity: LocationEntity)
 
     @Query("DELETE FROM locations WHERE url = :url")
-    suspend fun removeByUrl(url: String)
+    suspend fun deleteByUrl(url: String)
 
     @Update(entity = LocationEntity::class)
-    suspend fun updateLocation(locationEntity: LocationEntity)
+    suspend fun update(locationEntity: LocationEntity)
 
     @Query("UPDATE locations SET position = :position WHERE url = :locationUrl")
     suspend fun updatePosition(locationUrl: String, position: Int)
