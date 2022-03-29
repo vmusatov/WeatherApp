@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentAddLocationBinding
+import com.example.weatherapp.model.Location
 import com.example.weatherapp.ui.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -85,12 +86,22 @@ class AddLocationFragment : Fragment() {
         locationsList = binding.locationsList
         notFound = binding.notFound
 
-        manageLocationAdapter = AddLocationListAdapter {
+        manageLocationAdapter = AddLocationListAdapter { addLocation(it) }
+    }
+
+    private fun addLocation(location: Location) {
+        if (isLocationExist(location)) {
+            showShortToast(getString(R.string.location_alredy_added))
+        } else {
             coroutineScope.launch {
-                manageViewModel.addLocation(it).join()
+                manageViewModel.addLocation(location).join()
                 navigator().goBack()
             }
         }
+    }
+
+    private fun isLocationExist(location: Location): Boolean {
+        return manageViewModel.locations.value?.firstOrNull { it.url == location.url } != null
     }
 
     private fun setupUi() {
