@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -25,6 +28,13 @@ class ManageLocationsFragment : Fragment() {
 
     private lateinit var manageLocationAdapter: ManageLocationListAdapter
     private lateinit var touchHelper: ItemTouchHelper
+
+    private lateinit var locationsList: RecyclerView
+    private lateinit var emptyLocations: TextView
+
+    private lateinit var editBlock: ConstraintLayout
+    private lateinit var applyBtn: ImageView
+    private lateinit var deleteBtn: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +58,12 @@ class ManageLocationsFragment : Fragment() {
         touchHelper = ItemTouchHelper(
             LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter)
         )
+
+        locationsList = binding.locationsList
+        emptyLocations = binding.emptyLocations
+        applyBtn = binding.apply
+        deleteBtn = binding.delete
+        editBlock = binding.editBlock
     }
 
     private fun setupUi() {
@@ -57,7 +73,7 @@ class ManageLocationsFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.locations.observe(viewLifecycleOwner) {
-            manageLocationAdapter.update(it)
+            updateLocationsList(it)
         }
         viewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
             manageLocationAdapter.updateLocationsInfo(it)
@@ -65,26 +81,37 @@ class ManageLocationsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        touchHelper.attachToRecyclerView(binding.locationsList)
+        touchHelper.attachToRecyclerView(locationsList)
 
-        binding.delete.setOnClickListener {
+        deleteBtn.setOnClickListener {
             manageLocationAdapter.deleteSelected()
         }
 
-        binding.apply.setOnClickListener {
+        applyBtn.setOnClickListener {
             manageLocationAdapter.switchEditMode()
         }
 
         manageLocationAdapter.tempUnit = homeViewModel.getTempUnit()
 
-        with(binding.locationsList) {
+        with(locationsList) {
             adapter = manageLocationAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
+    private fun updateLocationsList(locations: List<Location>) {
+        if (locations.isEmpty()) {
+            locationsList.visibility = View.GONE
+            emptyLocations.visibility = View.VISIBLE
+        } else {
+            locationsList.visibility = View.VISIBLE
+            emptyLocations.visibility = View.GONE
+            manageLocationAdapter.update(locations)
+        }
+    }
+
     private fun setupToolbar() {
-        navigator().setToolbarTitle(requireContext().getString(R.string.manage_locations))
+        navigator().setToolbarTitle(getString(R.string.manage_locations))
         navigator().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
@@ -94,7 +121,6 @@ class ManageLocationsFragment : Fragment() {
                 }
             )
         )
-
         navigator().setToolbarRightAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_search,
@@ -112,9 +138,9 @@ class ManageLocationsFragment : Fragment() {
 
         override fun onSwitchEditMode(editMode: Boolean) {
             if (editMode) {
-                binding.editBlock.visibility = View.VISIBLE
+                editBlock.visibility = View.VISIBLE
             } else {
-                binding.editBlock.visibility = View.GONE
+                editBlock.visibility = View.GONE
             }
         }
 

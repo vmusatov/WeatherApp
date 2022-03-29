@@ -43,6 +43,9 @@ class ManageLocationsViewModel(
 
     fun removeLocation(location: Location) = viewModelScope.launch {
         locationRepository.removeLocation(location)
+        if (locationRepository.getLocationsCount() == 0) {
+            updateLocations()
+        }
     }
 
     fun updateLocationPosition(location: Location, position: Int) = viewModelScope.launch {

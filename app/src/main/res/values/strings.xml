@@ -64,6 +64,7 @@
 
     <string name="network_fail">Failed to get new data\n Check your internet connection</string>
     <string name="db_fail">Failed to get local data\n Try to update</string>
-    <string name="no_location">No selected location</string>
+    <string name="no_selected_location">No selected location</string>
+    <string name="no_added_locations">No added locations</string>
     <string name="show_last_saved_data">Show last saved data</string>
 </resources>

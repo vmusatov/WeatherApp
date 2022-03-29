@@ -273,7 +273,7 @@ class HomeFragment : Fragment() {
             UpdateFailType.NO_LOCATION -> {
                 refreshLayout.isEnabled = false
                 blockErrors.addLocation.visibility = View.VISIBLE
-                getString(R.string.no_location)
+                getString(R.string.no_selected_location)
             }
         }
     }
