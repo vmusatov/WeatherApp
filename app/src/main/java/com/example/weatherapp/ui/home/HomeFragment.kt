@@ -126,7 +126,7 @@ class HomeFragment : Fragment() {
             blockNotifications.notificationsPager
         ) { _, _ -> }.attach()
 
-        binding.refreshLayout.setOnRefreshListener { viewModel.updateWeather() }
+        binding.refreshLayout.setOnRefreshListener { viewModel.updateWeather(force = true) }
     }
 
     private fun updateWeather(data: WeatherData) {

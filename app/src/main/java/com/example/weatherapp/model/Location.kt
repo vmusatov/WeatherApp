@@ -7,6 +7,7 @@ import com.example.weatherapp.util.DateUtils
 import java.util.*
 
 data class Location(
+    var id: Int = -1,
     var name: String,
     var region: String,
     var country: String,
@@ -39,6 +40,7 @@ data class Location(
         fun from(from: LocationEntity): Location {
             val lastUpdated = from.lastUpdated?.let { DateUtils.dateTimeFromString(it) }
             return Location(
+                id = from.id,
                 name = from.name,
                 localtime = from.localtime,
                 region = from.region,

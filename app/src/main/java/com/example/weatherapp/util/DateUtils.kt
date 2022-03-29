@@ -3,6 +3,7 @@ package com.example.weatherapp.util
 import com.example.weatherapp.R
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class DateUtils {
     companion object {
@@ -11,6 +12,9 @@ class DateUtils {
         val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
 
         fun dateTimeFromString(s: String): Date? {
+            if (s.isEmpty()) {
+                return null
+            }
             return dateTimeFormat.parse(s)
         }
 
@@ -32,6 +36,11 @@ class DateUtils {
             calendar.time = dateTimeFormat.parse(dateString) ?: Date()
 
             return calendar.get(Calendar.HOUR_OF_DAY)
+        }
+
+        fun datesDiffInMin(startDate: Date, endDate: Date): Long {
+            val duration = endDate.time - startDate.time
+            return TimeUnit.MILLISECONDS.toMinutes(duration)
         }
 
         private fun mapDateName(dayOfWeek: Int): Int {

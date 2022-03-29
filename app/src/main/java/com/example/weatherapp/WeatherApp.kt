@@ -37,7 +37,13 @@ class WeatherApp : Application() {
 
         weatherApi = retrofit.create(WeatherApi::class.java)
 
-        weatherRepository = WeatherRepository(appPreferences, weatherApi)
+        weatherRepository = WeatherRepository(
+            appPreferences,
+            weatherApi,
+            db.getCurrentWeatherDao(),
+            db.getDaysDao(),
+            db.getHoursDao()
+        )
         locationRepository = LocationRepository(weatherApi, db.getLocationsDao())
     }
 

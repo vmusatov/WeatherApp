@@ -1,6 +1,7 @@
 package com.example.weatherapp.repository
 
 import com.example.weatherapp.data.db.dao.LocationsDao
+import com.example.weatherapp.data.db.entity.LocationWithWeatherTuple
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.SearchLocationApi
 import com.example.weatherapp.model.Location
@@ -19,6 +20,10 @@ class LocationRepository(
 ) {
 
     private val disposeBag = CompositeDisposable()
+
+    suspend fun getLocationWithWeather(locationUrl: String): LocationWithWeatherTuple? {
+        return locationsDao.getLocationByUrlWithWeather(locationUrl)
+    }
 
     suspend fun addLocation(location: Location) = withContext(Dispatchers.IO) {
         locationsDao.insert(location.toEntity())

@@ -18,7 +18,9 @@ import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
 import com.example.weatherapp.notification.factory.TempTomorrowFactory
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
+import com.example.weatherapp.util.DateUtils
 import kotlinx.coroutines.launch
+import java.util.*
 
 class HomeViewModel(
     private val weatherRepository: WeatherRepository,
@@ -53,15 +55,42 @@ class HomeViewModel(
         updateWeather()
     }
 
-    fun updateWeather(selectedLocation: Location? = null) = viewModelScope.launch {
-        val location = selectedLocation ?: locationRepository.getSelectedLocation()
-        location?.let {
+    fun updateWeather(location: Location? = null, force: Boolean = false) = viewModelScope.launch {
+        val selectedLocation = location ?: locationRepository.getSelectedLocation()
+        selectedLocation?.let {
             _selectedLocation.postValue(it)
             if (!it.isSelected) {
                 locationRepository.setLocationIsSelected(it)
             }
-            updateForecast(location)
-            updateAstronomy(location)
+
+            if (force || needForceUpdate(it)) {
+                loadFromApi(it)
+            } else {
+                loadFromDb(it)
+            }
+        }
+    }
+
+    private fun needForceUpdate(location: Location): Boolean {
+        if (location.lastUpdated == null) {
+            return true
+        }
+
+        val datesDiffInMin = DateUtils.datesDiffInMin(location.lastUpdated!!, Date())
+        return datesDiffInMin > 60
+    }
+
+    private fun loadFromApi(location: Location) {
+        updateForecast(location)
+        updateAstronomy(location)
+    }
+
+    private suspend fun loadFromDb(location: Location) {
+        locationRepository.getLocationWithWeather(location.url)?.let {
+            val weatherData = WeatherData.from(it)
+            updateNotifications(weatherData)
+            _weatherData.postValue(weatherData)
+            _astronomy.postValue(weatherData.current.astronomy)
         }
     }
 
@@ -70,26 +99,29 @@ class HomeViewModel(
         weatherRepository.loadForecast("${selectedLocation.lat}, ${selectedLocation.lon}",
             onSuccess = {
                 val data = WeatherData.from(it)
+
                 updateNotifications(data)
                 _weatherData.postValue(data)
                 _isUpdateInProgress.postValue(false)
 
-                updateLocation(selectedLocation.url, data.location)
+                updateDbData(selectedLocation, data)
             },
             onError = {
                 _isUpdateInProgress.postValue(false)
             })
     }
 
-    private fun updateLocation(url: String, location: Location) = viewModelScope.launch {
-        locationRepository.setLastUpdatedIsNow(url)
-        locationRepository.updateLocalTime(url, location.localtime)
-    }
-
     private fun updateAstronomy(selectedLocation: Location) {
         weatherRepository.loadAstronomy(
             "${selectedLocation.lat}, ${selectedLocation.lon}",
-            onSuccess = { _astronomy.postValue(Astronomy.from(it)) },
+            onSuccess = {
+                val astronomy = Astronomy.from(it)
+
+                _astronomy.postValue(astronomy)
+                viewModelScope.launch {
+                    weatherRepository.updateAstronomy(selectedLocation.id, astronomy)
+                }
+            },
             onError = {}
         )
     }
@@ -98,6 +130,22 @@ class HomeViewModel(
         _weatherNotifications.postValue(
             weatherNotificationBuilder.buildNotificationsList(data)
         )
+    }
+
+    private fun updateDbData(location: Location, data: WeatherData) = viewModelScope.launch {
+        weatherRepository.deleteLocationData(location.id)
+        locationRepository.updateLocalTime(location.url, data.location.localtime)
+
+        weatherRepository.addCurrentWeather(location.id, data.current)
+        data.daysForecast.forEach { day ->
+            val dayId = weatherRepository.addDay(location.id, day)
+
+            day.hours.forEach {
+                weatherRepository.addHour(location.id, dayId.toInt(), it)
+            }
+        }
+
+        locationRepository.setLastUpdatedIsNow(location.url)
     }
 
     fun getTempUnit(): TempUnit {

@@ -1,11 +1,14 @@
 package com.example.weatherapp.repository
 
 import android.content.SharedPreferences
+import com.example.weatherapp.data.db.dao.CurrentWeatherDao
+import com.example.weatherapp.data.db.dao.DaysDao
+import com.example.weatherapp.data.db.dao.HoursDao
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.AstronomyApi
 import com.example.weatherapp.data.remote.model.LocationWeatherCurrentApi
 import com.example.weatherapp.data.remote.model.LocationWeatherForecastApi
-import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.model.*
 import com.example.weatherapp.ui.settings.SettingsFragment
 import com.example.weatherapp.util.DateUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -19,6 +22,9 @@ import java.util.*
 class WeatherRepository(
     private val appPreferences: SharedPreferences,
     private val weatherApi: WeatherApi,
+    private val currentWeatherDao: CurrentWeatherDao,
+    private val daysDao: DaysDao,
+    private val hoursDao: HoursDao
 ) {
 
     private val disposeBag = CompositeDisposable()
@@ -71,6 +77,37 @@ class WeatherRepository(
         appPreferences.edit()
             .putInt(SettingsFragment.PREF_TEMP_CODE, tempUnit.code)
             .apply()
+    }
+
+    suspend fun updateAstronomy(locationId: Int, astronomy: Astronomy) =
+        withContext(Dispatchers.IO) {
+            currentWeatherDao.updateAstronomy(locationId, astronomy.sunrise, astronomy.sunset)
+        }
+
+    suspend fun deleteLocationData(locationId: Int) = withContext(Dispatchers.IO) {
+        currentWeatherDao.deleteByLocationId(locationId)
+        daysDao.deleteByLocationId(locationId)
+        hoursDao.deleteByLocationId(locationId)
+    }
+
+    suspend fun addCurrentWeather(locationId: Int, current: CurrentWeather) =
+        withContext(Dispatchers.IO) {
+            val entity = current.toEntity()
+            entity.locationId = locationId
+            currentWeatherDao.insert(entity)
+        }
+
+    suspend fun addHour(locationId: Int, dayId: Int, hour: Hour) = withContext(Dispatchers.IO) {
+        val entity = hour.toEntity()
+        entity.locationId = locationId
+        entity.dayId = dayId
+        hoursDao.insert(entity)
+    }
+
+    suspend fun addDay(locationId: Int, day: Day): Long = withContext(Dispatchers.IO) {
+        val entity = day.toEntity()
+        entity.locationId = locationId
+        return@withContext daysDao.insert(entity)
     }
 
     fun clear() {

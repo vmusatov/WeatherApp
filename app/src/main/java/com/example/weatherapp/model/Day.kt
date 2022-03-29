@@ -1,5 +1,6 @@
 package com.example.weatherapp.model
 
+import com.example.weatherapp.data.db.entity.DayEntity
 import com.example.weatherapp.data.remote.model.ForecastDayApi
 import kotlin.math.min
 
@@ -14,7 +15,36 @@ data class Day(
     var conditionSecondIcon: String,
     var hours: List<Hour>
 ) {
+    fun toEntity(): DayEntity {
+        return DayEntity(
+            id = 0,
+            locationId = -1,
+            date = date,
+            humidity = humidity,
+            maxTempC = maxTempC,
+            maxTempF = maxTempF,
+            minTempC = minTempC,
+            minTempF = minTempF,
+            conditionFirstIcon = conditionFirstIcon,
+            conditionSecondIcon = conditionSecondIcon
+        )
+    }
+
     companion object {
+        fun from(from: DayEntity): Day {
+            return Day(
+                date = from.date,
+                humidity = from.humidity,
+                maxTempC = from.maxTempC,
+                maxTempF = from.maxTempF,
+                minTempC = from.minTempC,
+                minTempF = from.minTempF,
+                conditionFirstIcon = from.conditionFirstIcon,
+                conditionSecondIcon = from.conditionSecondIcon,
+                emptyList()
+            )
+        }
+
         fun from(from: ForecastDayApi): Day {
             return Day(
                 date = from.date,

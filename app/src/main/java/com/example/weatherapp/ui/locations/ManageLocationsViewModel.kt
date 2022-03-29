@@ -36,9 +36,9 @@ class ManageLocationsViewModel(
         }
     }
 
-    fun addLocation(searchLocation: Location) = viewModelScope.launch {
-        searchLocation.position = locationRepository.getLocationsCount()
-        locationRepository.addLocation(searchLocation)
+    fun addLocation(location: Location) = viewModelScope.launch {
+        location.position = locationRepository.getLocationsCount()
+        locationRepository.addLocation(location)
         updateLocations()
     }
 
