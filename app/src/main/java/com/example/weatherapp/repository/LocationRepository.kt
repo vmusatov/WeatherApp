@@ -26,6 +26,12 @@ class LocationRepository(
     }
 
     suspend fun addLocation(location: Location) = withContext(Dispatchers.IO) {
+        location.position = getLocationsCount()
+
+        if (location.position == 0) {
+            location.isSelected = true
+        }
+
         locationsDao.insert(location.toEntity())
     }
 

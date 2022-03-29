@@ -13,9 +13,9 @@ import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.*
-import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.model.Astronomy
 import com.example.weatherapp.model.CurrentWeather
+import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.ui.ToolbarAction
@@ -23,7 +23,6 @@ import com.example.weatherapp.ui.navigator
 import com.example.weatherapp.ui.viewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
-
 
 class HomeFragment : Fragment() {
 
@@ -48,9 +47,11 @@ class HomeFragment : Fragment() {
     private val disableSwipeToUpdateRVScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            when (newState) {
-                SCROLL_STATE_DRAGGING -> binding.refreshLayout.isEnabled = false
-                else -> binding.refreshLayout.isEnabled = true
+            if (!binding.refreshLayout.isRefreshing) {
+                when (newState) {
+                    SCROLL_STATE_DRAGGING -> binding.refreshLayout.isEnabled = false
+                    else -> binding.refreshLayout.isEnabled = true
+                }
             }
         }
     }
@@ -58,7 +59,9 @@ class HomeFragment : Fragment() {
     private val disableSwipeToUpdateVPPageChangeCallback =
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
-                binding.refreshLayout.isEnabled = state == ViewPager.SCROLL_STATE_IDLE
+                if (!binding.refreshLayout.isRefreshing) {
+                    binding.refreshLayout.isEnabled = state == ViewPager.SCROLL_STATE_IDLE
+                }
             }
         }
 
@@ -72,6 +75,10 @@ class HomeFragment : Fragment() {
         setupFields()
         setupObservers()
         setupUi()
+
+        if (viewModel.selectedLocation.value == null) {
+            viewModel.updateWeather()
+        }
 
         return binding.root
     }
@@ -92,6 +99,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.selectedLocation.observe(viewLifecycleOwner) {
+            navigator().setToolbarTitle(it?.name ?: "")
+        }
         viewModel.weatherData.observe(viewLifecycleOwner) {
             updateWeather(it)
             updateHourlyForecast(it)
@@ -99,7 +109,7 @@ class HomeFragment : Fragment() {
         viewModel.astronomy.observe(viewLifecycleOwner) { updateAstronomy(it) }
         viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
         viewModel.isUpdateInProgress.observe(viewLifecycleOwner) { showIsUpdate(it) }
-        viewModel.selectedLocation.observe(viewLifecycleOwner) { navigator().setToolbarTitle(it.name) }
+        viewModel.updateFail.observe(viewLifecycleOwner) { handleError(it) }
     }
 
     private fun setupUi() {
@@ -127,6 +137,8 @@ class HomeFragment : Fragment() {
         ) { _, _ -> }.attach()
 
         binding.refreshLayout.setOnRefreshListener { viewModel.updateWeather(force = true) }
+        binding.addLocation.setOnClickListener { navigator().goToAddLocation() }
+        binding.showLastSaved.setOnClickListener { viewModel.updateWeather() }
     }
 
     private fun updateWeather(data: WeatherData) {
@@ -193,16 +205,13 @@ class HomeFragment : Fragment() {
 
         if (hours.isEmpty()) {
             hourlyForecastList.visibility = View.GONE
-            binding.byHourListEmpty.visibility = View.VISIBLE
         } else {
             graphDecorator = HourlyForecastItemDecorator(hours.map { it.tempF }, requireContext())
             hourlyForecastList.addItemDecoration(graphDecorator as HourlyForecastItemDecorator)
             hourlyForecastAdapter.update(hours, viewModel.getTempUnit())
 
             hourlyForecastList.visibility = View.VISIBLE
-            binding.byHourListEmpty.visibility = View.GONE
         }
-
     }
 
     private fun updateAstronomy(astronomy: Astronomy) {
@@ -225,9 +234,39 @@ class HomeFragment : Fragment() {
         )
     }
 
+    private fun handleError(type: UpdateFailType?) {
+        binding.refreshLayout.isEnabled = true
+
+        if (type == null) {
+            binding.errorBlock.visibility = View.GONE
+            return
+        }
+
+        binding.content.visibility = View.GONE
+        binding.errorBlock.visibility = View.VISIBLE
+
+        binding.addLocation.visibility = View.GONE
+        binding.showLastSaved.visibility = View.GONE
+
+        binding.errorText.text = when (type) {
+            UpdateFailType.FAIL_LOAD_FROM_DB -> getString(R.string.db_fail)
+            UpdateFailType.FAIL_LOAD_FROM_NETWORK -> {
+                binding.showLastSaved.visibility = View.VISIBLE
+                getString(R.string.network_fail)
+            }
+            UpdateFailType.NO_LOCATION -> {
+                binding.refreshLayout.isEnabled = false
+                binding.addLocation.visibility = View.VISIBLE
+                getString(R.string.no_location)
+            }
+        }
+    }
+
     private fun showIsUpdate(isUpdateInProgress: Boolean) {
         if (isUpdateInProgress) {
+            binding.errorBlock.visibility = View.GONE
             binding.refreshLayout.isRefreshing = true
+
             if (viewModel.weatherData.value == null) {
                 binding.content.visibility = View.INVISIBLE
             }

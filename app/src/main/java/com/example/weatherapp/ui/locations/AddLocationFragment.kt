@@ -17,7 +17,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentAddLocationBinding
 import com.example.weatherapp.ui.*
-import com.example.weatherapp.ui.home.HomeViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class AddLocationFragment : Fragment() {
 
@@ -30,6 +33,8 @@ class AddLocationFragment : Fragment() {
 
     private val viewModel: AddLocationViewModel by viewModels { viewModelFactory() }
     private val manageViewModel: ManageLocationsViewModel by activityViewModels { viewModelFactory() }
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     private val searchTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
@@ -81,8 +86,10 @@ class AddLocationFragment : Fragment() {
         notFound = binding.notFound
 
         manageLocationAdapter = AddLocationListAdapter {
-            manageViewModel.addLocation(it)
-            navigator().goBack()
+            coroutineScope.launch {
+                manageViewModel.addLocation(it).join()
+                navigator().goBack()
+            }
         }
     }
 

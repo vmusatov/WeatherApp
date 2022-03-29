@@ -22,6 +22,12 @@ import com.example.weatherapp.util.DateUtils
 import kotlinx.coroutines.launch
 import java.util.*
 
+enum class UpdateFailType {
+    NO_LOCATION,
+    FAIL_LOAD_FROM_DB,
+    FAIL_LOAD_FROM_NETWORK
+}
+
 class HomeViewModel(
     private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository
@@ -29,8 +35,8 @@ class HomeViewModel(
 
     private val TAG = HomeViewModel::class.java.simpleName
 
-    val selectedLocation: LiveData<Location> get() = _selectedLocation
-    private val _selectedLocation = MutableLiveData<Location>()
+    val selectedLocation: LiveData<Location?> get() = _selectedLocation
+    private val _selectedLocation = MutableLiveData<Location?>()
 
     val weatherData: LiveData<WeatherData> get() = _weatherData
     private val _weatherData = MutableLiveData<WeatherData>()
@@ -44,6 +50,9 @@ class HomeViewModel(
     val isUpdateInProgress: LiveData<Boolean> get() = _isUpdateInProgress
     private val _isUpdateInProgress = MutableLiveData<Boolean>()
 
+    val updateFail: LiveData<UpdateFailType?> get() = _updateFail
+    private val _updateFail = MutableLiveData<UpdateFailType?>()
+
     private val weatherNotificationBuilder = WeatherNotificationsBuilder()
 
     init {
@@ -51,23 +60,28 @@ class HomeViewModel(
         weatherNotificationBuilder.addFactory(ExpectPrecipitationsFactory())
         weatherNotificationBuilder.addFactory(ExpectPrecipitationsEndFactory())
         weatherNotificationBuilder.addFactory(TempTomorrowFactory())
-
-        updateWeather()
     }
 
     fun updateWeather(location: Location? = null, force: Boolean = false) = viewModelScope.launch {
+        _updateFail.postValue(null)
+
         val selectedLocation = location ?: locationRepository.getSelectedLocation()
-        selectedLocation?.let {
-            _selectedLocation.postValue(it)
-            if (!it.isSelected) {
-                locationRepository.setLocationIsSelected(it)
+        _selectedLocation.postValue(selectedLocation)
+
+        if (selectedLocation != null) {
+            if (!selectedLocation.isSelected) {
+                locationRepository.setLocationIsSelected(selectedLocation)
             }
 
-            if (force || needForceUpdate(it)) {
-                loadFromApi(it)
+            _isUpdateInProgress.postValue(true)
+
+            if (force || needForceUpdate(selectedLocation)) {
+                loadFromApi(selectedLocation)
             } else {
-                loadFromDb(it)
+                loadFromDb(selectedLocation)
             }
+        } else {
+            _updateFail.postValue(UpdateFailType.NO_LOCATION)
         }
     }
 
@@ -80,34 +94,35 @@ class HomeViewModel(
         return datesDiffInMin > 60
     }
 
-    private fun loadFromApi(location: Location) {
-        updateForecast(location)
-        updateAstronomy(location)
-    }
-
     private suspend fun loadFromDb(location: Location) {
-        locationRepository.getLocationWithWeather(location.url)?.let {
-            val weatherData = WeatherData.from(it)
+        val dbData = locationRepository.getLocationWithWeather(location.url)
+        if (dbData != null) {
+            val weatherData = WeatherData.from(dbData)
             updateNotifications(weatherData)
+
             _weatherData.postValue(weatherData)
             _astronomy.postValue(weatherData.current.astronomy)
+        } else {
+            _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_DB)
         }
+        _isUpdateInProgress.postValue(false)
     }
 
-    private fun updateForecast(selectedLocation: Location) {
-        _isUpdateInProgress.postValue(true)
-        weatherRepository.loadForecast("${selectedLocation.lat}, ${selectedLocation.lon}",
+    private fun loadFromApi(location: Location) {
+        weatherRepository.loadForecast("${location.lat}, ${location.lon}",
             onSuccess = {
                 val data = WeatherData.from(it)
 
+                updateAstronomy(location)
                 updateNotifications(data)
                 _weatherData.postValue(data)
                 _isUpdateInProgress.postValue(false)
 
-                updateDbData(selectedLocation, data)
+                updateDbData(location, data)
             },
             onError = {
                 _isUpdateInProgress.postValue(false)
+                _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_NETWORK)
             })
     }
 

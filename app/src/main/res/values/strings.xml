@@ -16,7 +16,6 @@
     <string name="undefined_day">Undefined day</string>
     <string name="today">Today</string>
 
-    <string name="no_data">No Data</string>
     <string name="options">Options</string>
     <string name="drawer_item_home">123</string>
     <string name="about">About</string>
@@ -61,4 +60,9 @@
 
     <string name="settings_menu_item_c">°C</string>
     <string name="settings_menu_item_f">°F</string>
+
+    <string name="network_fail">Failed to get new data\n Check your internet connection</string>
+    <string name="db_fail">Failed to get local data\n Try to update</string>
+    <string name="no_location">No selected location</string>
+    <string name="show_last_saved_data">Show last saved data</string>
 </resources>
