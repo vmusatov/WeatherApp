@@ -59,7 +59,7 @@ class WeatherRepository(
         onSuccess: Consumer<AstronomyApi>,
         onError: Consumer<Throwable>
     ) {
-        val result = weatherApi.getAstronomy(q, DateUtils.dateFormat.format(Date()))
+        val result = weatherApi.getAstronomy(q, DateUtils.DATE_FORMAT.format(Date()))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(onSuccess, onError)

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/app_margin"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:text="@string/powered_by_weatherapi"
+        android:textColor="?attr/colorSecondaryVariant"
+        android:textSize="@dimen/very_small_text" />
+
+    <TextView
+        android:id="@+id/updated_at"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:textColor="?attr/colorSecondaryVariant"
+        android:textSize="@dimen/very_small_text" />
+</LinearLayout>

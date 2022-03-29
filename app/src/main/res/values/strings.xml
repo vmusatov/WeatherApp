@@ -5,6 +5,7 @@
     <string name="kmh">%1$d km/h</string>
     <string name="mbar">%1$d mbar</string>
     <string name="feels_like">Feels like: %1$d°</string>
+    <string name="updated_at">updated %1$s</string>
 
     <string name="sunday">Sunday</string>
     <string name="monday">Monday</string>

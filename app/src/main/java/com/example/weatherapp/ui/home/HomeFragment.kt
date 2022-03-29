@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
@@ -40,17 +42,21 @@ class HomeFragment : Fragment() {
     private lateinit var blockAirQuality: BlockAirQualityBinding
     private lateinit var blockAstronomy: BlockAstronomyBinding
     private lateinit var blockNotifications: BlockNotificationsBinding
+    private lateinit var blockAdditionalInfo: BlockAdditionalInfoBinding
+    private lateinit var blockErrors: BlockErrorsBinding
 
+    private lateinit var content: LinearLayout
     private lateinit var hourlyForecastList: RecyclerView
     private lateinit var dailyForecastList: RecyclerView
+    private lateinit var refreshLayout: SwipeRefreshLayout
 
     private val disableSwipeToUpdateRVScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if (!binding.refreshLayout.isRefreshing) {
+            if (!refreshLayout.isRefreshing) {
                 when (newState) {
-                    SCROLL_STATE_DRAGGING -> binding.refreshLayout.isEnabled = false
-                    else -> binding.refreshLayout.isEnabled = true
+                    SCROLL_STATE_DRAGGING -> refreshLayout.isEnabled = false
+                    else -> refreshLayout.isEnabled = true
                 }
             }
         }
@@ -59,8 +65,8 @@ class HomeFragment : Fragment() {
     private val disableSwipeToUpdateVPPageChangeCallback =
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
-                if (!binding.refreshLayout.isRefreshing) {
-                    binding.refreshLayout.isEnabled = state == ViewPager.SCROLL_STATE_IDLE
+                if (!refreshLayout.isRefreshing) {
+                    refreshLayout.isEnabled = state == ViewPager.SCROLL_STATE_IDLE
                 }
             }
         }
@@ -92,10 +98,14 @@ class HomeFragment : Fragment() {
         blockAdditional = binding.additionalWeather
         blockAirQuality = binding.airQuality
         blockAstronomy = binding.astronomy
+        blockAdditionalInfo = binding.additionalInfo
+        blockErrors = binding.errors
 
+        content = binding.content
         hourlyForecastList = binding.byHourList
         dailyForecastList = binding.byDayList
         blockNotifications = binding.notifications
+        refreshLayout = binding.refreshLayout
     }
 
     private fun setupObservers() {
@@ -136,9 +146,9 @@ class HomeFragment : Fragment() {
             blockNotifications.notificationsPager
         ) { _, _ -> }.attach()
 
-        binding.refreshLayout.setOnRefreshListener { viewModel.updateWeather(force = true) }
-        binding.addLocation.setOnClickListener { navigator().goToAddLocation() }
-        binding.showLastSaved.setOnClickListener { viewModel.updateWeather() }
+        refreshLayout.setOnRefreshListener { viewModel.updateWeather(force = true) }
+        blockErrors.addLocation.setOnClickListener { navigator().goToAddLocation() }
+        blockErrors.showLastSaved.setOnClickListener { viewModel.updateWeather() }
     }
 
     private fun updateWeather(data: WeatherData) {
@@ -149,6 +159,12 @@ class HomeFragment : Fragment() {
         updateAirQuality(data.current)
 
         dailyForecastAdapter.update(data.daysForecast, tempUnit)
+
+        blockAdditionalInfo.updatedAt.visibility = View.GONE
+        data.lastUpdated?.let {
+            blockAdditionalInfo.updatedAt.text = getString(R.string.updated_at, it)
+            blockAdditionalInfo.updatedAt.visibility = View.VISIBLE
+        }
     }
 
     private fun updateNotifications(notifications: List<WeatherNotification>) {
@@ -235,28 +251,28 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleError(type: UpdateFailType?) {
-        binding.refreshLayout.isEnabled = true
+        refreshLayout.isEnabled = true
 
         if (type == null) {
-            binding.errorBlock.visibility = View.GONE
+            blockErrors.root.visibility = View.GONE
             return
         }
 
-        binding.content.visibility = View.GONE
-        binding.errorBlock.visibility = View.VISIBLE
+        content.visibility = View.GONE
+        blockErrors.root.visibility = View.VISIBLE
 
-        binding.addLocation.visibility = View.GONE
-        binding.showLastSaved.visibility = View.GONE
+        blockErrors.addLocation.visibility = View.GONE
+        blockErrors.showLastSaved.visibility = View.GONE
 
-        binding.errorText.text = when (type) {
+        blockErrors.errorText.text = when (type) {
             UpdateFailType.FAIL_LOAD_FROM_DB -> getString(R.string.db_fail)
             UpdateFailType.FAIL_LOAD_FROM_NETWORK -> {
-                binding.showLastSaved.visibility = View.VISIBLE
+                blockErrors.showLastSaved.visibility = View.VISIBLE
                 getString(R.string.network_fail)
             }
             UpdateFailType.NO_LOCATION -> {
-                binding.refreshLayout.isEnabled = false
-                binding.addLocation.visibility = View.VISIBLE
+                refreshLayout.isEnabled = false
+                blockErrors.addLocation.visibility = View.VISIBLE
                 getString(R.string.no_location)
             }
         }
@@ -264,15 +280,15 @@ class HomeFragment : Fragment() {
 
     private fun showIsUpdate(isUpdateInProgress: Boolean) {
         if (isUpdateInProgress) {
-            binding.errorBlock.visibility = View.GONE
-            binding.refreshLayout.isRefreshing = true
+            blockErrors.root.visibility = View.GONE
+            refreshLayout.isRefreshing = true
 
             if (viewModel.weatherData.value == null) {
-                binding.content.visibility = View.INVISIBLE
+                content.visibility = View.INVISIBLE
             }
         } else {
-            binding.refreshLayout.isRefreshing = false
-            binding.content.visibility = View.VISIBLE
+            refreshLayout.isRefreshing = false
+            content.visibility = View.VISIBLE
         }
     }
 }

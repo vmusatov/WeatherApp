@@ -8,32 +8,31 @@ import java.util.concurrent.TimeUnit
 class DateUtils {
     companion object {
 
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-        val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
+        val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd")
+        val DATE_TIME_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm")
+        val UPDATED_AT_DATE_FORMAT = SimpleDateFormat("dd.MM, HH:mm")
 
         fun dateTimeFromString(s: String): Date? {
             if (s.isEmpty()) {
                 return null
             }
-            return dateTimeFormat.parse(s)
+            return DATE_TIME_FORMAT.parse(s)
         }
 
         fun dateTimeToString(d: Date): String {
-            return dateTimeFormat.format(d)
+            return DATE_TIME_FORMAT.format(d)
         }
 
         fun getDayName(dateString: String): Int {
             val calendar = Calendar.getInstance()
-            calendar.time = dateFormat.parse(dateString) ?: Date()
+            calendar.time = DATE_FORMAT.parse(dateString) ?: Date()
 
             return mapDateName(calendar.get(Calendar.DAY_OF_WEEK))
         }
 
-        fun getNowHour(): Int = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
         fun getHourFromDate(dateString: String): Int {
             val calendar = Calendar.getInstance()
-            calendar.time = dateTimeFormat.parse(dateString) ?: Date()
+            calendar.time = DATE_TIME_FORMAT.parse(dateString) ?: Date()
 
             return calendar.get(Calendar.HOUR_OF_DAY)
         }

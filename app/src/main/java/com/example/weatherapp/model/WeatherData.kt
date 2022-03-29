@@ -3,12 +3,14 @@ package com.example.weatherapp.model
 import com.example.weatherapp.data.db.entity.LocationWithWeatherTuple
 import com.example.weatherapp.data.remote.model.LocationWeatherForecastApi
 import com.example.weatherapp.util.DateUtils
+import java.util.Date
 
 data class WeatherData(
     val location: Location,
     val current: CurrentWeather,
     val hoursForecast: List<Hour>,
-    val daysForecast: List<Day>
+    val daysForecast: List<Day>,
+    val lastUpdated: String?
 ) {
     companion object {
         fun from(apiModel: LocationWeatherForecastApi): WeatherData {
@@ -16,8 +18,9 @@ data class WeatherData(
             val current = CurrentWeather.from(apiModel)
             val days = apiModel.forecast.forecastDays.map { Day.from(it) }
             val hours = parseHoursForecast(apiModel.location.localtime, days)
+            val lastUpdated = DateUtils.UPDATED_AT_DATE_FORMAT.format(Date())
 
-            return WeatherData(location, current, hours, days)
+            return WeatherData(location, current, hours, days, lastUpdated)
         }
 
         fun from(entity: LocationWithWeatherTuple): WeatherData {
@@ -26,7 +29,11 @@ data class WeatherData(
             val days = parseDaysForecast(entity)
             val hours = parseHoursForecast(entity.location.localtime, days)
 
-            return WeatherData(location, current, hours, days)
+            val lastUpdated = location.lastUpdated?.let {
+                DateUtils.UPDATED_AT_DATE_FORMAT.format(it)
+            }
+
+            return WeatherData(location, current, hours, days, lastUpdated)
         }
 
         private fun parseDaysForecast(from: LocationWithWeatherTuple): List<Day> {

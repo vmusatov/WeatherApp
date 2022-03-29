@@ -17,44 +17,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/error_block"
-                android:layout_width="match_parent"
+            <include
+                android:id="@+id/errors"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                layout="@layout/block_errors"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/error_text"
-                    style="@style/contentBlock"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:textSize="@dimen/normal_text" />
-
-                <TextView
-                    android:id="@+id/add_location"
-                    style="@style/formContentBlock"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="@string/add_location"
-                    android:textSize="@dimen/small_text"/>
-
-                <TextView
-                    android:id="@+id/show_last_saved"
-                    style="@style/formContentBlock"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="@string/show_last_saved_data"
-                    android:textSize="@dimen/small_text"/>
-            </LinearLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
                 android:id="@+id/content"
@@ -98,6 +69,10 @@
                 <include
                     android:id="@+id/air_quality"
                     layout="@layout/block_air_quality" />
+
+                <include
+                    android:id="@+id/additional_info"
+                    layout="@layout/block_additional_info" />
 
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
