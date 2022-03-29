@@ -23,6 +23,7 @@ import com.example.weatherapp.ui.viewModelFactory
 class ManageLocationsFragment : Fragment() {
 
     private lateinit var binding: FragmentManageLocationsBinding
+
     private val viewModel: ManageLocationsViewModel by activityViewModels { viewModelFactory() }
     private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory() }
 
@@ -31,7 +32,6 @@ class ManageLocationsFragment : Fragment() {
 
     private lateinit var locationsList: RecyclerView
     private lateinit var emptyLocations: TextView
-
     private lateinit var editBlock: ConstraintLayout
     private lateinit var applyBtn: ImageView
     private lateinit var deleteBtn: ImageView
@@ -46,8 +46,6 @@ class ManageLocationsFragment : Fragment() {
         setupFields()
         setupUi()
         setupObservers()
-
-        viewModel.updateLocations()
 
         return binding.root
     }
@@ -76,7 +74,7 @@ class ManageLocationsFragment : Fragment() {
             updateLocationsList(it)
         }
         viewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
-            manageLocationAdapter.updateLocationsInfo(it)
+            manageLocationAdapter.updateLocationsInfo(it.toMutableList())
         }
     }
 
@@ -102,6 +100,7 @@ class ManageLocationsFragment : Fragment() {
     private fun updateLocationsList(locations: List<Location>) {
         if (locations.isEmpty()) {
             locationsList.visibility = View.GONE
+            editBlock.visibility = View.GONE
             emptyLocations.visibility = View.VISIBLE
         } else {
             locationsList.visibility = View.VISIBLE
@@ -133,6 +132,7 @@ class ManageLocationsFragment : Fragment() {
 
         override fun onSelectLocation(location: Location) {
             homeViewModel.updateWeather(location)
+            viewModel.updateWeatherInfo(listOf(location))
             navigator().goBack()
         }
 
@@ -145,13 +145,11 @@ class ManageLocationsFragment : Fragment() {
         }
 
         override fun onDeleteLocations(locations: List<Location>) {
-            locations.forEach { viewModel.removeLocation(it) }
+            viewModel.removeLocations(locations)
         }
 
         override fun onApplyChanges(locations: List<Location>) {
-            locations.forEachIndexed { index, location ->
-                viewModel.updateLocationPosition(location, index)
-            }
+            viewModel.updateLocationPositions(locations)
         }
 
         override fun onDragStart(viewHolder: RecyclerView.ViewHolder) {
