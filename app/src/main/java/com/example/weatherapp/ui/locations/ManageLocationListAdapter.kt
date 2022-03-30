@@ -9,13 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemManageLocationsBinding
 import com.example.weatherapp.model.Location
-import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.model.LocationWeatherInfo
+import com.example.weatherapp.model.TempUnit
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
 
+@SuppressLint("NotifyDataSetChanged")
 class ManageLocationListAdapter(
-    private val locationsManager: LocationsManager,
+    private val locationsChangeCallback: LocationsChangeCallback,
 ) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>() {
 
     private var data: MutableList<Location> = mutableListOf()
@@ -40,17 +41,17 @@ class ManageLocationListAdapter(
             notifyItemRemoved(data.indexOf(it))
             data.remove(it)
         }
-        locationsManager.onDeleteLocations(selectedItems)
+        locationsChangeCallback.onDeleteLocations(selectedItems)
         selectedItems.clear()
     }
 
     fun switchEditMode() {
         if (isEditMode) {
-            locationsManager.onApplyChanges(data)
+            locationsChangeCallback.onApplyChanges(data)
         }
         isEditMode = !isEditMode
         selectedItems.clear()
-        locationsManager.onSwitchEditMode(isEditMode)
+        locationsChangeCallback.onSwitchEditMode(isEditMode)
 
         notifyDataSetChanged()
     }
@@ -112,7 +113,7 @@ class ManageLocationListAdapter(
         with(holder.binding) {
             root.setOnClickListener {
                 if (!isEditMode) {
-                    locationsManager.onSelectLocation(it.tag as Location)
+                    locationsChangeCallback.onSelectLocation(it.tag as Location)
                 } else {
                     checkbox.performClick()
                 }
@@ -125,7 +126,7 @@ class ManageLocationListAdapter(
 
             dragDropView.setOnTouchListener { _, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
-                    locationsManager.onDragStart(holder)
+                    locationsChangeCallback.onDragStart(holder)
                 }
                 return@setOnTouchListener true
             }

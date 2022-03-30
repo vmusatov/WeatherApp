@@ -3,7 +3,7 @@ package com.example.weatherapp.ui.locations
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.model.Location
 
-interface LocationsManager {
+interface LocationsChangeCallback {
 
     fun onSelectLocation(location: Location)
 

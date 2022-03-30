@@ -51,7 +51,7 @@ class ManageLocationsFragment : Fragment() {
     }
 
     private fun setupFields() {
-        manageLocationAdapter = ManageLocationListAdapter(LocationsManagerImpl())
+        manageLocationAdapter = ManageLocationListAdapter(LocationsChangeCallbackImpl())
 
         touchHelper = ItemTouchHelper(
             LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter)
@@ -74,7 +74,7 @@ class ManageLocationsFragment : Fragment() {
             updateLocationsList(it)
         }
         viewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
-            manageLocationAdapter.updateLocationsInfo(it.toMutableList())
+            manageLocationAdapter.updateLocationsInfo(it.toList())
         }
     }
 
@@ -128,7 +128,7 @@ class ManageLocationsFragment : Fragment() {
         )
     }
 
-    inner class LocationsManagerImpl : LocationsManager {
+    inner class LocationsChangeCallbackImpl : LocationsChangeCallback {
 
         override fun onSelectLocation(location: Location) {
             homeViewModel.updateWeather(location)
