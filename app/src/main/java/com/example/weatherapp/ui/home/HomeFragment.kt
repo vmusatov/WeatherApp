@@ -131,7 +131,7 @@ class HomeFragment : Fragment() {
         hourlyForecastList.adapter = hourlyForecastAdapter
         hourlyForecastList.layoutManager = lm
         hourlyForecastList.addOnScrollListener(disableSwipeToUpdateRVScrollListener)
-        hourlyForecastList.scrollToPosition(0)
+        hourlyForecastList.itemAnimator = null
 
         dailyForecastList.adapter = dailyForecastAdapter
         dailyForecastList.layoutManager = LinearLayoutManager(requireContext())
@@ -218,14 +218,14 @@ class HomeFragment : Fragment() {
         graphDecorator?.let { hourlyForecastList.removeItemDecoration(it) }
 
         val hours = data.hoursForecast
-
         if (hours.isEmpty()) {
             hourlyForecastList.visibility = View.GONE
         } else {
+            hourlyForecastAdapter.update(hours, viewModel.getTempUnit())
             graphDecorator = HourlyForecastItemDecorator(hours.map { it.tempF }, requireContext())
             hourlyForecastList.addItemDecoration(graphDecorator as HourlyForecastItemDecorator)
-            hourlyForecastAdapter.update(hours, viewModel.getTempUnit())
 
+            hourlyForecastList.scrollToPosition(0)
             hourlyForecastList.visibility = View.VISIBLE
         }
     }
