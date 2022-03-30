@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemManageLocationsBinding
@@ -13,6 +14,23 @@ import com.example.weatherapp.model.LocationWeatherInfo
 import com.example.weatherapp.model.TempUnit
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
+
+class LocationsDiffCallback(
+    private val oldData: List<Location>,
+    private val newData: List<Location>
+) : DiffUtil.Callback() {
+    override fun getOldListSize(): Int = oldData.size
+
+    override fun getNewListSize(): Int = newData.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldData[oldItemPosition].url == newData[newItemPosition].url
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldData[oldItemPosition] == newData[newItemPosition]
+    }
+}
 
 @SuppressLint("NotifyDataSetChanged")
 class ManageLocationListAdapter(
@@ -27,13 +45,26 @@ class ManageLocationListAdapter(
     private var selectedItems: MutableList<Location> = mutableListOf()
 
     fun updateLocationsInfo(info: List<LocationWeatherInfo>) {
-        dataInfo = info.toMutableList()
-        notifyDataSetChanged()
+        info.forEach { newItem ->
+            val oldItem = this.dataInfo.firstOrNull { it.locationName == newItem.locationName }
+            if (oldItem == null) {
+                dataInfo.add(newItem)
+                notifyItemChanged(data.indexOfFirst { it.name == newItem.locationName })
+            } else if (oldItem != newItem) {
+                dataInfo[dataInfo.indexOf(oldItem)] = newItem
+                notifyItemChanged(data.indexOfFirst { it.name == newItem.locationName })
+            }
+        }
     }
 
     fun update(data: List<Location>) {
-        this.data = data.sortedBy { it.position }.toMutableList()
-        notifyDataSetChanged()
+        val newData = data.sortedBy { it.position }.toMutableList()
+        val diffCallback = LocationsDiffCallback(this.data, newData)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        this.data = newData
+
+        diffResult.dispatchUpdatesTo(this)
     }
 
     fun deleteSelected() {

@@ -71,6 +71,13 @@ class HomeFragment : Fragment() {
             }
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        hourlyForecastAdapter = HourlyForecastListAdapter()
+        dailyForecastAdapter = DailyForecastListAdapter()
+        notificationsAdapter = NotificationsPagerAdapter()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -90,10 +97,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupFields() {
-        hourlyForecastAdapter = HourlyForecastListAdapter()
-        dailyForecastAdapter = DailyForecastListAdapter()
-        notificationsAdapter = NotificationsPagerAdapter()
-
         blockCurrent = binding.current
         blockAdditional = binding.additionalWeather
         blockAirQuality = binding.airQuality

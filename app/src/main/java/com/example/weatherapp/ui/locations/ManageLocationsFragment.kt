@@ -36,6 +36,14 @@ class ManageLocationsFragment : Fragment() {
     private lateinit var applyBtn: ImageView
     private lateinit var deleteBtn: ImageView
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        manageLocationAdapter = ManageLocationListAdapter(LocationsChangeCallbackImpl())
+        touchHelper = ItemTouchHelper(
+            LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter)
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,11 +59,6 @@ class ManageLocationsFragment : Fragment() {
     }
 
     private fun setupFields() {
-        manageLocationAdapter = ManageLocationListAdapter(LocationsChangeCallbackImpl())
-
-        touchHelper = ItemTouchHelper(
-            LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter)
-        )
 
         locationsList = binding.locationsList
         emptyLocations = binding.emptyLocations
