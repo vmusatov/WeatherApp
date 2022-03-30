@@ -55,7 +55,10 @@ class ManageLocationsViewModel(
 
     fun removeLocations(locations: List<Location>) {
         for (location in locations) {
-            viewModelScope.launch { locationRepository.removeLocation(location) }
+            viewModelScope.launch {
+                weatherRepository.deleteLocationData(location.id)
+                locationRepository.deleteLocation(location)
+            }
         }
         _locations.value?.removeAll(locations)
     }

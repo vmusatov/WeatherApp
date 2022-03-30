@@ -26,13 +26,20 @@ class LocationRepository(
     }
 
     suspend fun addLocation(location: Location) = withContext(Dispatchers.IO) {
-        location.position = getLocationsCount()
+        location.position = locationsDao.getLocationsCount()
 
         if (location.position == 0) {
             location.isSelected = true
         }
 
         locationsDao.insert(location.toEntity())
+    }
+
+    suspend fun getLocationByUrl(url: String): Location? = withContext(Dispatchers.IO) {
+        locationsDao.getLocationByUrl(url)?.let {
+            return@withContext Location.from(it)
+        }
+        return@withContext null
     }
 
     suspend fun getSelectedLocation(): Location? = withContext(Dispatchers.IO) {
@@ -68,7 +75,7 @@ class LocationRepository(
         }
     }
 
-    suspend fun removeLocation(location: Location) = withContext(Dispatchers.IO) {
+    suspend fun deleteLocation(location: Location) = withContext(Dispatchers.IO) {
         locationsDao.getLocationByUrl(location.url)?.let { entity ->
             if (entity.isSelected == 1) {
                 val notSelectedLocation =
@@ -95,10 +102,6 @@ class LocationRepository(
 
     suspend fun setLastUpdatedIsNow(locationUrl: String) = withContext(Dispatchers.IO) {
         locationsDao.updateLastUpdated(locationUrl, DateUtils.dateTimeToString(Date()))
-    }
-
-    suspend fun getLocationsCount(): Int = withContext(Dispatchers.IO) {
-        locationsDao.getLocationsCount()
     }
 
     fun clear() = disposeBag.clear()

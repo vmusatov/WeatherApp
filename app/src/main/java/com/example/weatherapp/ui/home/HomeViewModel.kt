@@ -65,20 +65,19 @@ class HomeViewModel(
     fun updateWeather(location: Location? = null, force: Boolean = false) = viewModelScope.launch {
         _updateFail.postValue(null)
 
-        val selectedLocation = location ?: locationRepository.getSelectedLocation()
+        val fromDb = location?.let { locationRepository.getLocationByUrl(it.url) }
+        val selectedLocation = fromDb ?: locationRepository.getSelectedLocation()
         _selectedLocation.postValue(selectedLocation)
 
         if (selectedLocation != null) {
-            if (!selectedLocation.isSelected) {
-                locationRepository.setLocationIsSelected(selectedLocation)
-            }
-
-            _isUpdateInProgress.postValue(true)
-
             if (force || needForceUpdate(selectedLocation)) {
                 loadFromApi(selectedLocation)
             } else {
                 loadFromDb(selectedLocation)
+            }
+
+            if (!selectedLocation.isSelected) {
+                locationRepository.setLocationIsSelected(selectedLocation)
             }
         } else {
             _updateFail.postValue(UpdateFailType.NO_LOCATION)
@@ -105,10 +104,10 @@ class HomeViewModel(
         } else {
             _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_DB)
         }
-        _isUpdateInProgress.postValue(false)
     }
 
     private fun loadFromApi(location: Location) {
+        _isUpdateInProgress.postValue(true)
         weatherRepository.loadForecast("${location.lat}, ${location.lon}",
             onSuccess = {
                 val data = WeatherData.from(it)
