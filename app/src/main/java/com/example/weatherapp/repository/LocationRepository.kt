@@ -21,9 +21,14 @@ class LocationRepository(
 
     private val disposeBag = CompositeDisposable()
 
-    suspend fun getLocationWithWeather(locationUrl: String): LocationWithWeatherTuple? {
-        return locationsDao.getLocationByUrlWithWeather(locationUrl)
-    }
+    suspend fun getLocationWithWeather(locationUrl: String): LocationWithWeatherTuple? =
+        withContext(Dispatchers.IO) {
+            try {
+                locationsDao.getLocationByUrlWithWeather(locationUrl)
+            } catch (e: NullPointerException) {
+                null
+            }
+        }
 
     suspend fun addLocation(location: Location) = withContext(Dispatchers.IO) {
         location.position = locationsDao.getLocationsCount()

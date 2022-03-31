@@ -20,6 +20,7 @@ import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import com.example.weatherapp.util.DateUtils
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 enum class UpdateFailType {
@@ -33,7 +34,8 @@ class HomeViewModel(
     private val locationRepository: LocationRepository
 ) : ViewModel() {
 
-    private val TAG = HomeViewModel::class.java.simpleName
+    private var cashedData = mutableListOf<WeatherData>()
+    private val weatherNotificationBuilder = WeatherNotificationsBuilder()
 
     val selectedLocation: LiveData<Location?> get() = _selectedLocation
     private val _selectedLocation = MutableLiveData<Location?>()
@@ -53,34 +55,54 @@ class HomeViewModel(
     val updateFail: LiveData<UpdateFailType?> get() = _updateFail
     private val _updateFail = MutableLiveData<UpdateFailType?>()
 
-    private val weatherNotificationBuilder = WeatherNotificationsBuilder()
-
     init {
+        loadCacheData()
+
         weatherNotificationBuilder.addFactory(NoPrecipitationsFactory())
         weatherNotificationBuilder.addFactory(ExpectPrecipitationsFactory())
         weatherNotificationBuilder.addFactory(ExpectPrecipitationsEndFactory())
         weatherNotificationBuilder.addFactory(TempTomorrowFactory())
     }
 
+    private fun loadCacheData() = viewModelScope.launch {
+        cashedData.clear()
+        locationRepository.getAllLocations().forEach { location ->
+            val dbData = locationRepository.getLocationWithWeather(location.url)
+            dbData?.let { cashedData.add(WeatherData.from(it)) }
+        }
+    }
+
     fun updateWeather(location: Location? = null, force: Boolean = false) = viewModelScope.launch {
         _updateFail.postValue(null)
-
-        val fromDb = location?.let { locationRepository.getLocationByUrl(it.url) }
-        val selectedLocation = fromDb ?: locationRepository.getSelectedLocation()
-        _selectedLocation.postValue(selectedLocation)
+        val selectedLocation = selectLocation(location)
 
         if (selectedLocation != null) {
-            if (force || needForceUpdate(selectedLocation)) {
-                loadFromApi(selectedLocation)
-            } else {
-                loadFromDb(selectedLocation)
-            }
-
-            if (!selectedLocation.isSelected) {
-                locationRepository.setLocationIsSelected(selectedLocation)
-            }
+            updateLocationData(selectedLocation, force)
         } else {
             _updateFail.postValue(UpdateFailType.NO_LOCATION)
+        }
+    }
+
+    private suspend fun selectLocation(location: Location?): Location? {
+        return withContext(viewModelScope.coroutineContext) {
+            val fromDb = location?.let { locationRepository.getLocationByUrl(it.url) }
+            val selectedLocation = fromDb ?: locationRepository.getSelectedLocation()
+
+            selectedLocation?.let { locationRepository.setLocationIsSelected(it) }
+            _selectedLocation.postValue(selectedLocation)
+
+            selectedLocation
+        }
+    }
+
+    private suspend fun updateLocationData(location: Location, force: Boolean) {
+        val cashed = cashedData.firstOrNull { it.location.url == location.url }
+        if (force || needForceUpdate(location)) {
+            loadFromApi(location)
+        } else if (cashed == null) {
+            loadFromDb(location)
+        } else {
+            loadFromCache(cashed)
         }
     }
 
@@ -90,17 +112,29 @@ class HomeViewModel(
         }
 
         val datesDiffInMin = DateUtils.datesDiffInMin(location.lastUpdated!!, Date())
-        return datesDiffInMin > 60
+        return datesDiffInMin > MAX_MINUTES_WITHOUT_UPDATE
+    }
+
+    private fun loadFromCache(data: WeatherData) {
+        _weatherData.postValue(data)
+        _astronomy.postValue(data.current.astronomy)
+        updateNotifications(data)
+    }
+
+    private fun addToCache(data: WeatherData) {
+        cashedData.removeAll { it.location.url == data.location.url }
+        cashedData.add(data)
     }
 
     private suspend fun loadFromDb(location: Location) {
         val dbData = locationRepository.getLocationWithWeather(location.url)
         if (dbData != null) {
-            val weatherData = WeatherData.from(dbData)
-            updateNotifications(weatherData)
+            val data = WeatherData.from(dbData)
+            updateNotifications(data)
 
-            _weatherData.postValue(weatherData)
-            _astronomy.postValue(weatherData.current.astronomy)
+            _weatherData.postValue(data)
+            _astronomy.postValue(data.current.astronomy)
+            addToCache(data)
         } else {
             _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_DB)
         }
@@ -108,16 +142,19 @@ class HomeViewModel(
 
     private fun loadFromApi(location: Location) {
         _isUpdateInProgress.postValue(true)
-        weatherRepository.loadForecast("${location.lat}, ${location.lon}",
+        weatherRepository.loadForecast(
+            q = "${location.lat}, ${location.lon}",
             onSuccess = {
                 val data = WeatherData.from(it)
 
                 updateAstronomy(location)
                 updateNotifications(data)
+
                 _weatherData.postValue(data)
                 _isUpdateInProgress.postValue(false)
 
                 updateDbData(location, data)
+                addToCache(data)
             },
             onError = {
                 _isUpdateInProgress.postValue(false)
@@ -125,25 +162,21 @@ class HomeViewModel(
             })
     }
 
-    private fun updateAstronomy(selectedLocation: Location) {
+    private fun updateAstronomy(location: Location) {
         weatherRepository.loadAstronomy(
-            "${selectedLocation.lat}, ${selectedLocation.lon}",
+            q = "${location.lat}, ${location.lon}",
             onSuccess = {
                 val astronomy = Astronomy.from(it)
 
                 _astronomy.postValue(astronomy)
-                viewModelScope.launch {
-                    weatherRepository.updateAstronomy(selectedLocation.id, astronomy)
-                }
+                viewModelScope.launch { weatherRepository.updateAstronomy(location.id, astronomy) }
             },
             onError = {}
         )
     }
 
     private fun updateNotifications(data: WeatherData) {
-        _weatherNotifications.postValue(
-            weatherNotificationBuilder.buildNotificationsList(data)
-        )
+        _weatherNotifications.postValue(weatherNotificationBuilder.buildNotificationsList(data))
     }
 
     private fun updateDbData(location: Location, data: WeatherData) = viewModelScope.launch {
@@ -153,10 +186,7 @@ class HomeViewModel(
         weatherRepository.addCurrentWeather(location.id, data.current)
         data.daysForecast.forEach { day ->
             val dayId = weatherRepository.addDay(location.id, day)
-
-            day.hours.forEach {
-                weatherRepository.addHour(location.id, dayId.toInt(), it)
-            }
+            day.hours.forEach { weatherRepository.addHour(location.id, dayId.toInt(), it) }
         }
 
         locationRepository.setLastUpdatedIsNow(location.url)
@@ -197,5 +227,9 @@ class HomeViewModel(
         super.onCleared()
         weatherRepository.clear()
         locationRepository.clear()
+    }
+
+    companion object {
+        private const val MAX_MINUTES_WITHOUT_UPDATE = 60
     }
 }

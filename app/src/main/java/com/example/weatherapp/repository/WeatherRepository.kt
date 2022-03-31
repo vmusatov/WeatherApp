@@ -36,7 +36,7 @@ class WeatherRepository(
     ) {
         val result = weatherApi.getForecast(q)
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(Schedulers.io())
             .subscribe(onSuccess, onError)
 
         disposeBag.add(result)
@@ -61,7 +61,7 @@ class WeatherRepository(
     ) {
         val result = weatherApi.getAstronomy(q, DateUtils.DATE_FORMAT.format(Date()))
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(Schedulers.io())
             .subscribe(onSuccess, onError)
 
         disposeBag.add(result)
