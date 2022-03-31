@@ -96,6 +96,7 @@ class HomeViewModel(
     }
 
     private suspend fun updateLocationData(location: Location, force: Boolean) {
+        _isUpdateInProgress.postValue(true)
         val cashed = cashedData.firstOrNull { it.location.url == location.url }
         if (force || needForceUpdate(location)) {
             loadFromApi(location)
@@ -104,6 +105,7 @@ class HomeViewModel(
         } else {
             loadFromCache(cashed)
         }
+        _isUpdateInProgress.postValue(false)
     }
 
     private fun needForceUpdate(location: Location): Boolean {
@@ -126,6 +128,12 @@ class HomeViewModel(
         cashedData.add(data)
     }
 
+    private fun updateAstronomyInCache(location: Location, astronomy: Astronomy) {
+        cashedData.firstOrNull { it.location.url == location.url }?.let { data ->
+            data.current.astronomy = astronomy
+        }
+    }
+
     private suspend fun loadFromDb(location: Location) {
         val dbData = locationRepository.getLocationWithWeather(location.url)
         if (dbData != null) {
@@ -141,7 +149,6 @@ class HomeViewModel(
     }
 
     private fun loadFromApi(location: Location) {
-        _isUpdateInProgress.postValue(true)
         weatherRepository.loadForecast(
             q = "${location.lat}, ${location.lon}",
             onSuccess = {
@@ -151,13 +158,11 @@ class HomeViewModel(
                 updateNotifications(data)
 
                 _weatherData.postValue(data)
-                _isUpdateInProgress.postValue(false)
 
                 updateDbData(location, data)
                 addToCache(data)
             },
             onError = {
-                _isUpdateInProgress.postValue(false)
                 _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_NETWORK)
             })
     }
@@ -169,6 +174,7 @@ class HomeViewModel(
                 val astronomy = Astronomy.from(it)
 
                 _astronomy.postValue(astronomy)
+                updateAstronomyInCache(location, astronomy)
                 viewModelScope.launch { weatherRepository.updateAstronomy(location.id, astronomy) }
             },
             onError = {}
