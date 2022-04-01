@@ -13,8 +13,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class LocationRepository(
+class LocationRepository @Inject constructor(
     private val weatherApi: WeatherApi,
     private val locationsDao: LocationsDao
 ) {

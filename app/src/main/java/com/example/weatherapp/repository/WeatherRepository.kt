@@ -18,8 +18,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class WeatherRepository(
+class WeatherRepository @Inject constructor(
     private val appPreferences: SharedPreferences,
     private val weatherApi: WeatherApi,
     private val currentWeatherDao: CurrentWeatherDao,

@@ -2,8 +2,9 @@ package com.example.weatherapp.notification.factory
 
 import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
+import javax.inject.Inject
 
-class TempTomorrowFactory : BaseWeatherNotificationFactory() {
+class TempTomorrowFactory @Inject constructor() : BaseWeatherNotificationFactory() {
 
     override fun create(data: WeatherData): WeatherNotification? {
         if (nowHourAsInt < 16) {

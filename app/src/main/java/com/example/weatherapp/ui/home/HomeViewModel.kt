@@ -1,10 +1,7 @@
 package com.example.weatherapp.ui.home
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.weatherapp.R
 import com.example.weatherapp.model.Astronomy
 import com.example.weatherapp.model.Location
@@ -12,16 +9,14 @@ import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.notification.WeatherNotificationsBuilder
-import com.example.weatherapp.notification.factory.ExpectPrecipitationsEndFactory
-import com.example.weatherapp.notification.factory.ExpectPrecipitationsFactory
-import com.example.weatherapp.notification.factory.NoPrecipitationsFactory
-import com.example.weatherapp.notification.factory.TempTomorrowFactory
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import com.example.weatherapp.util.DateUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
 enum class UpdateFailType {
     NO_LOCATION,
@@ -31,11 +26,11 @@ enum class UpdateFailType {
 
 class HomeViewModel(
     private val weatherRepository: WeatherRepository,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val notificationsBuilder: WeatherNotificationsBuilder
 ) : ViewModel() {
 
     private var cashedData = mutableListOf<WeatherData>()
-    private val weatherNotificationBuilder = WeatherNotificationsBuilder()
 
     val selectedLocation: LiveData<Location?> get() = _selectedLocation
     private val _selectedLocation = MutableLiveData<Location?>()
@@ -57,11 +52,6 @@ class HomeViewModel(
 
     init {
         loadCacheData()
-
-        weatherNotificationBuilder.addFactory(NoPrecipitationsFactory())
-        weatherNotificationBuilder.addFactory(ExpectPrecipitationsFactory())
-        weatherNotificationBuilder.addFactory(ExpectPrecipitationsEndFactory())
-        weatherNotificationBuilder.addFactory(TempTomorrowFactory())
     }
 
     private fun loadCacheData() = viewModelScope.launch {
@@ -99,6 +89,7 @@ class HomeViewModel(
         _isUpdateInProgress.postValue(true)
         val cashed = cashedData.firstOrNull { it.location.url == location.url }
         if (force || needForceUpdate(location)) {
+            delay(300)
             loadFromApi(location)
         } else if (cashed == null) {
             loadFromDb(location)
@@ -182,7 +173,7 @@ class HomeViewModel(
     }
 
     private fun updateNotifications(data: WeatherData) {
-        _weatherNotifications.postValue(weatherNotificationBuilder.buildNotificationsList(data))
+        _weatherNotifications.postValue(notificationsBuilder.buildNotificationsList(data))
     }
 
     private fun updateDbData(location: Location, data: WeatherData) = viewModelScope.launch {
@@ -233,6 +224,18 @@ class HomeViewModel(
         super.onCleared()
         weatherRepository.clear()
         locationRepository.clear()
+    }
+
+    class Factory @Inject constructor(
+        private val weatherRepository: WeatherRepository,
+        private val locationRepository: LocationRepository,
+        private val notificationsBuilder: WeatherNotificationsBuilder
+    ) : ViewModelProvider.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return HomeViewModel(weatherRepository, locationRepository, notificationsBuilder) as T
+        }
     }
 
     companion object {

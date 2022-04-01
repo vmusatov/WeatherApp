@@ -1,5 +1,6 @@
 package com.example.weatherapp.ui.locations
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,19 +14,25 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
+import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentManageLocationsBinding
 import com.example.weatherapp.model.Location
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.navigator
-import com.example.weatherapp.ui.viewModelFactory
+import javax.inject.Inject
 
 class ManageLocationsFragment : Fragment() {
 
     private lateinit var binding: FragmentManageLocationsBinding
 
-    private val viewModel: ManageLocationsViewModel by activityViewModels { viewModelFactory() }
-    private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory() }
+    @Inject
+    lateinit var manageViewModelFactory: ManageLocationsViewModel.Factory
+    private val viewModel: ManageLocationsViewModel by activityViewModels { manageViewModelFactory }
+
+    @Inject
+    lateinit var homeViewModelFactory: HomeViewModel.Factory
+    private val homeViewModel: HomeViewModel by activityViewModels { homeViewModelFactory }
 
     private lateinit var manageLocationAdapter: ManageLocationListAdapter
     private lateinit var touchHelper: ItemTouchHelper
@@ -42,6 +49,11 @@ class ManageLocationsFragment : Fragment() {
         touchHelper = ItemTouchHelper(
             LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter)
         )
+    }
+
+    override fun onAttach(context: Context) {
+        context.appComponent.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(

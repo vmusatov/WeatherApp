@@ -4,8 +4,9 @@ import com.example.weatherapp.model.Hour
 import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.util.DateUtils
+import javax.inject.Inject
 
-class ExpectPrecipitationsFactory : BaseWeatherNotificationFactory() {
+class ExpectPrecipitationsFactory @Inject constructor() : BaseWeatherNotificationFactory() {
 
     override fun create(data: WeatherData): WeatherNotification? {
 

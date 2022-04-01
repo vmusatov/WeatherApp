@@ -1,5 +1,6 @@
 package com.example.weatherapp.ui.home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
+import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.*
 import com.example.weatherapp.model.Astronomy
 import com.example.weatherapp.model.CurrentWeather
@@ -22,14 +24,17 @@ import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.navigator
-import com.example.weatherapp.ui.viewModelFactory
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
+import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
-    private val viewModel: HomeViewModel by activityViewModels { viewModelFactory() }
+
+    @Inject
+    lateinit var factory: HomeViewModel.Factory
+    private val viewModel: HomeViewModel by activityViewModels { factory }
 
     private lateinit var hourlyForecastAdapter: HourlyForecastListAdapter
     private lateinit var dailyForecastAdapter: DailyForecastListAdapter
@@ -70,6 +75,11 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
+    override fun onAttach(context: Context) {
+        context.appComponent.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

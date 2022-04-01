@@ -1,5 +1,6 @@
 package com.example.weatherapp.ui.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -16,20 +17,29 @@ import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.weatherapp.R
+import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentSettingsBinding
 import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.navigator
-import com.example.weatherapp.ui.viewModelFactory
+import javax.inject.Inject
 
 class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
 
     private lateinit var binding: FragmentSettingsBinding
-    private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory() }
+
+    @Inject
+    lateinit var factory: HomeViewModel.Factory
+    private val homeViewModel: HomeViewModel by activityViewModels { factory }
 
     private lateinit var selectedUnit: TextView
     private lateinit var tempUnitBlock: LinearLayout
+
+    override fun onAttach(context: Context) {
+        context.appComponent.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

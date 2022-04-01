@@ -1,15 +1,13 @@
 package com.example.weatherapp.ui.locations
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.weatherapp.model.Location
 import com.example.weatherapp.model.LocationWeatherInfo
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ManageLocationsViewModel(
     private val weatherRepository: WeatherRepository,
@@ -68,5 +66,16 @@ class ManageLocationsViewModel(
             locationRepository.updatePosition(location.url, index)
         }
         updateLocations()
+    }
+
+    class Factory @Inject constructor(
+        private val weatherRepository: WeatherRepository,
+        private val locationRepository: LocationRepository
+    ) : ViewModelProvider.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return ManageLocationsViewModel(weatherRepository, locationRepository) as T
+        }
     }
 }

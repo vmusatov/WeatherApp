@@ -2,14 +2,11 @@ package com.example.weatherapp.notification
 
 import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.factory.WeatherNotificationFactory
+import javax.inject.Inject
 
-class WeatherNotificationsBuilder {
-
-    private val factories = mutableListOf<WeatherNotificationFactory>()
-
-    fun addFactory(factory: WeatherNotificationFactory) {
-        this.factories.add(factory)
-    }
+class WeatherNotificationsBuilder(
+    private val factories: Set<@JvmSuppressWildcards WeatherNotificationFactory>
+) {
 
     fun buildNotificationsList(data: WeatherData): List<WeatherNotification> {
         val notifications = mutableListOf<WeatherNotification>()

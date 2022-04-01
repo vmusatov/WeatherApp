@@ -1,5 +1,6 @@
 package com.example.weatherapp.ui.locations
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +16,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
+import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentAddLocationBinding
 import com.example.weatherapp.model.Location
 import com.example.weatherapp.ui.*
@@ -22,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class AddLocationFragment : Fragment() {
 
@@ -32,8 +35,13 @@ class AddLocationFragment : Fragment() {
     private lateinit var locationsList: RecyclerView
     private lateinit var notFound: TextView
 
-    private val viewModel: AddLocationViewModel by viewModels { viewModelFactory() }
-    private val manageViewModel: ManageLocationsViewModel by activityViewModels { viewModelFactory() }
+    @Inject
+    lateinit var addLocationsFactory: AddLocationViewModel.Factory
+    private val viewModel: AddLocationViewModel by viewModels { addLocationsFactory }
+
+    @Inject
+    lateinit var manageViewModelFactory: ManageLocationsViewModel.Factory
+    private val manageViewModel: ManageLocationsViewModel by activityViewModels { manageViewModelFactory }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
@@ -60,6 +68,11 @@ class AddLocationFragment : Fragment() {
             return@OnEditorActionListener true
         }
         return@OnEditorActionListener false
+    }
+
+    override fun onAttach(context: Context) {
+        context.appComponent.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(

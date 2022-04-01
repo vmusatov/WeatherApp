@@ -48,6 +48,10 @@ android {
 }
 
 dependencies {
+    def retrofit_version = "2.9.0"
+    def okhttp_version = "4.8.0"
+    def room_version = "2.4.2"
+    def daggerVersion = "2.36"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
@@ -61,9 +65,8 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
-    def retrofit_version = "2.9.0"
-    def okhttp_version = "4.8.0"
-    def room_version = "2.4.2"
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.10"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
