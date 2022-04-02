@@ -9,11 +9,13 @@ import com.example.weatherapp.data.db.dao.HoursDao
 import com.example.weatherapp.data.db.dao.LocationsDao
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class RoomModule {
 
     @Provides
+    @Singleton
     fun provideAppDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
             .addMigrations(
