@@ -1,0 +1,55 @@
+package com.example.weatherapp.ui.about
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.provider.Settings
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.weatherapp.BuildConfig
+import com.example.weatherapp.R
+import com.example.weatherapp.databinding.FragmentAboutBinding
+import com.example.weatherapp.ui.ToolbarAction
+import com.example.weatherapp.ui.navigator
+
+class AboutFragment : Fragment() {
+
+    private lateinit var binding: FragmentAboutBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentAboutBinding.inflate(inflater, container, false)
+
+        setupToolbar()
+
+        binding.title.text = getString(R.string.app_name)
+        binding.version.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
+
+        return binding.root
+    }
+
+    private fun setupToolbar() {
+        navigator().setToolbarTitle(requireContext().getString(R.string.about))
+        navigator().setToolbarAction(
+            ToolbarAction(
+                iconRes = R.drawable.ic_arrow_back,
+                onAction = { navigator().goBack() }
+            )
+        )
+        navigator().setToolbarRightAction(
+            ToolbarAction(
+                iconRes = R.drawable.ic_info,
+                onAction = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.data = Uri.parse("package:" + requireContext().packageName)
+                    startActivity(intent)
+                }
+            )
+        )
+    }
+}

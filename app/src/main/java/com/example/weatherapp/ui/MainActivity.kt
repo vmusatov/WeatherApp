@@ -9,6 +9,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ActivityMainBinding
+import com.example.weatherapp.ui.about.AboutFragment
 import com.example.weatherapp.ui.home.HomeFragment
 import com.example.weatherapp.ui.locations.AddLocationFragment
 import com.example.weatherapp.ui.locations.ManageLocationsFragment
@@ -49,6 +50,10 @@ class MainActivity : AppCompatActivity(), Navigator {
 
     override fun goToAddLocation() {
         launchFragment(AddLocationFragment())
+    }
+
+    override fun goToAbout() {
+        launchFragment(AboutFragment())
     }
 
     override fun setToolbarTitle(title: String) {

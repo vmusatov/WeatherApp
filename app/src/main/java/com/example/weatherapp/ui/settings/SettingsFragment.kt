@@ -35,6 +35,7 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
 
     private lateinit var selectedUnit: TextView
     private lateinit var tempUnitBlock: LinearLayout
+    private lateinit var about: TextView
 
     override fun onAttach(context: Context) {
         context.appComponent.inject(this)
@@ -58,6 +59,7 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     private fun setupFields() {
         selectedUnit = binding.selectedUnit
         tempUnitBlock = binding.tempUnitBlock
+        about = binding.about
     }
 
     private fun setupUi() {
@@ -69,6 +71,7 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
                 homeViewModel.getTempUnit().unitName
             )
         }
+        about.setOnClickListener { navigator().goToAbout() }
     }
 
     private fun showPopup(view: View, @MenuRes menuRes: Int, selectedItem: String? = null) {

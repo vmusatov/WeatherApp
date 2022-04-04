@@ -16,6 +16,8 @@ interface Navigator {
 
     fun goToAddLocation()
 
+    fun goToAbout()
+
     fun setToolbarTitle(title: String)
 
     fun setToolbarAction(action: ToolbarAction)
