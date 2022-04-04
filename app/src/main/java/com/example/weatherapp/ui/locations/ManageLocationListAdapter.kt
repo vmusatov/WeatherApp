@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
@@ -47,13 +48,15 @@ class ManageLocationListAdapter(
     fun updateLocationsInfo(info: List<LocationWeatherInfo>) {
         info.forEach { newItem ->
             val oldItem = this.dataInfo.firstOrNull { it.locationName == newItem.locationName }
+
             if (oldItem == null) {
                 dataInfo.add(newItem)
-                notifyItemChanged(data.indexOfFirst { it.name == newItem.locationName })
             } else if (oldItem != newItem) {
                 dataInfo[dataInfo.indexOf(oldItem)] = newItem
-                notifyItemChanged(data.indexOfFirst { it.name == newItem.locationName })
             }
+
+            val changedItemId = data.indexOfFirst { it.name == newItem.locationName }
+            notifyItemChanged(changedItemId)
         }
     }
 
@@ -76,12 +79,15 @@ class ManageLocationListAdapter(
         selectedItems.clear()
     }
 
-    fun switchEditMode() {
+    fun switchEditMode(selectedItem: Location? = null) {
         if (isEditMode) {
             locationsChangeCallback.onApplyChanges(data)
         }
         isEditMode = !isEditMode
+
         selectedItems.clear()
+        selectedItem?.let { selectedItems.add(it) }
+
         locationsChangeCallback.onSwitchEditMode(isEditMode)
 
         notifyDataSetChanged()
@@ -101,17 +107,17 @@ class ManageLocationListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = data[position]
-        setupUi(holder, item)
-        setupListeners(holder, item)
+        setupItemUi(holder, item)
+        setupItemListeners(holder, item)
     }
 
-    private fun setupUi(holder: ViewHolder, item: Location) {
+    private fun setupItemUi(holder: ViewHolder, item: Location) {
         with(holder.binding) {
             root.tag = item
 
             if (isEditMode) {
                 checkbox.visibility = View.VISIBLE
-                checkbox.isChecked = false
+                checkbox.isChecked = selectedItems.contains(item)
                 dragDropView.visibility = View.VISIBLE
                 locationTemp.visibility = View.GONE
                 locationCondition.visibility = View.GONE
@@ -140,7 +146,7 @@ class ManageLocationListAdapter(
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setupListeners(holder: ViewHolder, item: Location) {
+    private fun setupItemListeners(holder: ViewHolder, item: Location) {
         with(holder.binding) {
             root.setOnClickListener {
                 if (!isEditMode) {
@@ -151,7 +157,7 @@ class ManageLocationListAdapter(
             }
 
             root.setOnLongClickListener {
-                switchEditMode()
+                switchEditMode(item)
                 return@setOnLongClickListener true
             }
 
@@ -162,8 +168,8 @@ class ManageLocationListAdapter(
                 return@setOnTouchListener true
             }
 
-            checkbox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
+            checkbox.setOnClickListener {
+                if ((it as CheckBox).isChecked) {
                     selectedItems.add(item)
                 } else {
                     selectedItems.remove(item)
