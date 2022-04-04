@@ -6,10 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherapp.model.Location
-import com.example.weatherapp.notification.WeatherNotificationsBuilder
 import com.example.weatherapp.repository.LocationRepository
-import com.example.weatherapp.repository.WeatherRepository
-import com.example.weatherapp.ui.home.HomeViewModel
 import javax.inject.Inject
 
 class AddLocationViewModel(

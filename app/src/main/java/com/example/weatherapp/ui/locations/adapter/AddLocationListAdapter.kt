@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.locations
+package com.example.weatherapp.ui.locations.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +13,10 @@ class AddLocationListAdapter(
     private val addLocationListener: AddLocationListener
 ) : RecyclerView.Adapter<AddLocationListAdapter.ViewHolder>(), View.OnClickListener {
 
-    private var data: MutableList<Location> = mutableListOf()
+    private var data: List<Location> = listOf()
 
     fun update(data: List<Location>) {
-        this.data = data.toMutableList()
+        this.data = data
         notifyDataSetChanged()
     }
 

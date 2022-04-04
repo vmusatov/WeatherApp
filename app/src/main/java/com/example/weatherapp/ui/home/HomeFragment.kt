@@ -23,6 +23,10 @@ import com.example.weatherapp.model.TempUnit
 import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.WeatherNotification
 import com.example.weatherapp.ui.ToolbarAction
+import com.example.weatherapp.ui.home.adapter.DailyForecastListAdapter
+import com.example.weatherapp.ui.home.adapter.HourlyForecastItemDecorator
+import com.example.weatherapp.ui.home.adapter.HourlyForecastListAdapter
+import com.example.weatherapp.ui.home.adapter.NotificationsPagerAdapter
 import com.example.weatherapp.ui.navigator
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso

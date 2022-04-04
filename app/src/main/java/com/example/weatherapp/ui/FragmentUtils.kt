@@ -7,12 +7,6 @@ import android.widget.Toast
 import androidx.annotation.AnimRes
 import androidx.annotation.AnimatorRes
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.weatherapp.WeatherApp
-import com.example.weatherapp.ui.home.HomeViewModel
-import com.example.weatherapp.ui.locations.AddLocationViewModel
-import com.example.weatherapp.ui.locations.ManageLocationsViewModel
 
 data class FragmentAnimation(
     @AnimatorRes @AnimRes val enter: Int,

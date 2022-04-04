@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.locations
+package com.example.weatherapp.ui.locations.util
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.model.Location

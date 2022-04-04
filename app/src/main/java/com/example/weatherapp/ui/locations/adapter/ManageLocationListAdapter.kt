@@ -13,6 +13,7 @@ import com.example.weatherapp.databinding.ItemManageLocationsBinding
 import com.example.weatherapp.model.Location
 import com.example.weatherapp.model.LocationWeatherInfo
 import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.ui.locations.util.LocationsChangeCallback
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
 
