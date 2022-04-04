@@ -3,6 +3,7 @@ package com.example.weatherapp.ui.locations.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.databinding.ItemLocationSearchBinding
 import com.example.weatherapp.model.Location
@@ -16,8 +17,13 @@ class AddLocationListAdapter(
     private var data: List<Location> = listOf()
 
     fun update(data: List<Location>) {
-        this.data = data
-        notifyDataSetChanged()
+        val newData = data.sortedBy { it.position }.toMutableList()
+        val diffCallback = LocationsDiffCallback(this.data, newData)
+        val diffResult = DiffUtil.calculateDiff(diffCallback, false)
+
+        this.data = newData
+
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

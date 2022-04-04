@@ -5,7 +5,7 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
-import com.example.weatherapp.ui.locations.ManageLocationListAdapter
+import com.example.weatherapp.ui.locations.adapter.ManageLocationListAdapter
 
 class LocationsItemTouchHelperCallback(
     private val context: Context,

@@ -146,6 +146,7 @@ class AddLocationFragment : Fragment() {
             } else {
                 val result = if (it.size > 10) it.subList(0, 10) else it
                 manageLocationAdapter.update(result)
+                locationsList.scrollToPosition(0)
                 locationsList.visibility = View.VISIBLE
                 notFound.visibility = View.GONE
                 locationsList.requestApplyInsets()
