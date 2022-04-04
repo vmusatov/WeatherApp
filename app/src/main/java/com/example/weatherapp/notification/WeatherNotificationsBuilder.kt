@@ -4,7 +4,7 @@ import com.example.weatherapp.model.WeatherData
 import com.example.weatherapp.notification.factory.WeatherNotificationFactory
 import javax.inject.Inject
 
-class WeatherNotificationsBuilder(
+class WeatherNotificationsBuilder @Inject constructor(
     private val factories: Set<@JvmSuppressWildcards WeatherNotificationFactory>
 ) {
 
@@ -17,5 +17,4 @@ class WeatherNotificationsBuilder(
 
         return notifications
     }
-
 }

@@ -15,7 +15,6 @@ import javax.inject.Singleton
 class RoomModule {
 
     @Provides
-    @Singleton
     fun provideAppDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
             .addMigrations(
