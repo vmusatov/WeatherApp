@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.databinding.ItemLocationSearchBinding
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.domain.model.Location
 
 typealias AddLocationListener = (location: Location) -> Unit
 

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.databinding.ItemWeatherNotificationBinding
-import com.example.weatherapp.notification.WeatherNotification
+import com.example.weatherapp.domain.model.WeatherNotification
 
 class NotificationsPagerAdapter : RecyclerView.Adapter<NotificationsPagerAdapter.ViewHolder>() {
 

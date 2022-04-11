@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentManageLocationsBinding
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.locations.adapter.ManageLocationListAdapter

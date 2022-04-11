@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemDailyForecastBinding
-import com.example.weatherapp.model.TempUnit
-import com.example.weatherapp.model.Day
+import com.example.weatherapp.domain.model.TempUnit
+import com.example.weatherapp.domain.model.Day
 import com.example.weatherapp.util.DateUtils
 import com.squareup.picasso.Picasso
 import kotlin.math.min

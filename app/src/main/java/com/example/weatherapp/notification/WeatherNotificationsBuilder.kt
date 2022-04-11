@@ -1,6 +1,7 @@
 package com.example.weatherapp.notification
 
-import com.example.weatherapp.model.WeatherData
+import com.example.weatherapp.domain.model.WeatherNotification
+import com.example.weatherapp.domain.model.WeatherData
 import com.example.weatherapp.notification.factory.WeatherNotificationFactory
 import javax.inject.Inject
 

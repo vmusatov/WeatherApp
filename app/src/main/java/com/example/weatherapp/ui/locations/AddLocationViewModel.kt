@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.repository.LocationRepository
 import javax.inject.Inject
 

@@ -1,7 +1,7 @@
 package com.example.weatherapp.ui.locations.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.domain.model.Location
 
 class LocationsDiffCallback(
     private val oldData: List<Location>,

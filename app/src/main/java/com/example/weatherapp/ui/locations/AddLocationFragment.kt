@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentAddLocationBinding
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.ui.*
 import com.example.weatherapp.ui.locations.adapter.AddLocationListAdapter
 import kotlinx.coroutines.CoroutineScope

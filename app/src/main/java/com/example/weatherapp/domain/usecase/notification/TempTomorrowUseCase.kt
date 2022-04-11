@@ -1,12 +1,12 @@
-package com.example.weatherapp.notification.factory
+package com.example.weatherapp.domain.usecase.notification
 
 import com.example.weatherapp.domain.model.WeatherData
 import com.example.weatherapp.domain.model.WeatherNotification
 import javax.inject.Inject
 
-class TempTomorrowFactory @Inject constructor() : BaseWeatherNotificationFactory() {
+class TempTomorrowUseCase @Inject constructor() : BaseWeatherNotificationUseCase() {
 
-    override fun create(data: WeatherData): WeatherNotification? {
+    override fun createNotification(data: WeatherData): WeatherNotification? {
         if (nowHourAsInt < 16) {
             return null
         }
@@ -19,7 +19,7 @@ class TempTomorrowFactory @Inject constructor() : BaseWeatherNotificationFactory
         val temperatureTomorrow = WeatherNotification(title = "Temperature tomorrow")
         var undefined = false
         when (diff) {
-            in -50..-11 -> temperatureTomorrow.message = "Much colder than today"
+            in -100..-11 -> temperatureTomorrow.message = "Much colder than today"
             in -10..-6 -> temperatureTomorrow.message = "Colder than today"
             in -5..-3 -> temperatureTomorrow.message = "A little colder than today"
 
@@ -27,7 +27,7 @@ class TempTomorrowFactory @Inject constructor() : BaseWeatherNotificationFactory
 
             in 3..5 -> temperatureTomorrow.message = "A little warmer than today"
             in 6..10 -> temperatureTomorrow.message = "Warmer than today"
-            in 11..50 -> temperatureTomorrow.message = "Much warmer than today"
+            in 11..100 -> temperatureTomorrow.message = "Much warmer than today"
 
             else -> undefined = true
         }

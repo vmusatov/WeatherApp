@@ -1,4 +1,4 @@
-package com.example.weatherapp.notification.factory
+package com.example.weatherapp.domain.usecase.notification
 
 import com.example.weatherapp.domain.model.Hour
 import com.example.weatherapp.domain.model.WeatherData
@@ -6,9 +6,9 @@ import com.example.weatherapp.domain.model.WeatherNotification
 import com.example.weatherapp.util.DateUtils
 import javax.inject.Inject
 
-class ExpectPrecipitationsFactory @Inject constructor() : BaseWeatherNotificationFactory() {
+class ExpectPrecipitationsUseCase @Inject constructor() : BaseWeatherNotificationUseCase() {
 
-    override fun create(data: WeatherData): WeatherNotification? {
+    override fun createNotification(data: WeatherData): WeatherNotification? {
 
         if (nowHour.isHavePrecipitation()) {
             return null

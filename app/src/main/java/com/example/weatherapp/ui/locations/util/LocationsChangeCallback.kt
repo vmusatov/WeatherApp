@@ -1,7 +1,7 @@
 package com.example.weatherapp.ui.locations.util
 
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.domain.model.Location
 
 interface LocationsChangeCallback {
 

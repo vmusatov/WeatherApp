@@ -17,11 +17,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.*
-import com.example.weatherapp.model.Astronomy
-import com.example.weatherapp.model.CurrentWeather
-import com.example.weatherapp.model.TempUnit
-import com.example.weatherapp.model.WeatherData
-import com.example.weatherapp.notification.WeatherNotification
+import com.example.weatherapp.domain.model.Astronomy
+import com.example.weatherapp.domain.model.CurrentWeather
+import com.example.weatherapp.domain.model.TempUnit
+import com.example.weatherapp.domain.model.WeatherData
+import com.example.weatherapp.domain.model.WeatherNotification
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.adapter.DailyForecastListAdapter
 import com.example.weatherapp.ui.home.adapter.HourlyForecastItemDecorator

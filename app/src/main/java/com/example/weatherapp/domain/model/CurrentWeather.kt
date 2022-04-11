@@ -1,6 +1,7 @@
-package com.example.weatherapp.model
+package com.example.weatherapp.domain.model
 
 import com.example.weatherapp.data.db.entity.CurrentWeatherEntity
+import com.example.weatherapp.data.remote.model.LocationWeatherCurrentApi
 import com.example.weatherapp.data.remote.model.LocationWeatherForecastApi
 
 data class CurrentWeather(

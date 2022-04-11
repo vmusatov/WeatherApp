@@ -1,8 +1,8 @@
 package com.example.weatherapp.ui.locations
 
 import androidx.lifecycle.*
-import com.example.weatherapp.model.Location
-import com.example.weatherapp.model.LocationWeatherInfo
+import com.example.weatherapp.domain.model.Location
+import com.example.weatherapp.domain.model.ShortWeatherInfo
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import kotlinx.coroutines.Dispatchers
@@ -17,8 +17,8 @@ class ManageLocationsViewModel(
     val locations: LiveData<MutableList<Location>> get() = _locations
     private val _locations = MutableLiveData<MutableList<Location>>()
 
-    val locationsWeatherInfo: LiveData<MutableSet<LocationWeatherInfo>> get() = _locationsWeatherInfo
-    private val _locationsWeatherInfo = MutableLiveData<MutableSet<LocationWeatherInfo>>()
+    val locationsWeatherInfo: LiveData<MutableSet<ShortWeatherInfo>> get() = _locationsWeatherInfo
+    private val _locationsWeatherInfo = MutableLiveData<MutableSet<ShortWeatherInfo>>()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -38,7 +38,7 @@ class ManageLocationsViewModel(
             weatherRepository.loadLocationsCurrentWeather(query)?.let { response ->
                 val result = _locationsWeatherInfo.value ?: mutableSetOf()
                 result.addAll(
-                    response.map { LocationWeatherInfo.from(it) }.toMutableSet()
+                    response.map { ShortWeatherInfo.from(it) }.toMutableSet()
                 )
                 _locationsWeatherInfo.postValue(result)
             }

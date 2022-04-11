@@ -8,10 +8,9 @@ import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.AstronomyApi
 import com.example.weatherapp.data.remote.model.LocationWeatherCurrentApi
 import com.example.weatherapp.data.remote.model.LocationWeatherForecastApi
-import com.example.weatherapp.model.*
+import com.example.weatherapp.domain.model.*
 import com.example.weatherapp.ui.settings.SettingsFragment
 import com.example.weatherapp.util.DateUtils
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers

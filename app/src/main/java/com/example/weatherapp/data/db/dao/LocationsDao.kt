@@ -24,7 +24,7 @@ interface LocationsDao {
     suspend fun getLocationsCount(): Int
 
     @Insert(entity = LocationEntity::class)
-    suspend fun insert(locationEntity: LocationEntity)
+    suspend fun insert(locationEntity: LocationEntity): Long
 
     @Query("DELETE FROM locations WHERE url = :url")
     suspend fun deleteByUrl(url: String)

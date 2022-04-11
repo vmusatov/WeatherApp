@@ -1,4 +1,4 @@
-package com.example.weatherapp.notification
+package com.example.weatherapp.domain.model
 
 data class WeatherNotification(
     var title: String = "",

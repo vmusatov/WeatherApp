@@ -1,16 +1,16 @@
-package com.example.weatherapp.model
+package com.example.weatherapp.domain.model
 
 import com.example.weatherapp.data.remote.model.LocationWeatherCurrentApi
 
-data class LocationWeatherInfo(
+data class ShortWeatherInfo(
     val locationName: String,
     val tempC: Double,
     val tempF: Double,
     val conditionIconUrl: String
 ) {
     companion object {
-        fun from(from: LocationWeatherCurrentApi): LocationWeatherInfo {
-            return LocationWeatherInfo(
+        fun from(from: LocationWeatherCurrentApi): ShortWeatherInfo {
+            return ShortWeatherInfo(
                 locationName = from.location.name,
                 tempC = from.current.tempC,
                 tempF = from.current.tempF,

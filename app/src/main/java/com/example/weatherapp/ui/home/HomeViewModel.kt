@@ -3,11 +3,11 @@ package com.example.weatherapp.ui.home
 import android.content.Context
 import androidx.lifecycle.*
 import com.example.weatherapp.R
-import com.example.weatherapp.model.Astronomy
-import com.example.weatherapp.model.Location
-import com.example.weatherapp.model.TempUnit
-import com.example.weatherapp.model.WeatherData
-import com.example.weatherapp.notification.WeatherNotification
+import com.example.weatherapp.domain.model.Astronomy
+import com.example.weatherapp.domain.model.Location
+import com.example.weatherapp.domain.model.TempUnit
+import com.example.weatherapp.domain.model.WeatherData
+import com.example.weatherapp.domain.model.WeatherNotification
 import com.example.weatherapp.notification.WeatherNotificationsBuilder
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository

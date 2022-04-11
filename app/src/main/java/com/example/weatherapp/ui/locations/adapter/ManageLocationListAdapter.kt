@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemManageLocationsBinding
-import com.example.weatherapp.model.Location
-import com.example.weatherapp.model.LocationWeatherInfo
-import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.domain.model.Location
+import com.example.weatherapp.domain.model.ShortWeatherInfo
+import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.ui.locations.util.LocationsChangeCallback
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
@@ -23,13 +23,13 @@ class ManageLocationListAdapter(
 ) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>() {
 
     private var data: MutableList<Location> = mutableListOf()
-    private var dataInfo: MutableList<LocationWeatherInfo> = mutableListOf()
+    private var dataInfo: MutableList<ShortWeatherInfo> = mutableListOf()
     var tempUnit: TempUnit = TempUnit.DEFAULT
 
     private var isEditMode = false
     private var selectedItems: MutableList<Location> = mutableListOf()
 
-    fun updateLocationsInfo(info: List<LocationWeatherInfo>) {
+    fun updateLocationsInfo(info: List<ShortWeatherInfo>) {
         info.forEach { newItem ->
             val oldItem = this.dataInfo.firstOrNull { it.locationName == newItem.locationName }
 

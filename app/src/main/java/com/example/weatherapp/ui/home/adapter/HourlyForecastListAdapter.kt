@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemHourlyForecastBinding
-import com.example.weatherapp.model.Hour
-import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.domain.model.Hour
+import com.example.weatherapp.domain.model.TempUnit
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
 

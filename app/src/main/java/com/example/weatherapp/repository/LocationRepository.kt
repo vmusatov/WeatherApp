@@ -4,7 +4,7 @@ import com.example.weatherapp.data.db.dao.LocationsDao
 import com.example.weatherapp.data.db.entity.LocationWithWeatherTuple
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.SearchLocationApi
-import com.example.weatherapp.model.Location
+import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.util.DateUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

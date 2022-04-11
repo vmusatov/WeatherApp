@@ -19,7 +19,7 @@ import androidx.fragment.app.activityViewModels
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentSettingsBinding
-import com.example.weatherapp.model.TempUnit
+import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.navigator
