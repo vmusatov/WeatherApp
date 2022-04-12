@@ -10,6 +10,10 @@ class SetLocationIsSelectedUseCase @Inject constructor(
 ) : BaseUseCase<Location, Unit>() {
 
     override suspend fun execute(data: Location) {
-         locationsRepository.setLocationIsSelected(data)
+        locationsRepository.getSelectedLocation()?.let { old ->
+            locationsRepository.setLocationIsNotSelected(old)
+        }
+
+        locationsRepository.setLocationIsSelected(data)
     }
 }

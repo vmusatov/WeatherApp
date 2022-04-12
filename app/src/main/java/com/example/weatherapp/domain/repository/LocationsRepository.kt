@@ -21,4 +21,8 @@ interface LocationsRepository {
     suspend fun updateLocationLocalTime(locationUrl: String, localtime: String)
 
     suspend fun setLocationIsSelected(location: Location)
+
+    suspend fun setLocationIsNotSelected(location: Location)
+
+    suspend fun getLocationsCount(): Int
 }

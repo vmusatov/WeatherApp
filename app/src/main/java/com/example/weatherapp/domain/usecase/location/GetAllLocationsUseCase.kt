@@ -10,6 +10,6 @@ class GetAllLocationsUseCase @Inject constructor(
 ) : BaseUseCase<Unit, List<Location>>() {
 
     override suspend fun execute(data: Unit): List<Location> {
-        return  locationsRepository.getAllLocations()
+        return locationsRepository.getAllLocations()
     }
 }

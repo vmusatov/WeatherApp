@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class GetLocationsByNameUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository
-): BaseUseCase<String, List<Location>>() {
+) : BaseUseCase<String, List<Location>>() {
 
     override suspend fun execute(data: String): List<Location> {
         return locationsRepository.getLocationsByName(data)

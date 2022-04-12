@@ -7,9 +7,16 @@ import javax.inject.Inject
 
 class DeleteLocationUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository
-): BaseUseCase<Location, Unit>() {
+) : BaseUseCase<Location, Unit>() {
 
     override suspend fun execute(data: Location) {
+        if (data.isSelected) {
+            val notSelectedLocation =
+                locationsRepository.getAllLocations().firstOrNull { !it.isSelected }
+
+            notSelectedLocation?.let { locationsRepository.setLocationIsSelected(it) }
+        }
+
         locationsRepository.deleteLocation(data)
     }
 }

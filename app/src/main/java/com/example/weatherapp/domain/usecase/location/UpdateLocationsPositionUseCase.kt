@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class UpdateLocationsPositionUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository
-): BaseUseCase<List<Location>, Unit>() {
+) : BaseUseCase<List<Location>, Unit>() {
 
     override suspend fun execute(data: List<Location>) {
         data.forEachIndexed { index, location ->

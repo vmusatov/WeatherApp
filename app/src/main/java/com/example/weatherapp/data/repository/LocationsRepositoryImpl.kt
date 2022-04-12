@@ -14,27 +14,10 @@ class LocationsRepositoryImpl @Inject constructor(
 ) : LocationsRepository {
 
     override suspend fun saveLocation(location: Location): Long = withContext(Dispatchers.IO) {
-        location.position = locationsDao.getLocationsCount()
-
-        if (location.position == 0) {
-            location.isSelected = true
-        }
         locationsDao.insert(location.toEntity())
     }
 
     override suspend fun deleteLocation(location: Location) = withContext(Dispatchers.IO) {
-        locationsDao.getLocationByUrl(location.url)?.let { entity ->
-            if (entity.isSelected == 1) {
-                val notSelectedLocation =
-                    locationsDao.getAllLocations().firstOrNull { it.isSelected == 0 }
-
-                notSelectedLocation?.let {
-                    it.isSelected = 1
-                    locationsDao.update(it)
-                }
-            }
-        }
-
         locationsDao.deleteByUrl(location.url)
     }
 
@@ -48,7 +31,11 @@ class LocationsRepositoryImpl @Inject constructor(
 
     override suspend fun getLocationsByName(name: String): List<Location> =
         withContext(Dispatchers.IO) {
-            weatherApi.getSearchResult(name).blockingGet().map { Location.from(it) }
+            try {
+                weatherApi.getSearchResult(name).blockingGet().map { Location.from(it) }
+            } catch (e: Exception) {
+                emptyList()
+            }
         }
 
     override suspend fun getLocationByUrl(url: String): Location? = withContext(Dispatchers.IO) {
@@ -70,14 +57,17 @@ class LocationsRepositoryImpl @Inject constructor(
 
     override suspend fun setLocationIsSelected(location: Location): Unit =
         withContext(Dispatchers.IO) {
-            locationsDao.getLocationByUrl(location.url)?.let { new ->
-                locationsDao.getSelectedLocation()?.let { old ->
-                    old.isSelected = 0
-                    locationsDao.update(old)
-                }
-
-                new.isSelected = 1
-                locationsDao.update(new)
-            }
+            location.isSelected = true
+            locationsDao.update(location.toEntity())
         }
+
+    override suspend fun setLocationIsNotSelected(location: Location): Unit =
+        withContext(Dispatchers.IO) {
+            location.isSelected = false
+            locationsDao.update(location.toEntity())
+        }
+
+    override suspend fun getLocationsCount(): Int = withContext(Dispatchers.IO) {
+        locationsDao.getLocationsCount()
+    }
 }
