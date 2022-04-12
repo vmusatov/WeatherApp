@@ -11,6 +11,4 @@ interface WeatherRepository {
     suspend fun getShortWeatherInfo(location: Location): ShortWeatherInfo?
 
     suspend fun clearWeatherData(location: Location)
-
-    suspend fun saveWeatherData(location: Location, data: WeatherData)
 }

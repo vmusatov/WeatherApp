@@ -10,8 +10,8 @@ import com.example.weatherapp.domain.usecase.location.GetSelectedLocationUseCase
 import com.example.weatherapp.domain.usecase.location.SetLocationIsSelectedUseCase
 import com.example.weatherapp.domain.usecase.notification.CreateNotificationsListUseCase
 import com.example.weatherapp.domain.usecase.settings.GetTempUnitUseCase
-import com.example.weatherapp.domain.usecase.weather.Data
 import com.example.weatherapp.domain.usecase.weather.GetWeatherDataUseCase
+import com.example.weatherapp.domain.usecase.weather.GetWeatherDataUseCase.Data
 import com.example.weatherapp.domain.usecase.weather.ParseEpaIndexUseCase
 import com.example.weatherapp.domain.usecase.weather.ParseUvIndexUseCase
 import kotlinx.coroutines.launch

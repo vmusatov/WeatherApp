@@ -18,7 +18,6 @@ import javax.inject.Inject
 class ManageLocationsViewModel(
     private val getTempUnitUseCase: GetTempUnitUseCase,
     private val getAllLocationsUseCase: GetAllLocationsUseCase,
-    private val saveLocationUseCase: SaveLocationUseCase,
     private val updateLocationsPositionUseCase: UpdateLocationsPositionUseCase,
     private val deleteLocationUseCase: DeleteLocationUseCase,
     private val getShortWeatherInfoUseCase: GetShortWeatherInfoUseCase
@@ -79,7 +78,6 @@ class ManageLocationsViewModel(
     class Factory @Inject constructor(
         private val getTempUnitUseCase: GetTempUnitUseCase,
         private val getAllLocationsUseCase: GetAllLocationsUseCase,
-        private val saveLocationUseCase: SaveLocationUseCase,
         private val updateLocationsPositionUseCase: UpdateLocationsPositionUseCase,
         private val deleteLocationUseCase: DeleteLocationUseCase,
         private val getShortWeatherInfoUseCase: GetShortWeatherInfoUseCase
@@ -90,7 +88,6 @@ class ManageLocationsViewModel(
             return ManageLocationsViewModel(
                 getTempUnitUseCase,
                 getAllLocationsUseCase,
-                saveLocationUseCase,
                 updateLocationsPositionUseCase,
                 deleteLocationUseCase,
                 getShortWeatherInfoUseCase

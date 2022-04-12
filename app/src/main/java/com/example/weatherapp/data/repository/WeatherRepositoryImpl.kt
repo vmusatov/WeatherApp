@@ -25,12 +25,14 @@ class WeatherRepositoryImpl @Inject constructor(
         forceLoad: Boolean,
         location: Location
     ): WeatherData? = withContext(Dispatchers.IO) {
-        val dbData = getWeatherDataFromDb(location)
 
-        if (forceLoad || dbData == null) {
-            loadWeatherData(location)
+        if (forceLoad) {
+            val weatherData = loadWeatherData(location)
+            weatherData?.let { saveWeatherData(location, weatherData) }
+
+            weatherData
         } else {
-            dbData
+            getWeatherDataFromDb(location)
         }
     }
 
@@ -92,7 +94,7 @@ class WeatherRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun saveWeatherData(location: Location, data: WeatherData): Unit =
+    private suspend fun saveWeatherData(location: Location, data: WeatherData): Unit =
         withContext(Dispatchers.IO) {
             getLocationId(location)?.let { locationId ->
                 clearWeatherData(location)
