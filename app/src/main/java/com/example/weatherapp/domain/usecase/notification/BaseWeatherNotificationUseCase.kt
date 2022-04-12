@@ -7,7 +7,9 @@ import com.example.weatherapp.domain.usecase.BaseUseCase
 import com.example.weatherapp.util.DateUtils
 import kotlin.properties.Delegates
 
-abstract class BaseWeatherNotificationUseCase : BaseUseCase<WeatherData, WeatherNotification?>() {
+typealias WeatherNotificationUseCase = BaseUseCase<WeatherData, WeatherNotification?>
+
+abstract class BaseWeatherNotificationUseCase : WeatherNotificationUseCase() {
     protected lateinit var todayHours: List<Hour>
     protected lateinit var todayRemainingHours: List<Hour>
     protected lateinit var todayWithTomorrowHours: MutableList<Hour>

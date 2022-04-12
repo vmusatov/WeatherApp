@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.weatherapp.data.di.RepositoryModule
 import com.example.weatherapp.data.di.RetrofitModule
 import com.example.weatherapp.data.di.RoomModule
+import com.example.weatherapp.domain.di.DomainModule
 import com.example.weatherapp.ui.home.HomeFragment
 import com.example.weatherapp.ui.locations.AddLocationFragment
 import com.example.weatherapp.ui.locations.ManageLocationsFragment
@@ -16,8 +17,8 @@ import dagger.Component
         AppModule::class,
         RetrofitModule::class,
         RoomModule::class,
-        NotificationsModule::class,
-        RepositoryModule::class
+        RepositoryModule::class,
+        DomainModule::class
     ]
 )
 interface AppComponent {

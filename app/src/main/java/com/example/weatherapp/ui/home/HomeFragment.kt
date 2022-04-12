@@ -132,8 +132,8 @@ class HomeFragment : Fragment() {
         viewModel.weatherData.observe(viewLifecycleOwner) {
             updateWeather(it)
             updateHourlyForecast(it)
+            updateAstronomy(it.current.astronomy)
         }
-        viewModel.astronomy.observe(viewLifecycleOwner) { updateAstronomy(it) }
         viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
         viewModel.isUpdateInProgress.observe(viewLifecycleOwner) { showIsUpdate(it) }
         viewModel.updateFail.observe(viewLifecycleOwner) { handleError(it) }
