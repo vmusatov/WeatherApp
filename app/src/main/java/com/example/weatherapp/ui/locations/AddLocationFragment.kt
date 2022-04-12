@@ -104,18 +104,15 @@ class AddLocationFragment : Fragment() {
     }
 
     private fun addLocation(location: Location) {
-        if (isLocationExist(location)) {
+        if (viewModel.isLocationExist(location)) {
             showShortToast(getString(R.string.location_alredy_added))
         } else {
             coroutineScope.launch {
-                manageViewModel.addLocation(location).join()
+                viewModel.saveLocation(location).join()
+                manageViewModel.updateData()
                 navigator().goBack()
             }
         }
-    }
-
-    private fun isLocationExist(location: Location): Boolean {
-        return manageViewModel.locations.value?.firstOrNull { it.url == location.url } != null
     }
 
     private fun setupUi() {

@@ -32,9 +32,13 @@ class ManageLocationsViewModel(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            updateLocations().join()
-            updateWeatherInfo()
+            updateData()
         }
+    }
+
+    suspend fun updateData() {
+        updateLocations().join()
+        updateWeatherInfo()
     }
 
     private fun updateLocations() = viewModelScope.launch {
@@ -45,7 +49,7 @@ class ManageLocationsViewModel(
     fun updateWeatherInfo(locationsToUpdate: List<Location>? = null) = viewModelScope.launch {
         val queryLocations = locationsToUpdate ?: _locations.value
         queryLocations?.let { locations ->
-            val result= _locationsWeatherInfo.value ?: mutableSetOf()
+            val result = _locationsWeatherInfo.value ?: mutableSetOf()
 
             locations.forEach { location ->
                 val weatherInfo = getShortWeatherInfoUseCase.invoke(location)
@@ -54,12 +58,6 @@ class ManageLocationsViewModel(
 
             _locationsWeatherInfo.postValue(result)
         }
-    }
-
-    fun addLocation(location: Location) = viewModelScope.launch {
-        saveLocationUseCase.invoke(location)
-        updateLocations()
-        updateWeatherInfo(listOf(location))
     }
 
     fun removeLocations(locations: List<Location>) {
