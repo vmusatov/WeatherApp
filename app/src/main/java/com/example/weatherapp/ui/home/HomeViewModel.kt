@@ -3,17 +3,15 @@ package com.example.weatherapp.ui.home
 import android.content.Context
 import androidx.lifecycle.*
 import com.example.weatherapp.R
-import com.example.weatherapp.domain.model.Astronomy
-import com.example.weatherapp.domain.model.Location
-import com.example.weatherapp.domain.model.TempUnit
-import com.example.weatherapp.domain.model.WeatherData
-import com.example.weatherapp.domain.model.WeatherNotification
+import com.example.weatherapp.domain.model.*
+import com.example.weatherapp.domain.usecase.settings.GetTempUnitUseCase
 import com.example.weatherapp.notification.WeatherNotificationsBuilder
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import com.example.weatherapp.util.DateUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -27,7 +25,8 @@ enum class UpdateFailType {
 class HomeViewModel(
     private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository,
-    private val notificationsBuilder: WeatherNotificationsBuilder
+    private val notificationsBuilder: WeatherNotificationsBuilder,
+    private val getTempUnitUseCase: GetTempUnitUseCase
 ) : ViewModel() {
 
     private var cashedData = mutableListOf<WeatherData>()
@@ -189,12 +188,8 @@ class HomeViewModel(
         locationRepository.setLastUpdatedIsNow(location.url)
     }
 
-    fun getTempUnit(): TempUnit {
-        return weatherRepository.getTempUnit()
-    }
-
-    fun saveTempUnit(tempUnit: TempUnit) {
-        weatherRepository.saveTempUnit(tempUnit)
+    fun getTempUnit(): TempUnit = runBlocking {
+            getTempUnitUseCase(Unit)
     }
 
     fun parseUvIndex(context: Context, index: Int): String {
@@ -229,12 +224,18 @@ class HomeViewModel(
     class Factory @Inject constructor(
         private val weatherRepository: WeatherRepository,
         private val locationRepository: LocationRepository,
-        private val notificationsBuilder: WeatherNotificationsBuilder
+        private val notificationsBuilder: WeatherNotificationsBuilder,
+        private val getTempUnitUseCase: GetTempUnitUseCase
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return HomeViewModel(weatherRepository, locationRepository, notificationsBuilder) as T
+            return HomeViewModel(
+                weatherRepository,
+                locationRepository,
+                notificationsBuilder,
+                getTempUnitUseCase
+            ) as T
         }
     }
 

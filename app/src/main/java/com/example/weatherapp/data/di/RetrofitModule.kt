@@ -1,4 +1,4 @@
-package com.example.weatherapp.dagger
+package com.example.weatherapp.data.di
 
 import com.example.weatherapp.data.remote.WeatherApi
 import dagger.Module
@@ -10,7 +10,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
-class NetworkModule {
+class RetrofitModule {
 
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {

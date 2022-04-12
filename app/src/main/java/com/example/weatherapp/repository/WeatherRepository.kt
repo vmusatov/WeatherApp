@@ -8,8 +8,10 @@ import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.remote.model.AstronomyApi
 import com.example.weatherapp.data.remote.model.LocationWeatherCurrentApi
 import com.example.weatherapp.data.remote.model.LocationWeatherForecastApi
-import com.example.weatherapp.domain.model.*
-import com.example.weatherapp.ui.settings.SettingsFragment
+import com.example.weatherapp.domain.model.Astronomy
+import com.example.weatherapp.domain.model.CurrentWeather
+import com.example.weatherapp.domain.model.Day
+import com.example.weatherapp.domain.model.Hour
 import com.example.weatherapp.util.DateUtils
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
@@ -65,18 +67,6 @@ class WeatherRepository @Inject constructor(
             .subscribe(onSuccess, onError)
 
         disposeBag.add(result)
-    }
-
-    fun getTempUnit(): TempUnit {
-        return TempUnit.fromCode(
-            appPreferences.getInt(SettingsFragment.PREF_TEMP_CODE, TempUnit.DEFAULT.code)
-        ) ?: TempUnit.DEFAULT
-    }
-
-    fun saveTempUnit(tempUnit: TempUnit) {
-        appPreferences.edit()
-            .putInt(SettingsFragment.PREF_TEMP_CODE, tempUnit.code)
-            .apply()
     }
 
     suspend fun updateAstronomy(locationId: Int, astronomy: Astronomy) =

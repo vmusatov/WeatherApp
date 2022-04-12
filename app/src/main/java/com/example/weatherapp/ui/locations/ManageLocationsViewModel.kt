@@ -3,15 +3,19 @@ package com.example.weatherapp.ui.locations
 import androidx.lifecycle.*
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.ShortWeatherInfo
+import com.example.weatherapp.domain.model.TempUnit
+import com.example.weatherapp.domain.usecase.settings.GetTempUnitUseCase
 import com.example.weatherapp.repository.LocationRepository
 import com.example.weatherapp.repository.WeatherRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class ManageLocationsViewModel(
     private val weatherRepository: WeatherRepository,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val getTempUnitUseCase: GetTempUnitUseCase
 ) : ViewModel() {
 
     val locations: LiveData<MutableList<Location>> get() = _locations
@@ -68,14 +72,23 @@ class ManageLocationsViewModel(
         updateLocations()
     }
 
+    fun getTempUnit(): TempUnit = runBlocking {
+        getTempUnitUseCase(Unit)
+    }
+
     class Factory @Inject constructor(
         private val weatherRepository: WeatherRepository,
-        private val locationRepository: LocationRepository
+        private val locationRepository: LocationRepository,
+        private val getTempUnitUseCase: GetTempUnitUseCase
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return ManageLocationsViewModel(weatherRepository, locationRepository) as T
+            return ManageLocationsViewModel(
+                weatherRepository,
+                locationRepository,
+                getTempUnitUseCase
+            ) as T
         }
     }
 }

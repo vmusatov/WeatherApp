@@ -1,4 +1,4 @@
-package com.example.weatherapp.dagger
+package com.example.weatherapp.data.di
 
 import android.content.Context
 import androidx.room.Room
@@ -9,7 +9,6 @@ import com.example.weatherapp.data.db.dao.HoursDao
 import com.example.weatherapp.data.db.dao.LocationsDao
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
 @Module
 class RoomModule {

@@ -15,14 +15,14 @@ import androidx.annotation.MenuRes
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentSettingsBinding
 import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.navigator
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
@@ -30,8 +30,8 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     private lateinit var binding: FragmentSettingsBinding
 
     @Inject
-    lateinit var factory: HomeViewModel.Factory
-    private val homeViewModel: HomeViewModel by activityViewModels { factory }
+    lateinit var factory: SettingsViewModel.Factory
+    private val viewModel: SettingsViewModel by viewModels { factory }
 
     private lateinit var selectedUnit: TextView
     private lateinit var tempUnitBlock: LinearLayout
@@ -50,10 +50,15 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
 
         setupFields()
+        setupObservers()
         setupUi()
         setupToolbar()
 
         return binding.root
+    }
+
+    private fun setupObservers() {
+        viewModel.tempUnit.observe(viewLifecycleOwner) { selectedUnit.text = it.unitName }
     }
 
     private fun setupFields() {
@@ -63,12 +68,11 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun setupUi() {
-        selectedUnit.text = homeViewModel.getTempUnit().unitName
         tempUnitBlock.setOnClickListener {
             showPopup(
                 binding.unitTitle,
                 R.menu.change_temp_unit_action,
-                homeViewModel.getTempUnit().unitName
+                runBlocking { viewModel.getTempUnit().unitName }
             )
         }
         about.setOnClickListener { navigator().goToAbout() }
@@ -123,11 +127,6 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun updateTempUnit(tempUnit: TempUnit) {
-        selectedUnit.text = tempUnit.unitName
-        homeViewModel.saveTempUnit(tempUnit)
-    }
-
-    companion object {
-        const val PREF_TEMP_CODE = "PREF_TEMP_CODE"
+        viewModel.saveTempUnit(tempUnit)
     }
 }

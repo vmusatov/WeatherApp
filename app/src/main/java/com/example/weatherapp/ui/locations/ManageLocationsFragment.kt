@@ -107,7 +107,7 @@ class ManageLocationsFragment : Fragment() {
             manageLocationAdapter.switchEditMode()
         }
 
-        manageLocationAdapter.tempUnit = homeViewModel.getTempUnit()
+        manageLocationAdapter.tempUnit = viewModel.getTempUnit()
 
         with(locationsList) {
             adapter = manageLocationAdapter
