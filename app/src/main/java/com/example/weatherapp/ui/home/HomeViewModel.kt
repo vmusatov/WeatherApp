@@ -189,7 +189,7 @@ class HomeViewModel(
     }
 
     fun getTempUnit(): TempUnit = runBlocking {
-            getTempUnitUseCase(Unit)
+            getTempUnitUseCase.invoke(Unit)
     }
 
     fun parseUvIndex(context: Context, index: Int): String {

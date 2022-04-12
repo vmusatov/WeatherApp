@@ -73,7 +73,7 @@ class ManageLocationsViewModel(
     }
 
     fun getTempUnit(): TempUnit = runBlocking {
-        getTempUnitUseCase(Unit)
+        getTempUnitUseCase.invoke(Unit)
     }
 
     class Factory @Inject constructor(

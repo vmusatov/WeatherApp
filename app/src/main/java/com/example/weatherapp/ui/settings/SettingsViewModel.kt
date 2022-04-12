@@ -20,7 +20,7 @@ class SettingsViewModel(
     }
 
     private fun loadTempUnit() = viewModelScope.launch {
-         _tempUnit.postValue(getTempUnitUseCase(Unit))
+         _tempUnit.postValue(getTempUnitUseCase.invoke(Unit))
     }
 
     fun getTempUnit(): TempUnit {
