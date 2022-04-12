@@ -6,11 +6,11 @@ import com.example.weatherapp.domain.repository.WeatherRepository
 import com.example.weatherapp.domain.usecase.BaseUseCase
 import javax.inject.Inject
 
-class GetCurrWeatherUseCase @Inject constructor(
+class GetShortWeatherInfoUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository
-) : BaseUseCase<Location, ShortWeatherInfo>() {
+) : BaseUseCase<Location, ShortWeatherInfo?>() {
 
-    override suspend fun execute(data: Location): ShortWeatherInfo {
+    override suspend fun execute(data: Location): ShortWeatherInfo? {
         return weatherRepository.getShortWeatherInfo(data)
     }
 }

@@ -36,8 +36,26 @@ class WeatherRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getShortWeatherInfo(location: Location): ShortWeatherInfo {
-        return ShortWeatherInfo.from(weatherApi.getCurrent(location.url).blockingGet())
+    override suspend fun getShortWeatherInfo(location: Location): ShortWeatherInfo? {
+        return try {
+            ShortWeatherInfo.from(weatherApi.getCurrent(location.url).blockingGet())
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun clearWeatherData(location: Location) {
+        val locationId = if (location.id >= 0) {
+            location.id
+        } else {
+            locationsDao.getLocationByUrl(location.url)?.id
+        }
+
+        locationId?.let {
+            currentWeatherDao.deleteByLocationId(it)
+            daysDao.deleteByLocationId(it)
+            hoursDao.deleteByLocationId(it)
+        }
     }
 
     private fun needForceLoad(location: Location): Boolean {

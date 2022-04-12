@@ -8,5 +8,7 @@ interface WeatherRepository {
 
     suspend fun getWeatherDataByLocation(forceLoad: Boolean, location: Location): WeatherData
 
-    suspend fun getShortWeatherInfo(location: Location): ShortWeatherInfo
+    suspend fun getShortWeatherInfo(location: Location): ShortWeatherInfo?
+
+    suspend fun clearWeatherData(location: Location)
 }

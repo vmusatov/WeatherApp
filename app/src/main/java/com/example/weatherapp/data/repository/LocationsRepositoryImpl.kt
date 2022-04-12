@@ -57,14 +57,18 @@ class LocationsRepositoryImpl @Inject constructor(
 
     override suspend fun setLocationIsSelected(location: Location): Unit =
         withContext(Dispatchers.IO) {
-            location.isSelected = true
-            locationsDao.update(location.toEntity())
+            locationsDao.getLocationByUrl(location.url)?.let {
+                it.isSelected = 1
+                locationsDao.update(it)
+            }
         }
 
     override suspend fun setLocationIsNotSelected(location: Location): Unit =
         withContext(Dispatchers.IO) {
-            location.isSelected = false
-            locationsDao.update(location.toEntity())
+            locationsDao.getLocationByUrl(location.url)?.let {
+                it.isSelected = 0
+                locationsDao.update(it)
+            }
         }
 
     override suspend fun getLocationsCount(): Int = withContext(Dispatchers.IO) {

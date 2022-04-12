@@ -4,18 +4,24 @@ import androidx.lifecycle.*
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.ShortWeatherInfo
 import com.example.weatherapp.domain.model.TempUnit
+import com.example.weatherapp.domain.usecase.location.DeleteLocationUseCase
+import com.example.weatherapp.domain.usecase.location.GetAllLocationsUseCase
+import com.example.weatherapp.domain.usecase.location.SaveLocationUseCase
+import com.example.weatherapp.domain.usecase.location.UpdateLocationsPositionUseCase
 import com.example.weatherapp.domain.usecase.settings.GetTempUnitUseCase
-import com.example.weatherapp.repository.LocationRepository
-import com.example.weatherapp.repository.WeatherRepository
+import com.example.weatherapp.domain.usecase.weather.GetShortWeatherInfoUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class ManageLocationsViewModel(
-    private val weatherRepository: WeatherRepository,
-    private val locationRepository: LocationRepository,
-    private val getTempUnitUseCase: GetTempUnitUseCase
+    private val getTempUnitUseCase: GetTempUnitUseCase,
+    private val getAllLocationsUseCase: GetAllLocationsUseCase,
+    private val saveLocationUseCase: SaveLocationUseCase,
+    private val updateLocationsPositionUseCase: UpdateLocationsPositionUseCase,
+    private val deleteLocationUseCase: DeleteLocationUseCase,
+    private val getShortWeatherInfoUseCase: GetShortWeatherInfoUseCase
 ) : ViewModel() {
 
     val locations: LiveData<MutableList<Location>> get() = _locations
@@ -32,43 +38,39 @@ class ManageLocationsViewModel(
     }
 
     private fun updateLocations() = viewModelScope.launch {
-        val locations = locationRepository.getAllLocations()
+        val locations = getAllLocationsUseCase.invoke(Unit)
         _locations.postValue(locations.toMutableList())
     }
 
-    fun updateWeatherInfo(locations: List<Location>? = null) = viewModelScope.launch {
-        val query = locations?.map { it.url } ?: _locations.value?.map { it.url }
-        query?.let {
-            weatherRepository.loadLocationsCurrentWeather(query)?.let { response ->
-                val result = _locationsWeatherInfo.value ?: mutableSetOf()
-                result.addAll(
-                    response.map { ShortWeatherInfo.from(it) }.toMutableSet()
-                )
-                _locationsWeatherInfo.postValue(result)
+    fun updateWeatherInfo(locationsToUpdate: List<Location>? = null) = viewModelScope.launch {
+        val queryLocations = locationsToUpdate ?: _locations.value
+        queryLocations?.let { locations ->
+            val result= _locationsWeatherInfo.value ?: mutableSetOf()
+
+            locations.forEach { location ->
+                val weatherInfo = getShortWeatherInfoUseCase.invoke(location)
+                weatherInfo?.let { result.add(it) }
             }
+
+            _locationsWeatherInfo.postValue(result)
         }
     }
 
     fun addLocation(location: Location) = viewModelScope.launch {
-        locationRepository.addLocation(location)
+        saveLocationUseCase.invoke(location)
         updateLocations()
         updateWeatherInfo(listOf(location))
     }
 
     fun removeLocations(locations: List<Location>) {
         for (location in locations) {
-            viewModelScope.launch {
-                weatherRepository.deleteLocationData(location.id)
-                locationRepository.deleteLocation(location)
-            }
+            viewModelScope.launch { deleteLocationUseCase.invoke(location) }
         }
         _locations.value?.removeAll(locations)
     }
 
     fun updateLocationPositions(locations: List<Location>) = viewModelScope.launch {
-        locations.forEachIndexed { index, location ->
-            locationRepository.updatePosition(location.url, index)
-        }
+        updateLocationsPositionUseCase.invoke(locations)
         updateLocations()
     }
 
@@ -77,17 +79,23 @@ class ManageLocationsViewModel(
     }
 
     class Factory @Inject constructor(
-        private val weatherRepository: WeatherRepository,
-        private val locationRepository: LocationRepository,
-        private val getTempUnitUseCase: GetTempUnitUseCase
+        private val getTempUnitUseCase: GetTempUnitUseCase,
+        private val getAllLocationsUseCase: GetAllLocationsUseCase,
+        private val saveLocationUseCase: SaveLocationUseCase,
+        private val updateLocationsPositionUseCase: UpdateLocationsPositionUseCase,
+        private val deleteLocationUseCase: DeleteLocationUseCase,
+        private val getShortWeatherInfoUseCase: GetShortWeatherInfoUseCase
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return ManageLocationsViewModel(
-                weatherRepository,
-                locationRepository,
-                getTempUnitUseCase
+                getTempUnitUseCase,
+                getAllLocationsUseCase,
+                saveLocationUseCase,
+                updateLocationsPositionUseCase,
+                deleteLocationUseCase,
+                getShortWeatherInfoUseCase
             ) as T
         }
     }
