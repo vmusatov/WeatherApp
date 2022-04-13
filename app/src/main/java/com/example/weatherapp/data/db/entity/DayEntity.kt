@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.weatherapp.domain.model.Day
 
 @Entity(
     tableName = "days",
@@ -39,4 +40,34 @@ data class DayEntity(
 
     @ColumnInfo(name = "condition_second_icon")
     var conditionSecondIcon: String,
-)
+) {
+    fun toDay(): Day {
+        return Day(
+            date = date,
+            humidity = humidity,
+            maxTempC = maxTempC,
+            maxTempF = maxTempF,
+            minTempC = minTempC,
+            minTempF = minTempF,
+            conditionFirstIcon = conditionFirstIcon,
+            conditionSecondIcon = conditionSecondIcon,
+            emptyList()
+        )
+    }
+    companion object {
+        fun from(from: Day): DayEntity {
+            return DayEntity(
+                id = 0,
+                locationId = -1,
+                date = from.date,
+                humidity = from.humidity,
+                maxTempC = from.maxTempC,
+                maxTempF = from.maxTempF,
+                minTempC = from.minTempC,
+                minTempF = from.minTempF,
+                conditionFirstIcon = from.conditionFirstIcon,
+                conditionSecondIcon = from.conditionSecondIcon
+            )
+        }
+    }
+}

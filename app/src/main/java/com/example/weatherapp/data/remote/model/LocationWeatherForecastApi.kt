@@ -1,12 +1,28 @@
 package com.example.weatherapp.data.remote.model
 
+import com.example.weatherapp.domain.model.Day
+import com.example.weatherapp.domain.model.Hour
+import com.example.weatherapp.domain.model.WeatherData
+import com.example.weatherapp.util.DateUtils
 import com.google.gson.annotations.SerializedName
+import java.util.*
+import kotlin.math.min
 
 data class LocationWeatherForecastApi(
     val location: LocationApi,
     val current: WeatherCurrentApi,
     val forecast: ForecastApi,
-)
+) {
+    fun toWeatherData(): WeatherData {
+        val location = location.toLocation()
+        val current = current.toCurrentWeather()
+        val days = forecast.forecastDays.map { it.toDay() }
+        val hours = WeatherData.parseDaysToHoursForecast(location.localtime, days)
+        val lastUpdated = DateUtils.UPDATED_AT_DATE_FORMAT.format(Date())
+
+        return WeatherData(location, current, hours, days, lastUpdated)
+    }
+}
 
 data class ForecastApi(
     @SerializedName("forecastday")
@@ -18,7 +34,21 @@ data class ForecastDayApi(
     val day: DayApi,
     @SerializedName("hour")
     val hours: List<HourApi>
-)
+) {
+    fun toDay(): Day {
+        return Day(
+            date = date,
+            humidity = day.humidity,
+            maxTempC = day.maxTempC,
+            maxTempF = day.maxTempF,
+            minTempC = day.minTempC,
+            minTempF = day.minTempF,
+            conditionFirstIcon = hours[min(11, hours.size)].condition.icon,
+            conditionSecondIcon = hours[min(20, hours.size)].condition.icon,
+            hours = hours.map { it.toHour() }
+        )
+    }
+}
 
 data class DayApi(
     @SerializedName("maxtemp_c")
@@ -73,4 +103,19 @@ data class HourApi(
 
     @SerializedName("humidity")
     val humidity: Int
-)
+) {
+    fun toHour(): Hour {
+        return Hour(
+            dateTime = time,
+            tempC = tempC,
+            tempF = tempF,
+            conditionText = condition.text,
+            conditionIcon = condition.icon,
+            willItRain = willItRain,
+            chanceOfRain = chanceOfRain,
+            willItShow = willItShow,
+            chanceOfSnow = chanceOfSnow,
+            humidity = humidity
+        )
+    }
+}

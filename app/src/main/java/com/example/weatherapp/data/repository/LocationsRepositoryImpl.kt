@@ -1,6 +1,7 @@
 package com.example.weatherapp.data.repository
 
 import com.example.weatherapp.data.db.dao.LocationsDao
+import com.example.weatherapp.data.db.entity.LocationEntity
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.repository.LocationsRepository
@@ -14,7 +15,7 @@ class LocationsRepositoryImpl @Inject constructor(
 ) : LocationsRepository {
 
     override suspend fun saveLocation(location: Location): Long = withContext(Dispatchers.IO) {
-        locationsDao.insert(location.toEntity())
+        locationsDao.insert(LocationEntity.from(location))
     }
 
     override suspend fun deleteLocation(location: Location) = withContext(Dispatchers.IO) {
@@ -22,27 +23,25 @@ class LocationsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSelectedLocation(): Location? = withContext(Dispatchers.IO) {
-        locationsDao.getSelectedLocation()?.let { Location.from(it) }
+        locationsDao.getSelectedLocation()?.toLocation()
     }
 
     override suspend fun getAllLocations(): List<Location> = withContext(Dispatchers.IO) {
-        locationsDao.getAllLocations().map { Location.from(it) }
+        locationsDao.getAllLocations().map { it.toLocation() }
     }
 
     override suspend fun getLocationsByName(name: String): List<Location> =
         withContext(Dispatchers.IO) {
             try {
-                weatherApi.getSearchResult(name).blockingGet().map { Location.from(it) }
+                weatherApi.getSearchResult(name).blockingGet().map { it.toLocation() }
             } catch (e: Exception) {
+
                 emptyList()
             }
         }
 
     override suspend fun getLocationByUrl(url: String): Location? = withContext(Dispatchers.IO) {
-        locationsDao.getLocationByUrl(url)?.let {
-            return@withContext Location.from(it)
-        }
-        return@withContext null
+        locationsDao.getLocationByUrl(url)?.toLocation()
     }
 
     override suspend fun updateLocationPosition(location: Location, position: Int) =

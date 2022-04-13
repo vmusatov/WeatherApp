@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.weatherapp.domain.model.Hour
 
 @Entity(
     tableName = "hours",
@@ -48,4 +49,39 @@ data class HourEntity(
 
     @ColumnInfo(name = "humidity")
     var humidity: Int
-)
+) {
+    fun toHour(): Hour {
+        return Hour(
+            dateTime = dateTime,
+            tempC = tempC,
+            tempF = tempF,
+            conditionText = conditionText,
+            conditionIcon = conditionIcon,
+            willItRain = willItRain,
+            chanceOfRain = chanceOfRain,
+            willItShow = willItShow,
+            chanceOfSnow = chanceOfSnow,
+            humidity = humidity
+        )
+    }
+
+    companion object {
+        fun from(from: Hour): HourEntity {
+            return HourEntity(
+                id = 0,
+                locationId = -1,
+                dayId = -1,
+                dateTime = from.dateTime,
+                tempC = from.tempC,
+                tempF = from.tempF,
+                conditionText = from.conditionText,
+                conditionIcon = from.conditionIcon,
+                willItRain = from.willItRain,
+                chanceOfRain = from.chanceOfRain,
+                willItShow = from.willItShow,
+                chanceOfSnow = from.chanceOfSnow,
+                humidity = from.humidity
+            )
+        }
+    }
+}

@@ -1,9 +1,6 @@
 package com.example.weatherapp.domain.model
 
-import com.example.weatherapp.data.db.entity.LocationWithWeatherTuple
-import com.example.weatherapp.data.remote.model.LocationWeatherForecastApi
 import com.example.weatherapp.util.DateUtils
-import java.util.Date
 
 data class WeatherData(
     val location: Location,
@@ -13,43 +10,8 @@ data class WeatherData(
     val lastUpdated: String?
 ) {
     companion object {
-        fun from(apiModel: LocationWeatherForecastApi): WeatherData {
-            val location = Location.from(apiModel.location)
-            val current = CurrentWeather.from(apiModel)
-            val days = apiModel.forecast.forecastDays.map { Day.from(it) }
-            val hours = parseHoursForecast(apiModel.location.localtime, days)
-            val lastUpdated = DateUtils.UPDATED_AT_DATE_FORMAT.format(Date())
 
-            return WeatherData(location, current, hours, days, lastUpdated)
-        }
-
-        fun from(entity: LocationWithWeatherTuple): WeatherData {
-            val location = Location.from(entity.location)
-            val current = CurrentWeather.from(entity.current)
-            val days = parseDaysForecast(entity)
-            val hours = parseHoursForecast(entity.location.localtime, days)
-
-            val lastUpdated = location.lastUpdated?.let {
-                DateUtils.UPDATED_AT_DATE_FORMAT.format(it)
-            }
-
-            return WeatherData(location, current, hours, days, lastUpdated)
-        }
-
-        private fun parseDaysForecast(from: LocationWithWeatherTuple): List<Day> {
-            return from.days.map { dayEntity ->
-                val day = Day.from(dayEntity)
-                day.hours = from.hours
-                    .filter { it.dayId == dayEntity.id }
-                    .map { Hour.from(it) }
-                day
-            }
-        }
-
-        private fun parseHoursForecast(
-            localTime: String,
-            forecastDays: List<Day>
-        ): List<Hour> {
+        fun parseDaysToHoursForecast(localTime: String, forecastDays: List<Day>): List<Hour> {
             val hours = mutableListOf<Hour>()
 
             if (forecastDays.isNotEmpty()) {

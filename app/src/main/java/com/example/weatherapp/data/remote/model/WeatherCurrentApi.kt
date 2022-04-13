@@ -1,5 +1,7 @@
 package com.example.weatherapp.data.remote.model
 
+import com.example.weatherapp.domain.model.Astronomy
+import com.example.weatherapp.domain.model.CurrentWeather
 import com.google.gson.annotations.SerializedName
 
 data class WeatherCurrentApi(
@@ -35,7 +37,27 @@ data class WeatherCurrentApi(
 
     @SerializedName("air_quality")
     var airQuality: AirQualityApi
-)
+) {
+    fun toCurrentWeather(): CurrentWeather {
+        return CurrentWeather(
+            tempC = tempC,
+            tempF = tempF,
+            feelsLikeTempC = feelsLikeTempC,
+            feelsLikeTempF = feelsLikeTempF,
+            conditionIcon = condition.icon,
+            conditionText = condition.text,
+            astronomy = Astronomy("", ""),
+            windKph = windKph,
+            uvIndex = uvIndex,
+            pressureMb = pressureMb,
+            co = airQuality.co,
+            no2 = airQuality.no2,
+            o3 = airQuality.o3,
+            so2 = airQuality.so2,
+            usEpaIndex = airQuality.usEpaIndex
+        )
+    }
+}
 
 data class AirQualityApi(
     val co: Double,

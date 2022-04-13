@@ -4,6 +4,9 @@ import com.example.weatherapp.data.db.dao.CurrentWeatherDao
 import com.example.weatherapp.data.db.dao.DaysDao
 import com.example.weatherapp.data.db.dao.HoursDao
 import com.example.weatherapp.data.db.dao.LocationsDao
+import com.example.weatherapp.data.db.entity.CurrentWeatherEntity
+import com.example.weatherapp.data.db.entity.DayEntity
+import com.example.weatherapp.data.db.entity.HourEntity
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.domain.model.*
 import com.example.weatherapp.domain.repository.WeatherRepository
@@ -39,9 +42,7 @@ class WeatherRepositoryImpl @Inject constructor(
     private suspend fun getWeatherDataFromDb(location: Location): WeatherData? =
         withContext(Dispatchers.IO) {
             try {
-                locationsDao.getLocationByUrlWithWeather(location.url)?.let {
-                    WeatherData.from(it)
-                }
+                locationsDao.getLocationByUrlWithWeather(location.url)?.toWeatherData()
             } catch (e: Exception) {
                 null
             }
@@ -50,8 +51,9 @@ class WeatherRepositoryImpl @Inject constructor(
     private suspend fun loadWeatherData(location: Location): WeatherData? =
         withContext(Dispatchers.IO) {
             try {
-                val weatherData =
-                    WeatherData.from(weatherApi.getForecast(location.url).blockingGet())
+                val forecast = weatherApi.getForecast(location.url).blockingGet()
+                val weatherData = forecast.toWeatherData()
+
                 loadAstronomy(location)?.let { weatherData.current.astronomy = it }
 
                 weatherData
@@ -68,7 +70,7 @@ class WeatherRepositoryImpl @Inject constructor(
                     weatherApi.getAstronomy(query, DateUtils.DATE_FORMAT.format(Date()))
                         .blockingGet()
 
-                Astronomy.from(fromApi)
+                fromApi.toAstronomy()
             } catch (e: Exception) {
                 null
             }
@@ -77,7 +79,8 @@ class WeatherRepositoryImpl @Inject constructor(
     override suspend fun getShortWeatherInfo(location: Location): ShortWeatherInfo? =
         withContext(Dispatchers.IO) {
             try {
-                ShortWeatherInfo.from(weatherApi.getCurrent(location.url).blockingGet())
+                val currentWeather = weatherApi.getCurrent(location.url).blockingGet()
+                currentWeather.toShortWeatherInfo()
             } catch (e: Exception) {
                 null
             }
@@ -113,30 +116,26 @@ class WeatherRepositoryImpl @Inject constructor(
 
     private suspend fun addCurrentWeather(locationId: Int, current: CurrentWeather) =
         withContext(Dispatchers.IO) {
-            val entity = current.toEntity()
+            val entity = CurrentWeatherEntity.from(current)
             entity.locationId = locationId
             currentWeatherDao.insert(entity)
         }
 
     private suspend fun addHour(locationId: Int, dayId: Int, hour: Hour) =
         withContext(Dispatchers.IO) {
-            val entity = hour.toEntity()
+            val entity = HourEntity.from(hour)
             entity.locationId = locationId
             entity.dayId = dayId
             hoursDao.insert(entity)
         }
 
     private suspend fun addDay(locationId: Int, day: Day): Long = withContext(Dispatchers.IO) {
-        val entity = day.toEntity()
+        val entity = DayEntity.from(day)
         entity.locationId = locationId
         return@withContext daysDao.insert(entity)
     }
 
     private suspend fun getLocationId(location: Location): Int? {
-        return if (location.id >= 0) {
-            location.id
-        } else {
-            locationsDao.getLocationByUrl(location.url)?.id
-        }
+        return locationsDao.getLocationByUrl(location.url)?.id
     }
 }

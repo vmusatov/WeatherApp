@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.weatherapp.domain.model.Astronomy
+import com.example.weatherapp.domain.model.CurrentWeather
 
 @Entity(
     tableName = "current_weather",
@@ -63,5 +65,50 @@ data class CurrentWeatherEntity(
 
     @ColumnInfo(name = "us_epa_index")
     var usEpaIndex: Int
-)
+) {
+    fun toCurrentWeather(): CurrentWeather {
+        return CurrentWeather(
+            tempC = tempC,
+            tempF = tempF,
+            feelsLikeTempC = feelsLikeTempC,
+            feelsLikeTempF = feelsLikeTempF,
+            conditionIcon = conditionIcon,
+            conditionText = conditionText,
+            astronomy = Astronomy(sunrise, sunset),
+            windKph = windKph,
+            uvIndex = uvIndex,
+            pressureMb = pressureMb,
+            co = co,
+            no2 = no2,
+            o3 = o3,
+            so2 = so2,
+            usEpaIndex = usEpaIndex
+        )
+    }
+
+    companion object {
+        fun from(from: CurrentWeather): CurrentWeatherEntity {
+            return CurrentWeatherEntity(
+                id = 0,
+                locationId = -1,
+                tempC = from.tempC,
+                tempF = from.tempF,
+                feelsLikeTempC = from.feelsLikeTempC,
+                feelsLikeTempF = from.feelsLikeTempF,
+                conditionIcon = from.conditionIcon,
+                conditionText = from.conditionText,
+                sunrise = from.astronomy.sunrise,
+                sunset = from.astronomy.sunset,
+                windKph = from.windKph,
+                uvIndex = from.uvIndex,
+                pressureMb = from.pressureMb,
+                co = from.co,
+                no2 = from.no2,
+                o3 = from.o3,
+                so2 = from.so2,
+                usEpaIndex = from.usEpaIndex
+            )
+        }
+    }
+}
 
