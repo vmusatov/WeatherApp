@@ -5,8 +5,8 @@ import com.example.weatherapp.data.db.entity.CurrentWeatherEntity
 import com.example.weatherapp.data.db.entity.DayEntity
 import com.example.weatherapp.data.db.entity.HourEntity
 import com.example.weatherapp.data.remote.WeatherApi
-import com.example.weatherapp.data.remote.utils.safeApiCall
-import com.example.weatherapp.data.remote.utils.safeDbCall
+import com.example.weatherapp.data.utils.safeApiCall
+import com.example.weatherapp.data.utils.safeDbCall
 import com.example.weatherapp.domain.model.*
 import com.example.weatherapp.domain.repository.WeatherRepository
 import com.example.weatherapp.domain.utils.WorkResult

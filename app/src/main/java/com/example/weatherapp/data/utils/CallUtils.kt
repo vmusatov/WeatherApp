@@ -1,4 +1,4 @@
-package com.example.weatherapp.data.remote.utils
+package com.example.weatherapp.data.utils
 
 import com.example.weatherapp.exception.DbException
 import com.example.weatherapp.exception.NetworkException

@@ -3,7 +3,7 @@ package com.example.weatherapp.data.repository
 import com.example.weatherapp.data.db.dao.LocationsDao
 import com.example.weatherapp.data.db.entity.LocationEntity
 import com.example.weatherapp.data.remote.WeatherApi
-import com.example.weatherapp.data.remote.utils.safeApiCall
+import com.example.weatherapp.data.utils.safeApiCall
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.repository.LocationsRepository
 import com.example.weatherapp.domain.utils.WorkResult
