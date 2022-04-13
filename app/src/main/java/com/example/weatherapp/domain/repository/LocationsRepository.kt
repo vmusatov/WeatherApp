@@ -1,6 +1,7 @@
 package com.example.weatherapp.domain.repository
 
 import com.example.weatherapp.domain.model.Location
+import com.example.weatherapp.domain.utils.WorkResult
 
 interface LocationsRepository {
 
@@ -12,7 +13,7 @@ interface LocationsRepository {
 
     suspend fun getAllLocations(): List<Location>
 
-    suspend fun getLocationsByName(name: String): List<Location>
+    suspend fun autocompleteLocationsByName(name: String): WorkResult<List<Location>>
 
     suspend fun getLocationByUrl(url: String): Location?
 

@@ -5,8 +5,12 @@ import com.example.weatherapp.data.db.entity.CurrentWeatherEntity
 import com.example.weatherapp.data.db.entity.DayEntity
 import com.example.weatherapp.data.db.entity.HourEntity
 import com.example.weatherapp.data.remote.WeatherApi
+import com.example.weatherapp.data.remote.utils.safeApiCall
+import com.example.weatherapp.data.remote.utils.safeDbCall
 import com.example.weatherapp.domain.model.*
 import com.example.weatherapp.domain.repository.WeatherRepository
+import com.example.weatherapp.domain.utils.WorkResult
+import com.example.weatherapp.domain.utils.WorkResult.Success
 import com.example.weatherapp.util.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,63 +29,50 @@ class WeatherRepositoryImpl @Inject constructor(
     override suspend fun getWeatherDataByLocation(
         forceLoad: Boolean,
         location: Location
-    ): WeatherData? = withContext(Dispatchers.IO) {
-
+    ): WorkResult<WeatherData> = withContext(Dispatchers.IO) {
         if (forceLoad) {
-            val weatherData = loadWeatherData(location)
-            weatherData?.let { saveWeatherData(location, weatherData) }
-
-            weatherData
+            val weatherDataResult = loadWeatherData(location)
+            if (weatherDataResult is Success) {
+                saveWeatherData(location, weatherDataResult.data)
+            }
+            weatherDataResult
         } else {
             getWeatherDataFromDb(location)
         }
     }
 
-    private suspend fun getWeatherDataFromDb(location: Location): WeatherData? =
+    private suspend fun getWeatherDataFromDb(location: Location): WorkResult<WeatherData> =
         withContext(Dispatchers.IO) {
-            try {
-                weatherDao.getLocationWeatherByUrl(location.url)?.toWeatherData()
-            } catch (e: Exception) {
-                null
+            safeDbCall { weatherDao.getLocationWeatherByUrl(location.url) }.map { it.toWeatherData() }
+        }
+
+    private suspend fun loadWeatherData(location: Location): WorkResult<WeatherData> =
+        withContext(Dispatchers.IO) {
+            val result =
+                safeApiCall { weatherApi.getForecast(location.url) }.map { it.toWeatherData() }
+
+            if (result is Success) { loadAstronomy(location, result.data) }
+
+            result
+        }
+
+    private suspend fun loadAstronomy(location: Location, weatherData: WeatherData) =
+        withContext(Dispatchers.IO) {
+            val query = "${location.lat}, ${location.lon}"
+            val dateNow = DateUtils.DATE_FORMAT.format(Date())
+
+            val result =
+                safeApiCall { weatherApi.getAstronomy(query, dateNow) }.map { it.toAstronomy() }
+
+            if (result is Success) {
+                weatherData.current.astronomy = result.data
             }
         }
 
-    private suspend fun loadWeatherData(location: Location): WeatherData? =
+    override suspend fun getShortWeatherInfo(location: Location): WorkResult<ShortWeatherInfo> =
         withContext(Dispatchers.IO) {
-            try {
-                val forecast = weatherApi.getForecast(location.url).blockingGet()
-                val weatherData = forecast.toWeatherData()
-
-                loadAstronomy(location)?.let { weatherData.current.astronomy = it }
-
-                weatherData
-            } catch (e: Exception) {
-                null
-            }
-        }
-
-    private suspend fun loadAstronomy(location: Location): Astronomy? =
-        withContext(Dispatchers.IO) {
-            try {
-                val query = "${location.lat}, ${location.lon}"
-                val fromApi =
-                    weatherApi.getAstronomy(query, DateUtils.DATE_FORMAT.format(Date()))
-                        .blockingGet()
-
-                fromApi.toAstronomy()
-            } catch (e: Exception) {
-                null
-            }
-        }
-
-    override suspend fun getShortWeatherInfo(location: Location): ShortWeatherInfo? =
-        withContext(Dispatchers.IO) {
-            try {
-                val currentWeather = weatherApi.getCurrent(location.url).blockingGet()
-                currentWeather.toShortWeatherInfo()
-            } catch (e: Exception) {
-                null
-            }
+            safeApiCall { weatherApi.getCurrent(location.url) }
+                .map { it.toShortWeatherInfo() }
         }
 
     override suspend fun clearWeatherData(location: Location): Unit =

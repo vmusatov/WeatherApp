@@ -17,12 +17,9 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.*
-import com.example.weatherapp.domain.model.Astronomy
-import com.example.weatherapp.domain.model.CurrentWeather
-import com.example.weatherapp.domain.model.TempUnit
-import com.example.weatherapp.domain.model.WeatherData
-import com.example.weatherapp.domain.model.WeatherNotification
+import com.example.weatherapp.domain.model.*
 import com.example.weatherapp.ui.ToolbarAction
+import com.example.weatherapp.ui.UpdateFailType
 import com.example.weatherapp.ui.home.adapter.DailyForecastListAdapter
 import com.example.weatherapp.ui.home.adapter.HourlyForecastItemDecorator
 import com.example.weatherapp.ui.home.adapter.HourlyForecastListAdapter
@@ -165,7 +162,6 @@ class HomeFragment : Fragment() {
 
         refreshLayout.setOnRefreshListener { viewModel.updateWeather(force = true) }
         blockErrors.addLocation.setOnClickListener { navigator().goToAddLocation() }
-        blockErrors.showLastSaved.setOnClickListener { viewModel.updateWeather() }
     }
 
     private fun updateWeather(data: WeatherData) {
@@ -279,19 +275,16 @@ class HomeFragment : Fragment() {
         blockErrors.root.visibility = View.VISIBLE
 
         blockErrors.addLocation.visibility = View.GONE
-        blockErrors.showLastSaved.visibility = View.GONE
 
         blockErrors.errorText.text = when (type) {
             UpdateFailType.FAIL_LOAD_FROM_DB -> getString(R.string.db_fail)
-            UpdateFailType.FAIL_LOAD_FROM_NETWORK -> {
-                blockErrors.showLastSaved.visibility = View.VISIBLE
-                getString(R.string.network_fail)
-            }
+            UpdateFailType.FAIL_LOAD_FROM_NETWORK -> getString(R.string.network_fail)
             UpdateFailType.NO_LOCATION -> {
                 refreshLayout.isEnabled = false
                 blockErrors.addLocation.visibility = View.VISIBLE
                 getString(R.string.no_selected_location)
             }
+            UpdateFailType.UNDEFINED -> getString(R.string.undefined_fail)
         }
     }
 
@@ -305,7 +298,9 @@ class HomeFragment : Fragment() {
             }
         } else {
             refreshLayout.isRefreshing = false
-            content.visibility = View.VISIBLE
+            if (viewModel.updateFail.value == null) {
+                content.visibility = View.VISIBLE
+            }
         }
     }
 }

@@ -21,14 +21,4 @@
         android:gravity="center"
         android:text="@string/add_location"
         android:textSize="@dimen/small_text" />
-
-    <TextView
-        android:id="@+id/show_last_saved"
-        style="@style/formContentBlock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="@string/show_last_saved_data"
-        android:textSize="@dimen/small_text" />
 </LinearLayout>

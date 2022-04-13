@@ -2,6 +2,8 @@ package com.example.weatherapp.ui.home
 
 import android.content.Context
 import androidx.lifecycle.*
+import com.example.weatherapp.exception.DbException
+import com.example.weatherapp.exception.NetworkException
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.domain.model.WeatherData
@@ -14,15 +16,12 @@ import com.example.weatherapp.domain.usecase.weather.GetWeatherDataUseCase
 import com.example.weatherapp.domain.usecase.weather.GetWeatherDataUseCase.Data
 import com.example.weatherapp.domain.usecase.weather.ParseEpaIndexUseCase
 import com.example.weatherapp.domain.usecase.weather.ParseUvIndexUseCase
+import com.example.weatherapp.domain.utils.WorkResult.Fail
+import com.example.weatherapp.domain.utils.WorkResult.Success
+import com.example.weatherapp.ui.UpdateFailType
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-
-enum class UpdateFailType {
-    NO_LOCATION,
-    FAIL_LOAD_FROM_DB,
-    FAIL_LOAD_FROM_NETWORK
-}
 
 class HomeViewModel(
     private val getTempUnitUseCase: GetTempUnitUseCase,
@@ -54,7 +53,7 @@ class HomeViewModel(
         val selectedLocation = selectLocation(location)
 
         if (selectedLocation != null) {
-            updateLocationData(selectedLocation, force)
+            updateLocationWeather(selectedLocation, force)
         } else {
             _updateFail.postValue(UpdateFailType.NO_LOCATION)
         }
@@ -69,19 +68,27 @@ class HomeViewModel(
         return selectedLocation
     }
 
-    private suspend fun updateLocationData(location: Location, force: Boolean) {
+    private suspend fun updateLocationWeather(location: Location, force: Boolean) {
         _isUpdateInProgress.postValue(true)
 
         val requestData = Data(location = location, forceLoad = force)
-        val weatherData = getWeatherDataUseCase.invoke(requestData)
-
-        if (weatherData != null) {
-            updateNotifications(weatherData)
-            _weatherData.postValue(weatherData)
-        } else {
-            _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_NETWORK)
+        when (val result = getWeatherDataUseCase.invoke(requestData)) {
+            is Success -> {
+                updateNotifications(result.data)
+                _weatherData.postValue(result.data)
+            }
+            is Fail -> handleFailResult(result)
         }
+
         _isUpdateInProgress.postValue(false)
+    }
+
+    private fun handleFailResult(result: Fail<Any>) {
+        when (result.exception) {
+            is NetworkException -> _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_NETWORK)
+            is DbException -> _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_NETWORK)
+            else -> _updateFail.postValue(UpdateFailType.UNDEFINED)
+        }
     }
 
     private fun updateNotifications(data: WeatherData) = viewModelScope.launch {

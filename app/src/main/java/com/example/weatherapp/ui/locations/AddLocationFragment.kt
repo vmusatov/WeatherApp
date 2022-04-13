@@ -34,7 +34,7 @@ class AddLocationFragment : Fragment() {
 
     private lateinit var locationSearchText: EditText
     private lateinit var locationsList: RecyclerView
-    private lateinit var notFound: TextView
+    private lateinit var errorText: TextView
 
     @Inject
     lateinit var addLocationsFactory: AddLocationViewModel.Factory
@@ -50,7 +50,7 @@ class AddLocationFragment : Fragment() {
         override fun afterTextChanged(s: Editable?) {
             val q = s.toString().trim()
             if (q.isEmpty()) {
-                notFound.visibility = View.GONE
+                errorText.visibility = View.GONE
                 locationsList.visibility = View.GONE
             } else {
                 viewModel.search(q)
@@ -98,7 +98,7 @@ class AddLocationFragment : Fragment() {
     private fun setupFields() {
         locationSearchText = binding.location
         locationsList = binding.locationsList
-        notFound = binding.notFound
+        errorText = binding.errorText
 
         manageLocationAdapter = AddLocationListAdapter { addLocation(it) }
     }
@@ -139,14 +139,29 @@ class AddLocationFragment : Fragment() {
         viewModel.searchResult.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 locationsList.visibility = View.GONE
-                notFound.visibility = View.VISIBLE
+                errorText.text = getString(R.string.nothing_found)
+                errorText.visibility = View.VISIBLE
             } else {
                 val result = if (it.size > 10) it.subList(0, 10) else it
                 manageLocationAdapter.update(result)
                 locationsList.scrollToPosition(0)
                 locationsList.visibility = View.VISIBLE
-                notFound.visibility = View.GONE
+                errorText.visibility = View.GONE
                 locationsList.requestApplyInsets()
+            }
+        }
+
+        viewModel.updateFail.observe(viewLifecycleOwner) {
+            locationsList.visibility = View.GONE
+            errorText.visibility = View.VISIBLE
+
+            when (it) {
+                UpdateFailType.FAIL_LOAD_FROM_NETWORK -> {
+                    errorText.text = getString(R.string.network_fail)
+                }
+                else -> {
+                    errorText.text = getString(R.string.undefined_fail)
+                }
             }
         }
     }

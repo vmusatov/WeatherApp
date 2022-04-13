@@ -5,6 +5,7 @@ import com.example.weatherapp.domain.model.WeatherData
 import com.example.weatherapp.domain.repository.LocationsRepository
 import com.example.weatherapp.domain.repository.WeatherRepository
 import com.example.weatherapp.domain.usecase.BaseUseCase
+import com.example.weatherapp.domain.utils.WorkResult
 import com.example.weatherapp.util.DateUtils
 import java.util.*
 import javax.inject.Inject
@@ -12,9 +13,9 @@ import javax.inject.Inject
 class GetWeatherDataUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository,
     private val weatherRepository: WeatherRepository
-) : BaseUseCase<GetWeatherDataUseCase.Data, WeatherData?>() {
+) : BaseUseCase<GetWeatherDataUseCase.Data, WorkResult<WeatherData>>() {
 
-    override suspend fun execute(data: Data): WeatherData? {
+    override suspend fun execute(data: Data): WorkResult<WeatherData> {
         val location = locationsRepository.getLocationByUrl(data.location.url) ?: data.location
 
         val needForceLoad = data.forceLoad || needForceLoad(location)

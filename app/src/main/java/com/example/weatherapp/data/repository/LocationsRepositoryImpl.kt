@@ -3,8 +3,10 @@ package com.example.weatherapp.data.repository
 import com.example.weatherapp.data.db.dao.LocationsDao
 import com.example.weatherapp.data.db.entity.LocationEntity
 import com.example.weatherapp.data.remote.WeatherApi
+import com.example.weatherapp.data.remote.utils.safeApiCall
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.repository.LocationsRepository
+import com.example.weatherapp.domain.utils.WorkResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,13 +32,10 @@ class LocationsRepositoryImpl @Inject constructor(
         locationsDao.getAllLocations().map { it.toLocation() }
     }
 
-    override suspend fun getLocationsByName(name: String): List<Location> =
+    override suspend fun autocompleteLocationsByName(name: String): WorkResult<List<Location>> =
         withContext(Dispatchers.IO) {
-            try {
-                weatherApi.getSearchResult(name).blockingGet().map { it.toLocation() }
-            } catch (e: Exception) {
-
-                emptyList()
+            safeApiCall { weatherApi.getSearchResult(name) }.map { locations ->
+                locations.map { it.toLocation() }
             }
         }
 

@@ -19,7 +19,6 @@
     <string name="today">Today</string>
 
     <string name="options">Options</string>
-    <string name="drawer_item_home">123</string>
     <string name="about">About</string>
     <string name="manage_locations">Manage locations</string>
     <string name="add_location">Add location</string>
@@ -63,8 +62,9 @@
     <string name="settings_menu_item_c">°C</string>
     <string name="settings_menu_item_f">°F</string>
 
-    <string name="network_fail">Failed to get new data\n Check your internet connection</string>
-    <string name="db_fail">Failed to get local data\n Try to update</string>
+    <string name="undefined_fail">Something went wrong\nTry to update</string>
+    <string name="network_fail">Failed to get new data\nCheck your internet connection</string>
+    <string name="db_fail">Failed to get local data\nTry to update</string>
     <string name="no_selected_location">No selected location</string>
     <string name="no_added_locations">No added locations</string>
     <string name="show_last_saved_data">Show last saved data</string>

@@ -6,10 +6,10 @@ import com.example.weatherapp.domain.model.ShortWeatherInfo
 import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.domain.usecase.location.DeleteLocationUseCase
 import com.example.weatherapp.domain.usecase.location.GetAllLocationsUseCase
-import com.example.weatherapp.domain.usecase.location.SaveLocationUseCase
 import com.example.weatherapp.domain.usecase.location.UpdateLocationsPositionUseCase
 import com.example.weatherapp.domain.usecase.settings.GetTempUnitUseCase
 import com.example.weatherapp.domain.usecase.weather.GetShortWeatherInfoUseCase
+import com.example.weatherapp.domain.utils.WorkResult.Success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -48,14 +48,16 @@ class ManageLocationsViewModel(
     fun updateWeatherInfo(locationsToUpdate: List<Location>? = null) = viewModelScope.launch {
         val queryLocations = locationsToUpdate ?: _locations.value
         queryLocations?.let { locations ->
-            val result = _locationsWeatherInfo.value ?: mutableSetOf()
+            val resultSet = _locationsWeatherInfo.value ?: mutableSetOf()
 
             locations.forEach { location ->
-                val weatherInfo = getShortWeatherInfoUseCase.invoke(location)
-                weatherInfo?.let { result.add(it) }
+                val result = getShortWeatherInfoUseCase.invoke(location)
+                if (result is Success) {
+                    resultSet.add(result.data)
+                }
             }
 
-            _locationsWeatherInfo.postValue(result)
+            _locationsWeatherInfo.postValue(resultSet)
         }
     }
 
