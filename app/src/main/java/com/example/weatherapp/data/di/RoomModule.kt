@@ -3,10 +3,7 @@ package com.example.weatherapp.data.di
 import android.content.Context
 import androidx.room.Room
 import com.example.weatherapp.data.db.*
-import com.example.weatherapp.data.db.dao.CurrentWeatherDao
-import com.example.weatherapp.data.db.dao.DaysDao
-import com.example.weatherapp.data.db.dao.HoursDao
-import com.example.weatherapp.data.db.dao.LocationsDao
+import com.example.weatherapp.data.db.dao.*
 import dagger.Module
 import dagger.Provides
 
@@ -25,6 +22,9 @@ class RoomModule {
             )
             .build()
     }
+
+    @Provides
+    fun provideWeatherDao(db: AppDatabase): WeatherDao = db.getWeatherDao()
 
     @Provides
     fun provideCurrentWeatherDao(db: AppDatabase): CurrentWeatherDao = db.getCurrentWeatherDao()

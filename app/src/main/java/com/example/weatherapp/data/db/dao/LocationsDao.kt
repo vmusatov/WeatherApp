@@ -1,15 +1,13 @@
 package com.example.weatherapp.data.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import com.example.weatherapp.data.db.entity.LocationEntity
-import com.example.weatherapp.data.db.entity.LocationWithWeatherTuple
 
 @Dao
 interface LocationsDao {
-
-    @Transaction
-    @Query("SELECT * FROM locations WHERE url = :url")
-    suspend fun getLocationByUrlWithWeather(url: String): LocationWithWeatherTuple?
 
     @Query("SELECT * FROM locations")
     suspend fun getAllLocations(): List<LocationEntity>

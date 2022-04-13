@@ -1,9 +1,6 @@
 package com.example.weatherapp.data.repository
 
-import com.example.weatherapp.data.db.dao.CurrentWeatherDao
-import com.example.weatherapp.data.db.dao.DaysDao
-import com.example.weatherapp.data.db.dao.HoursDao
-import com.example.weatherapp.data.db.dao.LocationsDao
+import com.example.weatherapp.data.db.dao.*
 import com.example.weatherapp.data.db.entity.CurrentWeatherEntity
 import com.example.weatherapp.data.db.entity.DayEntity
 import com.example.weatherapp.data.db.entity.HourEntity
@@ -18,6 +15,7 @@ import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
     private val weatherApi: WeatherApi,
+    private val weatherDao: WeatherDao,
     private val locationsDao: LocationsDao,
     private val currentWeatherDao: CurrentWeatherDao,
     private val daysDao: DaysDao,
@@ -42,7 +40,7 @@ class WeatherRepositoryImpl @Inject constructor(
     private suspend fun getWeatherDataFromDb(location: Location): WeatherData? =
         withContext(Dispatchers.IO) {
             try {
-                locationsDao.getLocationByUrlWithWeather(location.url)?.toWeatherData()
+                weatherDao.getLocationWeatherByUrl(location.url)?.toWeatherData()
             } catch (e: Exception) {
                 null
             }

@@ -6,7 +6,7 @@ import com.example.weatherapp.domain.model.Day
 import com.example.weatherapp.domain.model.WeatherData
 import com.example.weatherapp.util.DateUtils
 
-class LocationWithWeatherTuple(
+class LocationWeatherTuple(
     @Embedded
     val location: LocationEntity,
 

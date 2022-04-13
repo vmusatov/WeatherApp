@@ -1,10 +1,7 @@
 package com.example.weatherapp.data.di
 
 import android.content.SharedPreferences
-import com.example.weatherapp.data.db.dao.CurrentWeatherDao
-import com.example.weatherapp.data.db.dao.DaysDao
-import com.example.weatherapp.data.db.dao.HoursDao
-import com.example.weatherapp.data.db.dao.LocationsDao
+import com.example.weatherapp.data.db.dao.*
 import com.example.weatherapp.data.remote.WeatherApi
 import com.example.weatherapp.data.repository.LocationsRepositoryImpl
 import com.example.weatherapp.data.repository.SettingsRepositoryImpl
@@ -34,11 +31,19 @@ class RepositoryModule {
     @Provides
     fun provideWeatherRepository(
         weatherApi: WeatherApi,
+        weatherDao: WeatherDao,
         locationsDao: LocationsDao,
         currentWeatherDao: CurrentWeatherDao,
         daysDao: DaysDao,
         hoursDao: HoursDao
     ): WeatherRepository {
-        return WeatherRepositoryImpl(weatherApi, locationsDao, currentWeatherDao, daysDao, hoursDao)
+        return WeatherRepositoryImpl(
+            weatherApi,
+            weatherDao,
+            locationsDao,
+            currentWeatherDao,
+            daysDao,
+            hoursDao
+        )
     }
 }
