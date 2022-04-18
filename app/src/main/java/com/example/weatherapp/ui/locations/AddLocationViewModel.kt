@@ -25,6 +25,14 @@ class AddLocationViewModel(
     val updateFail: LiveData<UpdateFailType?> get() = _updateFail
     private val _updateFail = MutableLiveData<UpdateFailType?>()
 
+    private val savedLocations = mutableListOf<Location>()
+
+    init {
+        viewModelScope.launch {
+            savedLocations.addAll(getAllLocationsUseCase.invoke(Unit))
+        }
+    }
+
     fun search(q: String) = viewModelScope.launch {
         when (val result = getLocationsByNameUseCase(q)) {
             is Success -> _searchResult.postValue(result.data)
@@ -34,12 +42,10 @@ class AddLocationViewModel(
 
     fun saveLocation(location: Location) = viewModelScope.launch {
         saveLocationUseCase.invoke(location)
+        savedLocations.add(location)
     }
 
-    fun isLocationExist(location: Location): Boolean = runBlocking {
-        getAllLocationsUseCase.invoke(Unit)
-            .firstOrNull { it.url == location.url } != null
-    }
+    fun isLocationExist(location: Location): Boolean = savedLocations.any { it.url == location.url }
 
     private fun handleFailResult(result: Fail<Any>) {
         when (result.exception) {
