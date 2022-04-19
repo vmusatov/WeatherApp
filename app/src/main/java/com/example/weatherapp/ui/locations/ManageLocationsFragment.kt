@@ -91,7 +91,7 @@ class ManageLocationsFragment : Fragment() {
         viewModel.locations.observe(viewLifecycleOwner) {
             updateLocationsList(it)
         }
-        viewModel.locationsWeatherInfo.observe(viewLifecycleOwner) {
+        viewModel.locationsShortWeatherData.observe(viewLifecycleOwner) {
             manageLocationAdapter.updateLocationsInfo(it.toList())
         }
     }

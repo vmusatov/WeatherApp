@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemManageLocationsBinding
 import com.example.weatherapp.domain.model.Location
-import com.example.weatherapp.domain.model.ShortWeatherInfo
+import com.example.weatherapp.domain.model.ShortWeatherData
 import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.ui.locations.util.LocationsChangeCallback
 import com.squareup.picasso.Picasso
@@ -22,42 +22,42 @@ class ManageLocationListAdapter(
     private val locationsChangeCallback: LocationsChangeCallback,
 ) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>() {
 
-    private var data: MutableList<Location> = mutableListOf()
-    private var dataInfo: MutableList<ShortWeatherInfo> = mutableListOf()
+    private var locations: MutableList<Location> = mutableListOf()
+    private var weatherData: MutableList<ShortWeatherData> = mutableListOf()
     var tempUnit: TempUnit = TempUnit.DEFAULT
 
     private var isEditMode = false
     private var selectedItems: MutableList<Location> = mutableListOf()
 
-    fun updateLocationsInfo(info: List<ShortWeatherInfo>) {
-        info.forEach { newItem ->
-            val oldItem = this.dataInfo.firstOrNull { it.locationName == newItem.locationName }
+    fun updateLocationsInfo(weatherData: List<ShortWeatherData>) {
+        weatherData.forEach { newItem ->
+            val oldItem = this.weatherData.firstOrNull { it.locationName == newItem.locationName }
 
             if (oldItem == null) {
-                dataInfo.add(newItem)
+                this.weatherData.add(newItem)
             } else if (oldItem != newItem) {
-                dataInfo[dataInfo.indexOf(oldItem)] = newItem
+                this.weatherData[this.weatherData.indexOf(oldItem)] = newItem
             }
 
-            val changedItemId = data.indexOfFirst { it.name == newItem.locationName }
+            val changedItemId = locations.indexOfFirst { it.name == newItem.locationName }
             notifyItemChanged(changedItemId)
         }
     }
 
-    fun update(data: List<Location>) {
-        val newData = data.sortedBy { it.position }.toMutableList()
-        val diffCallback = LocationsDiffCallback(this.data, newData)
+    fun update(locations: List<Location>) {
+        val newData = locations.sortedBy { it.position }.toMutableList()
+        val diffCallback = LocationsDiffCallback(this.locations, newData)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
-        this.data = newData
+        this.locations = newData
 
         diffResult.dispatchUpdatesTo(this)
     }
 
     fun deleteSelected() {
         selectedItems.forEach {
-            notifyItemRemoved(data.indexOf(it))
-            data.remove(it)
+            notifyItemRemoved(locations.indexOf(it))
+            locations.remove(it)
         }
         locationsChangeCallback.onDeleteLocations(selectedItems)
         selectedItems.clear()
@@ -65,7 +65,7 @@ class ManageLocationListAdapter(
 
     fun switchEditMode(selectedItem: Location? = null) {
         if (isEditMode) {
-            locationsChangeCallback.onApplyChanges(data)
+            locationsChangeCallback.onApplyChanges(locations)
         }
         isEditMode = !isEditMode
 
@@ -78,8 +78,8 @@ class ManageLocationListAdapter(
     }
 
     fun onItemMove(fromPosition: Int, toPosition: Int) {
-        val prev: Location = data.removeAt(fromPosition)
-        data.add(toPosition, prev)
+        val prev: Location = locations.removeAt(fromPosition)
+        locations.add(toPosition, prev)
         notifyItemMoved(fromPosition, toPosition)
     }
 
@@ -90,7 +90,7 @@ class ManageLocationListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = data[position]
+        val item = locations[position]
         setupItemUi(holder, item)
         setupItemListeners(holder, item)
     }
@@ -116,7 +116,7 @@ class ManageLocationListAdapter(
             locationDesc.text = "${item.region}, ${item.country}"
 
             val res = holder.itemView.resources
-            dataInfo.firstOrNull { it.locationName == item.name }?.let {
+            weatherData.firstOrNull { it.locationName == item.name }?.let {
                 locationTemp.text = if (tempUnit == TempUnit.C) {
                     res.getString(R.string.degree, it.tempC.roundToInt())
                 } else {
@@ -163,7 +163,7 @@ class ManageLocationListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return locations.size
     }
 
     class ViewHolder(val binding: ItemManageLocationsBinding) :

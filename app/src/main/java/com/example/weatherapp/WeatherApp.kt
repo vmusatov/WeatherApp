@@ -2,8 +2,8 @@ package com.example.weatherapp
 
 import android.app.Application
 import android.content.Context
-import com.example.weatherapp.dagger.AppComponent
-import com.example.weatherapp.dagger.DaggerAppComponent
+import com.example.weatherapp.di.AppComponent
+import com.example.weatherapp.di.DaggerAppComponent
 import com.squareup.picasso.Picasso
 
 val Context.appComponent: AppComponent

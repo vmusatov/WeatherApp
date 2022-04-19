@@ -1,4 +1,4 @@
-package com.example.weatherapp.dagger
+package com.example.weatherapp.di
 
 import android.content.Context
 import android.content.SharedPreferences

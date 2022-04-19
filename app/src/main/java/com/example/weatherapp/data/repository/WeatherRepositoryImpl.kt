@@ -69,10 +69,10 @@ class WeatherRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getShortWeatherInfo(location: Location): WorkResult<ShortWeatherInfo> =
+    override suspend fun getShortWeatherInfo(location: Location): WorkResult<ShortWeatherData> =
         withContext(Dispatchers.IO) {
             safeApiCall { weatherApi.getCurrent(location.url) }
-                .map { it.toShortWeatherInfo() }
+                .map { it.toShortWeatherData() }
         }
 
     override suspend fun clearWeatherData(location: Location): Unit =

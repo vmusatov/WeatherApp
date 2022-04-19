@@ -1,6 +1,6 @@
 package com.example.weatherapp.domain.model
 
-data class ShortWeatherInfo(
+data class ShortWeatherData(
     val locationName: String,
     val tempC: Double,
     val tempF: Double,

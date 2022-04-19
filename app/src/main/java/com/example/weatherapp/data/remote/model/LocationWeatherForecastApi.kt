@@ -1,5 +1,6 @@
 package com.example.weatherapp.data.remote.model
 
+import com.example.weatherapp.data.utils.parseDaysToHoursForecast
 import com.example.weatherapp.domain.model.Day
 import com.example.weatherapp.domain.model.Hour
 import com.example.weatherapp.domain.model.WeatherData
@@ -17,7 +18,7 @@ data class LocationWeatherForecastApi(
         val location = location.toLocation()
         val current = current.toCurrentWeather()
         val days = forecast.forecastDays.map { it.toDay() }
-        val hours = WeatherData.parseDaysToHoursForecast(location.localtime, days)
+        val hours = parseDaysToHoursForecast(location.localtime, days)
         val lastUpdated = DateUtils.UPDATED_AT_DATE_FORMAT.format(Date())
 
         return WeatherData(location, current, hours, days, lastUpdated)
