@@ -29,7 +29,9 @@ import javax.inject.Inject
 
 class AddLocationFragment : Fragment() {
 
-    private lateinit var binding: FragmentAddLocationBinding
+    private var _binding: FragmentAddLocationBinding? = null
+    private val binding: FragmentAddLocationBinding get() =  checkNotNull(_binding)
+
     private lateinit var manageLocationAdapter: AddLocationListAdapter
 
     private lateinit var locationSearchText: EditText
@@ -81,13 +83,18 @@ class AddLocationFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAddLocationBinding.inflate(inflater, container, false)
+        _binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
         setupFields()
         setupUi()
         setupObservers()
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

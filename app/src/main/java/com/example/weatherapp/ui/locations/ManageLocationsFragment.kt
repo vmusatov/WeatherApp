@@ -27,7 +27,8 @@ import javax.inject.Inject
 
 class ManageLocationsFragment : Fragment() {
 
-    private lateinit var binding: FragmentManageLocationsBinding
+    private var _binding: FragmentManageLocationsBinding? = null
+    private val binding: FragmentManageLocationsBinding get() =  checkNotNull(_binding)
 
     @Inject
     lateinit var manageViewModelFactory: ManageLocationsViewModel.Factory
@@ -64,13 +65,18 @@ class ManageLocationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentManageLocationsBinding.inflate(inflater, container, false)
+        _binding = FragmentManageLocationsBinding.inflate(inflater, container, false)
 
         setupFields()
         setupUi()
         setupObservers()
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupFields() {

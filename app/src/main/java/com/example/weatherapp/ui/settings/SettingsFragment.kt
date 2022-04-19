@@ -27,7 +27,8 @@ import javax.inject.Inject
 
 class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
 
-    private lateinit var binding: FragmentSettingsBinding
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding: FragmentSettingsBinding get() =  checkNotNull(_binding)
 
     @Inject
     lateinit var factory: SettingsViewModel.Factory
@@ -47,7 +48,7 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
 
         setupFields()
         setupObservers()
@@ -55,6 +56,11 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
         setupToolbar()
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupObservers() {

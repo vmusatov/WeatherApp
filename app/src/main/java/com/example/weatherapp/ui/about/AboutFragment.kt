@@ -16,14 +16,15 @@ import com.example.weatherapp.ui.navigator
 
 class AboutFragment : Fragment() {
 
-    private lateinit var binding: FragmentAboutBinding
+    private var _binding: FragmentAboutBinding? = null
+    private val binding: FragmentAboutBinding get() = checkNotNull(_binding)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAboutBinding.inflate(inflater, container, false)
+        _binding = FragmentAboutBinding.inflate(inflater, container, false)
 
         setupToolbar()
 
@@ -31,6 +32,11 @@ class AboutFragment : Fragment() {
         binding.version.text = getString(R.string.app_version, BuildConfig.VERSION_NAME)
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupToolbar() {
