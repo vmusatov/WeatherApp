@@ -45,7 +45,6 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/hourly_forecast"
                     style="@style/formContentBlock"
-                    android:foreground="@drawable/form_shadow"
                     android:paddingStart="@dimen/app_small_padding"
                     android:paddingEnd="@dimen/app_small_padding" />
 
