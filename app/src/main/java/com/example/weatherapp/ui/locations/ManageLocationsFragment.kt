@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -28,7 +25,7 @@ import javax.inject.Inject
 class ManageLocationsFragment : Fragment() {
 
     private var _binding: FragmentManageLocationsBinding? = null
-    private val binding: FragmentManageLocationsBinding get() =  checkNotNull(_binding)
+    private val binding: FragmentManageLocationsBinding get() = checkNotNull(_binding)
 
     @Inject
     lateinit var manageViewModelFactory: ManageLocationsViewModel.Factory
@@ -40,12 +37,6 @@ class ManageLocationsFragment : Fragment() {
 
     private lateinit var manageLocationAdapter: ManageLocationListAdapter
     private lateinit var touchHelper: ItemTouchHelper
-
-    private lateinit var locationsList: RecyclerView
-    private lateinit var emptyLocations: TextView
-    private lateinit var editBlock: ConstraintLayout
-    private lateinit var applyBtn: ImageView
-    private lateinit var deleteBtn: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +58,6 @@ class ManageLocationsFragment : Fragment() {
     ): View {
         _binding = FragmentManageLocationsBinding.inflate(inflater, container, false)
 
-        setupFields()
         setupUi()
         setupObservers()
 
@@ -77,15 +67,6 @@ class ManageLocationsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun setupFields() {
-
-        locationsList = binding.locationsList
-        emptyLocations = binding.emptyLocations
-        applyBtn = binding.apply
-        deleteBtn = binding.delete
-        editBlock = binding.editBlock
     }
 
     private fun setupUi() {
@@ -102,14 +83,14 @@ class ManageLocationsFragment : Fragment() {
         }
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecyclerView() = with(binding) {
         touchHelper.attachToRecyclerView(locationsList)
 
-        deleteBtn.setOnClickListener {
+        delete.setOnClickListener {
             manageLocationAdapter.deleteSelected()
         }
 
-        applyBtn.setOnClickListener {
+        apply.setOnClickListener {
             manageLocationAdapter.switchEditMode()
         }
 
@@ -121,7 +102,7 @@ class ManageLocationsFragment : Fragment() {
         }
     }
 
-    private fun updateLocationsList(locations: List<Location>) {
+    private fun updateLocationsList(locations: List<Location>) = with(binding) {
         if (locations.isEmpty()) {
             locationsList.visibility = View.GONE
             editBlock.visibility = View.GONE
@@ -160,7 +141,7 @@ class ManageLocationsFragment : Fragment() {
             navigator().goBack()
         }
 
-        override fun onSwitchEditMode(editMode: Boolean) {
+        override fun onSwitchEditMode(editMode: Boolean) = with(binding) {
             if (editMode) {
                 editBlock.visibility = View.VISIBLE
             } else {

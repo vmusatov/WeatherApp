@@ -8,13 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentAddLocationBinding
@@ -30,13 +28,9 @@ import javax.inject.Inject
 class AddLocationFragment : Fragment() {
 
     private var _binding: FragmentAddLocationBinding? = null
-    private val binding: FragmentAddLocationBinding get() =  checkNotNull(_binding)
+    private val binding: FragmentAddLocationBinding get() = checkNotNull(_binding)
 
     private lateinit var manageLocationAdapter: AddLocationListAdapter
-
-    private lateinit var locationSearchText: EditText
-    private lateinit var locationsList: RecyclerView
-    private lateinit var errorText: TextView
 
     @Inject
     lateinit var addLocationsFactory: AddLocationViewModel.Factory
@@ -52,8 +46,8 @@ class AddLocationFragment : Fragment() {
         override fun afterTextChanged(s: Editable?) {
             val q = s.toString().trim()
             if (q.isEmpty()) {
-                errorText.visibility = View.GONE
-                locationsList.visibility = View.GONE
+                binding.errorText.visibility = View.GONE
+                binding.locationsList.visibility = View.GONE
             } else {
                 viewModel.search(q)
             }
@@ -67,7 +61,7 @@ class AddLocationFragment : Fragment() {
         val text = textView.text.toString().trim()
         if (text.isNotEmpty() && actionId == EditorInfo.IME_ACTION_SEARCH) {
             viewModel.search(text)
-            hideSoftKeyboard(locationSearchText)
+            hideSoftKeyboard(binding.locationSearchText)
             return@OnEditorActionListener true
         }
         return@OnEditorActionListener false
@@ -78,6 +72,11 @@ class AddLocationFragment : Fragment() {
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        manageLocationAdapter = AddLocationListAdapter { addLocation(it) }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -85,7 +84,6 @@ class AddLocationFragment : Fragment() {
     ): View {
         _binding = FragmentAddLocationBinding.inflate(inflater, container, false)
 
-        setupFields()
         setupUi()
         setupObservers()
 
@@ -99,15 +97,7 @@ class AddLocationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        showSoftKeyboard(binding.location)
-    }
-
-    private fun setupFields() {
-        locationSearchText = binding.location
-        locationsList = binding.locationsList
-        errorText = binding.errorText
-
-        manageLocationAdapter = AddLocationListAdapter { addLocation(it) }
+        showSoftKeyboard(binding.locationSearchText)
     }
 
     private fun addLocation(location: Location) {
@@ -122,7 +112,7 @@ class AddLocationFragment : Fragment() {
         }
     }
 
-    private fun setupUi() {
+    private fun setupUi() = with(binding) {
         setupToolbar()
 
         locationsList.adapter = manageLocationAdapter
@@ -142,7 +132,7 @@ class AddLocationFragment : Fragment() {
         )
     }
 
-    private fun setupObservers() {
+    private fun setupObservers() = with(binding) {
         viewModel.searchResult.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 locationsList.visibility = View.GONE

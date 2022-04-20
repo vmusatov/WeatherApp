@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/location"
+        android:id="@+id/location_search_text"
         style="@style/formContentBlock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

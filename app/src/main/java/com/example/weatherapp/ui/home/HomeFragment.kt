@@ -5,18 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
-import com.example.weatherapp.databinding.*
+import com.example.weatherapp.databinding.FragmentHomeBinding
 import com.example.weatherapp.domain.model.*
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.UpdateFailType
@@ -31,7 +29,8 @@ import javax.inject.Inject
 
 class HomeFragment : Fragment() {
 
-    private lateinit var binding: FragmentHomeBinding
+    private var _binding: FragmentHomeBinding? = null
+    private val binding: FragmentHomeBinding get() = checkNotNull(_binding)
 
     @Inject
     lateinit var factory: HomeViewModel.Factory
@@ -43,26 +42,13 @@ class HomeFragment : Fragment() {
 
     private var graphDecorator: RecyclerView.ItemDecoration? = null
 
-    private lateinit var blockCurrent: BlockCurrentBinding
-    private lateinit var blockAdditional: BlockAdditionalWeatherBinding
-    private lateinit var blockAirQuality: BlockAirQualityBinding
-    private lateinit var blockAstronomy: BlockAstronomyBinding
-    private lateinit var blockNotifications: BlockNotificationsBinding
-    private lateinit var blockAdditionalInfo: BlockAdditionalInfoBinding
-    private lateinit var blockErrors: BlockErrorsBinding
-
-    private lateinit var content: LinearLayout
-    private lateinit var hourlyForecastList: RecyclerView
-    private lateinit var dailyForecastList: RecyclerView
-    private lateinit var refreshLayout: SwipeRefreshLayout
-
     private val disableSwipeToUpdateRVScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if (!refreshLayout.isRefreshing) {
+            if (!binding.refreshLayout.isRefreshing) {
                 when (newState) {
-                    SCROLL_STATE_DRAGGING -> refreshLayout.isEnabled = false
-                    else -> refreshLayout.isEnabled = true
+                    SCROLL_STATE_DRAGGING -> binding.refreshLayout.isEnabled = false
+                    else -> binding.refreshLayout.isEnabled = true
                 }
             }
         }
@@ -71,8 +57,8 @@ class HomeFragment : Fragment() {
     private val disableSwipeToUpdateVPPageChangeCallback =
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
-                if (!refreshLayout.isRefreshing) {
-                    refreshLayout.isEnabled = state == ViewPager.SCROLL_STATE_IDLE
+                if (!binding.refreshLayout.isRefreshing) {
+                    binding.refreshLayout.isEnabled = state == ViewPager.SCROLL_STATE_IDLE
                 }
             }
         }
@@ -94,9 +80,8 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        setupFields()
         setupObservers()
         setupUi()
 
@@ -107,145 +92,137 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupFields() {
-        blockCurrent = binding.current
-        blockAdditional = binding.additionalWeather
-        blockAirQuality = binding.airQuality
-        blockAstronomy = binding.astronomy
-        blockAdditionalInfo = binding.additionalInfo
-        blockErrors = binding.errors
-
-        content = binding.content
-        hourlyForecastList = binding.byHourList
-        dailyForecastList = binding.byDayList
-        blockNotifications = binding.notifications
-        refreshLayout = binding.refreshLayout
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupObservers() {
         viewModel.selectedLocation.observe(viewLifecycleOwner) {
             navigator().setToolbarTitle(it?.name ?: "")
         }
-        viewModel.weatherData.observe(viewLifecycleOwner) {
-            updateWeather(it)
-            updateHourlyForecast(it)
-            updateAstronomy(it.current.astronomy)
-        }
+        viewModel.weatherData.observe(viewLifecycleOwner) { updateWeather(it) }
         viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
         viewModel.isUpdateInProgress.observe(viewLifecycleOwner) { showIsUpdate(it) }
         viewModel.updateFail.observe(viewLifecycleOwner) { handleError(it) }
     }
 
-    private fun setupUi() {
+    private fun setupUi() = with(binding) {
         setupToolbar()
 
-        val lm = LinearLayoutManager(requireContext())
-        lm.orientation = RecyclerView.HORIZONTAL
+        hourlyForecast.adapter = hourlyForecastAdapter
+        hourlyForecast.layoutManager = LinearLayoutManager(requireContext()).apply {
+            orientation = RecyclerView.HORIZONTAL
+        }
+        hourlyForecast.addOnScrollListener(disableSwipeToUpdateRVScrollListener)
+        hourlyForecast.itemAnimator = null
 
-        hourlyForecastList.adapter = hourlyForecastAdapter
-        hourlyForecastList.layoutManager = lm
-        hourlyForecastList.addOnScrollListener(disableSwipeToUpdateRVScrollListener)
-        hourlyForecastList.itemAnimator = null
+        dailyForecast.adapter = dailyForecastAdapter
+        dailyForecast.layoutManager = LinearLayoutManager(requireContext())
 
-        dailyForecastList.adapter = dailyForecastAdapter
-        dailyForecastList.layoutManager = LinearLayoutManager(requireContext())
-
-        blockNotifications.notificationsPager.adapter = notificationsAdapter
-        blockNotifications.notificationsPager.registerOnPageChangeCallback(
+        notifications.notificationsPager.adapter = notificationsAdapter
+        notifications.notificationsPager.registerOnPageChangeCallback(
             disableSwipeToUpdateVPPageChangeCallback
         )
-
         TabLayoutMediator(
-            blockNotifications.tabLayout,
-            blockNotifications.notificationsPager
+            notifications.tabLayout,
+            notifications.notificationsPager
         ) { _, _ -> }.attach()
 
         refreshLayout.setOnRefreshListener { viewModel.updateWeather(force = true) }
-        blockErrors.addLocation.setOnClickListener { navigator().goToAddLocation() }
+        errors.addLocation.setOnClickListener { navigator().goToAddLocation() }
     }
 
-    private fun updateWeather(data: WeatherData) {
+    private fun updateWeather(data: WeatherData) = with(binding) {
         val tempUnit = viewModel.getTempUnit()
 
         updateCurrentWeather(data.current, tempUnit)
         updateAdditionalWeather(data.current)
         updateAirQuality(data.current)
+        updateAstronomy(data.current.astronomy)
 
+        updateHourlyForecast(data, tempUnit)
         dailyForecastAdapter.update(data.daysForecast, tempUnit)
 
-        blockAdditionalInfo.updatedAt.visibility = View.GONE
-        data.lastUpdated?.let {
-            blockAdditionalInfo.updatedAt.text = getString(R.string.updated_at, it)
-            blockAdditionalInfo.updatedAt.visibility = View.VISIBLE
-        }
+        updateFooter(data)
     }
 
-    private fun updateNotifications(notifications: List<WeatherNotification>) {
-        if (notifications.isEmpty()) {
-            blockNotifications.root.visibility = View.GONE
+    private fun updateNotifications(notificationsList: List<WeatherNotification>) = with(binding) {
+        if (notificationsList.isEmpty()) {
+            notifications.root.visibility = View.GONE
         } else {
-            notificationsAdapter.update(notifications)
-            blockNotifications.root.visibility = View.VISIBLE
-            if (notifications.size == 1) {
-                blockNotifications.tabLayout.visibility = View.GONE
+            notificationsAdapter.update(notificationsList)
+            notifications.root.visibility = View.VISIBLE
+            if (notificationsList.size == 1) {
+                notifications.tabLayout.visibility = View.GONE
             } else {
-                blockNotifications.tabLayout.visibility = View.VISIBLE
+                notifications.tabLayout.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun updateCurrentWeather(current: CurrentWeather, tempUnit: TempUnit) {
-        blockCurrent.conditionText.text = current.conditionText
+    private fun updateCurrentWeather(currentWeather: CurrentWeather, tempUnit: TempUnit) =
+        with(binding) {
+            current.conditionText.text = currentWeather.conditionText
 
-        Picasso.get()
-            .load(current.conditionIcon)
-            .into(blockCurrent.currentConditionImage)
+            Picasso.get()
+                .load(currentWeather.conditionIcon)
+                .into(current.currentConditionImage)
 
-        if (tempUnit == TempUnit.C) {
-            blockCurrent.currentTemp.text = getString(R.string.degree, current.tempC.toInt())
-            blockCurrent.feelLikeTemp.text =
-                getString(R.string.feels_like, current.feelsLikeTempC.toInt())
-        } else {
-            blockCurrent.currentTemp.text = getString(R.string.degree, current.tempF.toInt())
-            blockCurrent.feelLikeTemp.text =
-                getString(R.string.feels_like, current.feelsLikeTempF.toInt())
+            if (tempUnit == TempUnit.C) {
+                current.currentTemp.text = getString(R.string.degree, currentWeather.tempC.toInt())
+                current.feelLikeTemp.text =
+                    getString(R.string.feels_like, currentWeather.feelsLikeTempC.toInt())
+            } else {
+                current.currentTemp.text = getString(R.string.degree, currentWeather.tempF.toInt())
+                current.feelLikeTemp.text =
+                    getString(R.string.feels_like, currentWeather.feelsLikeTempF.toInt())
+            }
         }
+
+    private fun updateAdditionalWeather(current: CurrentWeather) = with(binding) {
+        additionalWeather.pressureText.text = getString(R.string.mbar, current.pressureMb.toInt())
+        additionalWeather.windText.text = getString(R.string.kmh, current.windKph.toInt())
+        additionalWeather.uvIndexText.text =
+            viewModel.parseUvIndex(requireContext(), current.uvIndex)
     }
 
-    private fun updateAdditionalWeather(current: CurrentWeather) {
-        blockAdditional.pressureText.text = getString(R.string.mbar, current.pressureMb.toInt())
-        blockAdditional.windText.text = getString(R.string.kmh, current.windKph.toInt())
-        blockAdditional.uvIndexText.text = viewModel.parseUvIndex(requireContext(), current.uvIndex)
-    }
-
-    private fun updateAirQuality(current: CurrentWeather) {
-        blockAirQuality.coValue.text = current.co.toInt().toString()
-        blockAirQuality.no2Value.text = current.no2.toInt().toString()
-        blockAirQuality.o3Value.text = current.o3.toInt().toString()
-        blockAirQuality.so2Value.text = current.so2.toInt().toString()
-        blockAirQuality.usEpaIndexValue.text =
+    private fun updateAirQuality(current: CurrentWeather) = with(binding) {
+        airQuality.coValue.text = current.co.toInt().toString()
+        airQuality.no2Value.text = current.no2.toInt().toString()
+        airQuality.o3Value.text = current.o3.toInt().toString()
+        airQuality.so2Value.text = current.so2.toInt().toString()
+        airQuality.usEpaIndexValue.text =
             viewModel.parseEpaIndex(requireContext(), current.usEpaIndex)
     }
 
-    private fun updateHourlyForecast(data: WeatherData) {
-        graphDecorator?.let { hourlyForecastList.removeItemDecoration(it) }
+    private fun updateHourlyForecast(data: WeatherData, tempUnit: TempUnit) = with(binding) {
+        graphDecorator?.let { hourlyForecast.removeItemDecoration(it) }
 
         val hours = data.hoursForecast
         if (hours.isEmpty()) {
-            hourlyForecastList.visibility = View.GONE
+            hourlyForecast.visibility = View.GONE
         } else {
-            hourlyForecastAdapter.update(hours, viewModel.getTempUnit())
+            hourlyForecastAdapter.update(hours, tempUnit)
             graphDecorator = HourlyForecastItemDecorator(hours.map { it.tempF }, requireContext())
-            hourlyForecastList.addItemDecoration(graphDecorator as HourlyForecastItemDecorator)
+            hourlyForecast.addItemDecoration(graphDecorator as HourlyForecastItemDecorator)
 
-            hourlyForecastList.scrollToPosition(0)
-            hourlyForecastList.visibility = View.VISIBLE
+            hourlyForecast.scrollToPosition(0)
+            hourlyForecast.visibility = View.VISIBLE
         }
     }
 
-    private fun updateAstronomy(astronomy: Astronomy) {
-        blockAstronomy.sunriseText.text = astronomy.sunrise
-        blockAstronomy.sunsetText.text = astronomy.sunset
+    private fun updateAstronomy(astronomyData: Astronomy) = with(binding) {
+        astronomy.sunriseText.text = astronomyData.sunrise
+        astronomy.sunsetText.text = astronomyData.sunset
+    }
+
+    private fun updateFooter(data: WeatherData) = with(binding) {
+        footer.updatedAt.visibility = View.GONE
+        data.lastUpdated?.let {
+            footer.updatedAt.text = getString(R.string.updated_at, it)
+            footer.updatedAt.visibility = View.VISIBLE
+        }
     }
 
     private fun setupToolbar() {
@@ -263,34 +240,34 @@ class HomeFragment : Fragment() {
         )
     }
 
-    private fun handleError(type: UpdateFailType?) {
+    private fun handleError(type: UpdateFailType?) = with(binding) {
         refreshLayout.isEnabled = true
 
         if (type == null) {
-            blockErrors.root.visibility = View.GONE
+            errors.root.visibility = View.GONE
             return
         }
 
         content.visibility = View.GONE
-        blockErrors.root.visibility = View.VISIBLE
+        errors.root.visibility = View.VISIBLE
 
-        blockErrors.addLocation.visibility = View.GONE
+        errors.addLocation.visibility = View.GONE
 
-        blockErrors.errorText.text = when (type) {
+        errors.errorText.text = when (type) {
             UpdateFailType.FAIL_LOAD_FROM_DB -> getString(R.string.db_fail)
             UpdateFailType.FAIL_LOAD_FROM_NETWORK -> getString(R.string.network_fail)
             UpdateFailType.NO_LOCATION -> {
                 refreshLayout.isEnabled = false
-                blockErrors.addLocation.visibility = View.VISIBLE
+                errors.addLocation.visibility = View.VISIBLE
                 getString(R.string.no_selected_location)
             }
             UpdateFailType.UNDEFINED -> getString(R.string.undefined_fail)
         }
     }
 
-    private fun showIsUpdate(isUpdateInProgress: Boolean) {
+    private fun showIsUpdate(isUpdateInProgress: Boolean) = with(binding) {
         if (isUpdateInProgress) {
-            blockErrors.root.visibility = View.GONE
+            errors.root.visibility = View.GONE
             refreshLayout.isRefreshing = true
 
             if (viewModel.weatherData.value == null) {

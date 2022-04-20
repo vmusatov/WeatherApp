@@ -43,7 +43,7 @@
                     layout="@layout/block_current" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/by_hour_list"
+                    android:id="@+id/hourly_forecast"
                     style="@style/formContentBlock"
                     android:foreground="@drawable/form_shadow"
                     android:paddingStart="@dimen/app_small_padding"
@@ -53,9 +53,8 @@
                     android:id="@+id/notifications"
                     layout="@layout/block_notifications" />
 
-
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/by_day_list"
+                    android:id="@+id/daily_forecast"
                     style="@style/formContentBlock" />
 
                 <include
@@ -71,7 +70,7 @@
                     layout="@layout/block_air_quality" />
 
                 <include
-                    android:id="@+id/additional_info"
+                    android:id="@+id/footer"
                     layout="@layout/block_additional_info" />
 
             </LinearLayout>

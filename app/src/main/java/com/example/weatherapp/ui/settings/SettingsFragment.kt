@@ -8,9 +8,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.PopupMenu
-import android.widget.TextView
 import androidx.annotation.MenuRes
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.view.iterator
@@ -28,15 +26,11 @@ import javax.inject.Inject
 class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
 
     private var _binding: FragmentSettingsBinding? = null
-    private val binding: FragmentSettingsBinding get() =  checkNotNull(_binding)
+    private val binding: FragmentSettingsBinding get() = checkNotNull(_binding)
 
     @Inject
     lateinit var factory: SettingsViewModel.Factory
     private val viewModel: SettingsViewModel by viewModels { factory }
-
-    private lateinit var selectedUnit: TextView
-    private lateinit var tempUnitBlock: LinearLayout
-    private lateinit var about: TextView
 
     override fun onAttach(context: Context) {
         context.appComponent.inject(this)
@@ -50,7 +44,6 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
 
-        setupFields()
         setupObservers()
         setupUi()
         setupToolbar()
@@ -64,16 +57,10 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun setupObservers() {
-        viewModel.tempUnit.observe(viewLifecycleOwner) { selectedUnit.text = it.unitName }
+        viewModel.tempUnit.observe(viewLifecycleOwner) { binding.selectedUnit.text = it.unitName }
     }
 
-    private fun setupFields() {
-        selectedUnit = binding.selectedUnit
-        tempUnitBlock = binding.tempUnitBlock
-        about = binding.about
-    }
-
-    private fun setupUi() {
+    private fun setupUi() = with(binding) {
         tempUnitBlock.setOnClickListener {
             showPopup(
                 binding.unitTitle,
