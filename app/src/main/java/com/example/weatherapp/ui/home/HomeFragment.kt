@@ -36,9 +36,9 @@ class HomeFragment : Fragment() {
     lateinit var factory: HomeViewModel.Factory
     private val viewModel: HomeViewModel by activityViewModels { factory }
 
-    private lateinit var hourlyForecastAdapter: HourlyForecastListAdapter
-    private lateinit var dailyForecastAdapter: DailyForecastListAdapter
-    private lateinit var notificationsAdapter: NotificationsPagerAdapter
+    private var hourlyForecastAdapter: HourlyForecastListAdapter? = null
+    private var dailyForecastAdapter: DailyForecastListAdapter? = null
+    private var notificationsAdapter: NotificationsPagerAdapter? = null
 
     private var graphDecorator: RecyclerView.ItemDecoration? = null
 
@@ -68,13 +68,6 @@ class HomeFragment : Fragment() {
         super.onAttach(context)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        hourlyForecastAdapter = HourlyForecastListAdapter()
-        dailyForecastAdapter = DailyForecastListAdapter()
-        notificationsAdapter = NotificationsPagerAdapter()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -95,6 +88,12 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
+        hourlyForecastAdapter = null
+        dailyForecastAdapter = null
+        notificationsAdapter = null
+
+        graphDecorator = null
     }
 
     private fun setupObservers() {
@@ -109,6 +108,10 @@ class HomeFragment : Fragment() {
 
     private fun setupUi() = with(binding) {
         setupToolbar()
+
+        hourlyForecastAdapter = HourlyForecastListAdapter()
+        dailyForecastAdapter = DailyForecastListAdapter()
+        notificationsAdapter = NotificationsPagerAdapter()
 
         hourlyForecast.adapter = hourlyForecastAdapter
         hourlyForecast.layoutManager = LinearLayoutManager(requireContext()).apply {
@@ -142,7 +145,7 @@ class HomeFragment : Fragment() {
         updateAstronomy(data.current.astronomy)
 
         updateHourlyForecast(data, tempUnit)
-        dailyForecastAdapter.update(data.daysForecast, tempUnit)
+        dailyForecastAdapter?.update(data.daysForecast, tempUnit)
 
         updateFooter(data)
     }
@@ -151,7 +154,7 @@ class HomeFragment : Fragment() {
         if (notificationsList.isEmpty()) {
             notifications.root.visibility = View.GONE
         } else {
-            notificationsAdapter.update(notificationsList)
+            notificationsAdapter?.update(notificationsList)
             notifications.root.visibility = View.VISIBLE
             if (notificationsList.size == 1) {
                 notifications.tabLayout.visibility = View.GONE
@@ -203,7 +206,7 @@ class HomeFragment : Fragment() {
         if (hours.isEmpty()) {
             hourlyForecast.visibility = View.GONE
         } else {
-            hourlyForecastAdapter.update(hours, tempUnit)
+            hourlyForecastAdapter?.update(hours, tempUnit)
             graphDecorator = HourlyForecastItemDecorator(hours.map { it.tempF }, requireContext())
             hourlyForecast.addItemDecoration(graphDecorator as HourlyForecastItemDecorator)
 
