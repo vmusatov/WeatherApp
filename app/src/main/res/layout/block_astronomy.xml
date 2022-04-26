@@ -30,8 +30,8 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_sunrise"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintEnd_toStartOf="@+id/sunset_icon"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -61,7 +61,6 @@
         android:src="@drawable/ic_sunset"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/sunrise_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
