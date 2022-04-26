@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:gravity="center"
     android:orientation="vertical"
     android:layout_marginTop="@dimen/app_margin"
@@ -14,7 +15,8 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:textSize="@dimen/small_text"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="Precipitations"/>
 
     <TextView
         android:id="@+id/message"
@@ -24,6 +26,7 @@
         android:ellipsize="end"
         android:textColor="?attr/colorSecondaryVariant"
         android:textSize="@dimen/small_text"
-        android:layout_marginTop="@dimen/app_small_margin" />
+        android:layout_marginTop="@dimen/app_small_margin"
+        tools:text="Expect precipitations"/>
 
 </LinearLayout>

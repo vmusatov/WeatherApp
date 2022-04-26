@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="30dp"
+    xmlns:tools="http://schemas.android.com/tools"
     android:paddingHorizontal="10dp">
 
     <TextView
@@ -12,8 +13,8 @@
         android:textSize="@dimen/small_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/today"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="170dp"
@@ -43,7 +44,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/app_very_small_margin"
                 android:textColor="?attr/colorSecondaryVariant"
-                android:textSize="@dimen/very_small_text" />
+                android:textSize="@dimen/very_small_text"
+                tools:text="85%"/>
         </LinearLayout>
 
 
@@ -54,7 +56,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/condition_to"
             app:layout_constraintStart_toEndOf="@+id/humidity"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_sunny"/>
 
         <ImageView
             android:id="@+id/condition_to"
@@ -63,7 +66,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/temp_max"
             app:layout_constraintStart_toEndOf="@id/condition_from"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_sunny"/>
 
         <TextView
             android:id="@+id/temp_max"
@@ -73,7 +77,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/temp_min"
             app:layout_constraintStart_toEndOf="@id/condition_to"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="15°"/>
 
         <TextView
             android:id="@+id/temp_min"
@@ -82,7 +87,8 @@
             android:textSize="@dimen/small_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="25°"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -15,14 +15,16 @@
             android:id="@+id/toolbar_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary" />
+            android:background="?attr/colorPrimary"
+            tools:src="@drawable/ic_hamburger_menu" />
 
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/app_large_margin"
-            android:textSize="@dimen/normal_text" />
+            android:textSize="@dimen/normal_text"
+            tools:text="Los Angeles" />
 
         <ImageView
             android:id="@+id/toolbar_right_icon"
@@ -30,7 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="@dimen/app_margin"
-            android:background="?attr/colorPrimary" />
+            android:background="?attr/colorPrimary"
+            tools:src="@drawable/ic_settings" />
 
     </androidx.appcompat.widget.Toolbar>
 

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/app_margin"
+    android:padding="@dimen/app_padding"
     android:orientation="horizontal">
 
     <TextView
@@ -19,5 +20,6 @@
         android:layout_height="wrap_content"
         android:gravity="end"
         android:textColor="?attr/colorSecondaryVariant"
-        android:textSize="@dimen/very_small_text" />
+        android:textSize="@dimen/very_small_text"
+        tools:text="@string/updated_at" />
 </LinearLayout>

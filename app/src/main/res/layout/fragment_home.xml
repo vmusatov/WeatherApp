@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,60 +20,103 @@
 
             <include
                 android:id="@+id/errors"
+                layout="@layout/block_errors"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                layout="@layout/block_errors"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.Group
                 android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/app_margin"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:constraint_referenced_ids="current, hourly_forecast, notifications, daily_forecast,
+                 additional_weather, astronomy, air_quality, footer" />
+
+            <include
+                android:id="@+id/current"
+                layout="@layout/block_current"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <include
-                    android:id="@+id/current"
-                    layout="@layout/block_current" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/hourly_forecast"
+                style="@style/formContentBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/app_small_padding"
+                android:paddingEnd="@dimen/app_small_padding"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/current"
+                tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_hourly_forecast"
+                tools:orientation="horizontal" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/hourly_forecast"
-                    style="@style/formContentBlock"
-                    android:paddingStart="@dimen/app_small_padding"
-                    android:paddingEnd="@dimen/app_small_padding" />
+            <include
+                android:id="@+id/notifications"
+                style="@style/formContentBlock"
+                layout="@layout/block_notifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/hourly_forecast" />
 
-                <include
-                    android:id="@+id/notifications"
-                    layout="@layout/block_notifications" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/daily_forecast"
+                style="@style/formContentBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notifications"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_daily_forecast" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/daily_forecast"
-                    style="@style/formContentBlock" />
+            <include
+                android:id="@+id/additional_weather"
+                style="@style/formContentBlock"
+                layout="@layout/block_additional_weather"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/daily_forecast" />
 
-                <include
-                    android:id="@+id/additional_weather"
-                    layout="@layout/block_additional_weather" />
+            <include
+                android:id="@+id/astronomy"
+                style="@style/formContentBlock"
+                layout="@layout/block_astronomy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/additional_weather" />
 
-                <include
-                    android:id="@+id/astronomy"
-                    layout="@layout/block_astronomy" />
+            <include
+                android:id="@+id/air_quality"
+                style="@style/formContentBlock"
+                layout="@layout/block_air_quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/astronomy" />
 
-                <include
-                    android:id="@+id/air_quality"
-                    layout="@layout/block_air_quality" />
+            <include
+                android:id="@+id/footer"
+                layout="@layout/block_additional_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/air_quality" />
 
-                <include
-                    android:id="@+id/footer"
-                    layout="@layout/block_additional_info" />
-
-            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

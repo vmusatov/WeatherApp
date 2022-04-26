@@ -6,27 +6,27 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-        <LinearLayout
-            android:id="@+id/temp_unit_block"
-            style="@style/formContentBlock"
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/temp_unit_block"
+        style="@style/formContentBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/unitTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:text="@string/unit"
+            android:textSize="@dimen/normal_text" />
 
-            <TextView
-                android:id="@+id/unitTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/unit"
-                android:textSize="@dimen/normal_text" />
-
-            <TextView
-                android:id="@+id/selected_unit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/selected"
-                android:textSize="@dimen/small_text" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/selected_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/selected"
+            android:textSize="@dimen/small_text" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/about"

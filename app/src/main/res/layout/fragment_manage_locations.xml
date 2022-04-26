@@ -10,6 +10,7 @@
     <TextView
         android:id="@+id/empty_locations"
         style="@style/contentBlock"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
@@ -25,11 +26,12 @@
         android:id="@+id/locations_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="@dimen/app_padding"
         app:layout_constraintBottom_toTopOf="@+id/edit_block"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/item_manage_locations"
+        tools:itemCount="5"/>
 
     <LinearLayout
         android:id="@+id/edit_block"

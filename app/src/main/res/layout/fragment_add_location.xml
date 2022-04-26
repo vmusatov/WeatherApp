@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary"
@@ -31,9 +32,12 @@
         android:id="@+id/locations_list"
         style="@style/formContentBlock"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/app_margin"
         android:layout_marginBottom="@dimen/app_margin"
         android:visibility="gone"
-        android:windowSoftInputMode="adjustResize"/>
+        android:windowSoftInputMode="adjustResize"
+        tools:itemCount="5"
+        tools:listitem="@layout/item_location_search"
+        tools:visibility="visible" />
 </LinearLayout>

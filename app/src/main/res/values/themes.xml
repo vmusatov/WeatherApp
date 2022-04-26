@@ -18,16 +18,16 @@
     </style>
 
     <style name="contentBlock">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingStart">@dimen/app_large_padding</item>
         <item name="android:paddingEnd">@dimen/app_large_padding</item>
         <item name="android:paddingBottom">@dimen/app_large_padding</item>
     </style>
 
-    <style name="formContentBlock" parent="contentBlock">
+    <style name="formContentBlock">
         <item name="android:background">@drawable/form</item>
         <item name="android:layout_marginTop">@dimen/app_margin</item>
+        <item name="android:layout_marginStart">@dimen/app_small_margin</item>
+        <item name="android:layout_marginEnd">@dimen/app_small_margin</item>
         <item name="android:padding">@dimen/app_padding</item>
     </style>
 
