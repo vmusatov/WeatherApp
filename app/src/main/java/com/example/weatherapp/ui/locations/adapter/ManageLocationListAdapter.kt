@@ -2,25 +2,19 @@ package com.example.weatherapp.ui.locations.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemManageLocationsBinding
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.ShortWeatherData
 import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.ui.locations.util.LocationsChangeCallback
-import com.squareup.picasso.Picasso
-import kotlin.math.roundToInt
 
 @SuppressLint("NotifyDataSetChanged")
 class ManageLocationListAdapter(
     private val locationsChangeCallback: LocationsChangeCallback,
-) : RecyclerView.Adapter<ManageLocationListAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ManageLocationItemHolder>() {
 
     private var locations: MutableList<Location> = mutableListOf()
     private var weatherData: MutableList<ShortWeatherData> = mutableListOf()
@@ -83,89 +77,28 @@ class ManageLocationListAdapter(
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageLocationItemHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemManageLocationsBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding)
+        return ManageLocationItemHolder(
+            binding = binding,
+            isEditMode = { isEditMode },
+            onSwitchEditMode = { item -> switchEditMode(item) },
+            onAddItem = { item -> selectedItems.add(item) },
+            onRemoveItem = { item -> selectedItems.remove(item) },
+            isItemSelected = { item -> selectedItems.contains(item) }
+        )
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ManageLocationItemHolder, position: Int) {
         val item = locations[position]
-        setupItemUi(holder, item)
-        setupItemListeners(holder, item)
-    }
+        val itemWeatherData = weatherData.firstOrNull { it.locationName == item.name }
 
-    private fun setupItemUi(holder: ViewHolder, item: Location) {
-        with(holder.binding) {
-            root.tag = item
-
-            if (isEditMode) {
-                checkbox.visibility = View.VISIBLE
-                checkbox.isChecked = selectedItems.contains(item)
-                dragDropView.visibility = View.VISIBLE
-                locationTemp.visibility = View.GONE
-                locationCondition.visibility = View.GONE
-            } else {
-                checkbox.visibility = View.GONE
-                dragDropView.visibility = View.GONE
-                locationTemp.visibility = View.VISIBLE
-                locationCondition.visibility = View.VISIBLE
-            }
-
-            locationName.text = item.name
-            locationDesc.text = "${item.region}, ${item.country}"
-
-            val res = holder.itemView.resources
-            weatherData.firstOrNull { it.locationName == item.name }?.let {
-                locationTemp.text = if (tempUnit == TempUnit.C) {
-                    res.getString(R.string.degree, it.tempC.roundToInt())
-                } else {
-                    res.getString(R.string.degree, it.tempF.roundToInt())
-                }
-                Picasso.get()
-                    .load(it.conditionIconUrl)
-                    .into(locationCondition)
-            }
-        }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun setupItemListeners(holder: ViewHolder, item: Location) {
-        with(holder.binding) {
-            root.setOnClickListener {
-                if (!isEditMode) {
-                    locationsChangeCallback.onSelectLocation(it.tag as Location)
-                } else {
-                    checkbox.performClick()
-                }
-            }
-
-            root.setOnLongClickListener {
-                switchEditMode(item)
-                return@setOnLongClickListener true
-            }
-
-            dragDropView.setOnTouchListener { _, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    locationsChangeCallback.onDragStart(holder)
-                }
-                return@setOnTouchListener true
-            }
-
-            checkbox.setOnClickListener {
-                if ((it as CheckBox).isChecked) {
-                    selectedItems.add(item)
-                } else {
-                    selectedItems.remove(item)
-                }
-            }
-        }
+        holder.bindUi(item, itemWeatherData, tempUnit)
+        holder.bindListeners(item, locationsChangeCallback)
     }
 
     override fun getItemCount(): Int {
         return locations.size
     }
-
-    class ViewHolder(val binding: ItemManageLocationsBinding) :
-        RecyclerView.ViewHolder(binding.root)
 }

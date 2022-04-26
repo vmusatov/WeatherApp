@@ -1,7 +1,6 @@
 package com.example.weatherapp.ui.locations.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +11,7 @@ typealias AddLocationListener = (location: Location) -> Unit
 
 class AddLocationListAdapter(
     private val addLocationListener: AddLocationListener
-) : RecyclerView.Adapter<AddLocationListAdapter.ViewHolder>(), View.OnClickListener {
+) : RecyclerView.Adapter<AddLocationItemHolder>() {
 
     private var data: List<Location> = listOf()
 
@@ -26,32 +25,17 @@ class AddLocationListAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AddLocationItemHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemLocationSearchBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding)
+        return AddLocationItemHolder(binding, addLocationListener)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        with(holder.binding) {
-            val item = data[position]
-            root.tag = item
-
-            locationName.text = item.name
-            locationDesc.text = "${item.region}, ${item.country}"
-
-            root.setOnClickListener(this@AddLocationListAdapter)
-        }
+    override fun onBindViewHolder(holder: AddLocationItemHolder, position: Int) {
+        holder.bind(data[position])
     }
 
     override fun getItemCount(): Int {
         return data.size
-    }
-
-    class ViewHolder(val binding: ItemLocationSearchBinding) : RecyclerView.ViewHolder(binding.root)
-
-    override fun onClick(v: View) {
-        val location = v.tag as Location
-        addLocationListener.invoke(location)
     }
 }
