@@ -2,8 +2,7 @@
 Погодное приложение для Android
 
 ## Сборка и запуск
-Для того что бы собрать проект необходимо в корне проекта создать файл app.properties (по аналогии с .app.properties)
-и указать в поле weatherApiKey ключ для доступа к апи 
+Для того что бы собрать проект необходимо в корне проекта создать файл app.properties (по аналогии с .app.properties)и указать в поле weatherApiKey ключ для доступа к апи
 
 Ключ можно бесплатно получить зарегистрировавшись на https://www.weatherapi.com/
 
@@ -23,9 +22,11 @@
 * сетевое взаимодействие - OkHttp, Retrofit
 * доступ к БД - Room
 * DI - Dagger2
+* OpenStreetMap (т.к. Google Play сервисы на данный момент не работают в России)
 
 ## Скриншоты
 
 <img src="screenshots/home_night.jpg" width="270"> <img src="screenshots/home_day.jpg" width="270">
-<img src="screenshots/manage_locations.jpg" width="270"> <img src="screenshots/manage_locations2.jpg" width="270">
-<img src="screenshots/add_location.jpg" width="270"> <img src="screenshots/settings.jpg" width="270">
+<img src="screenshots/settings.jpg" width="270"> <img src="screenshots/manage_locations.jpg" width="270"> 
+<img src="screenshots/manage_locations2.jpg" width="270"> <img src="screenshots/add_location.jpg" width="270">
+<img src="screenshots/add_location_map.jpg" width="270"> 
