@@ -25,10 +25,7 @@
 * OpenStreetMap (т.к. Google Play сервисы на данный момент не работают в России)
 
 ## Скриншоты
-<img src="screenshots/home_night.jpg" width="270"> 
-<img src="screenshots/home_day.jpg" width="270">
-<img src="screenshots/manage_locations.jpg" width="270"> 
-<img src="screenshots/manage_locations2.jpg" width="270"> 
-<img src="screenshots/add_location.jpg" width="270">
-<img src="screenshots/add_location_map.jpg" width="270">
+<img src="screenshots/home_night.jpg" width="270"> <img src="screenshots/home_day.jpg" width="270">
+<img src="screenshots/manage_locations.jpg" width="270"> <img src="screenshots/manage_locations2.jpg" width="270"> 
+<img src="screenshots/add_location.jpg" width="270"> <img src="screenshots/add_location_map.jpg" width="270">
 <img src="screenshots/settings.jpg" width="270"> 
