@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.R
@@ -35,10 +34,6 @@ class AddLocationFragment : Fragment() {
     @Inject
     lateinit var addLocationsFactory: AddLocationViewModel.Factory
     private val viewModel: AddLocationViewModel by viewModels { addLocationsFactory }
-
-    @Inject
-    lateinit var manageViewModelFactory: ManageLocationsViewModel.Factory
-    private val manageViewModel: ManageLocationsViewModel by activityViewModels { manageViewModelFactory }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
@@ -106,7 +101,6 @@ class AddLocationFragment : Fragment() {
         } else {
             coroutineScope.launch {
                 viewModel.saveLocation(location).join()
-                manageViewModel.updateData()
                 navigator().goBack()
             }
         }
@@ -120,6 +114,8 @@ class AddLocationFragment : Fragment() {
 
         locationSearchText.addTextChangedListener(searchTextWatcher)
         locationSearchText.setOnEditorActionListener(editorActionListener)
+
+        map.setOnClickListener { navigator().goToMap() }
     }
 
     private fun setupToolbar() {

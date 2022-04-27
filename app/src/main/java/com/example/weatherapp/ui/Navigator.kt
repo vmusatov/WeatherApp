@@ -18,6 +18,8 @@ interface Navigator {
 
     fun goToAbout()
 
+    fun goToMap()
+
     fun setToolbarTitle(title: String)
 
     fun setToolbarAction(action: ToolbarAction)

@@ -8,6 +8,7 @@ import com.example.weatherapp.domain.di.DomainModule
 import com.example.weatherapp.ui.home.HomeFragment
 import com.example.weatherapp.ui.locations.AddLocationFragment
 import com.example.weatherapp.ui.locations.ManageLocationsFragment
+import com.example.weatherapp.ui.locations.MapFragment
 import com.example.weatherapp.ui.settings.SettingsFragment
 import dagger.BindsInstance
 import dagger.Component
@@ -30,6 +31,8 @@ interface AppComponent {
     fun inject(manageLocationsFragment: ManageLocationsFragment)
 
     fun inject(settingsFragment: SettingsFragment)
+
+    fun inject(mapFragment: MapFragment)
 
     @Component.Builder
     interface Builder {

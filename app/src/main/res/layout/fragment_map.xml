@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/popup"
+        style="@style/formContentBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/popup_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:constraint_referenced_ids="location_name, location_desc, location_temp,
+             location_condition, add_location, close_popup" />
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center"
+            android:textSize="@dimen/normal_text"
+            android:visibility="gone"
+            tools:text="@string/network_fail"/>
+
+        <TextView
+            android:id="@+id/location_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/normal_text"
+            android:layout_marginStart="@dimen/app_small_margin"
+            app:layout_constraintEnd_toStartOf="@+id/location_temp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Los Angeles" />
+
+        <TextView
+            android:id="@+id/location_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/app_small_margin"
+            android:ellipsize="end"
+            android:maxEms="15"
+            android:maxLines="1"
+            android:textColor="?attr/colorSecondaryVariant"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintEnd_toStartOf="@+id/location_temp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/location_name"
+            tools:text="California, United States of America" />
+
+        <TextView
+            android:id="@+id/location_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/app_small_margin"
+            android:textSize="@dimen/small_text"
+            app:layout_constraintBottom_toBottomOf="@+id/location_desc"
+            app:layout_constraintEnd_toStartOf="@id/location_condition"
+            app:layout_constraintTop_toTopOf="@+id/location_name"
+            tools:text="15°" />
+
+        <ImageView
+            android:id="@+id/location_condition"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toBottomOf="@+id/location_desc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/location_name"
+            tools:src="@drawable/ic_sunny" />
+
+        <TextView
+            android:id="@+id/add_location"
+            style="@style/button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/add"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/location_desc" />
+
+        <TextView
+            android:id="@+id/close_popup"
+            style="@style/button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/location_desc" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

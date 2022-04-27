@@ -29,13 +29,7 @@ class ManageLocationsViewModel(
     val locationsShortWeatherData: LiveData<MutableSet<ShortWeatherData>> get() = _locationsShortWeatherData
     private val _locationsShortWeatherData = MutableLiveData<MutableSet<ShortWeatherData>>()
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            updateData()
-        }
-    }
-
-    suspend fun updateData() {
+    fun updateData() = viewModelScope.launch(Dispatchers.IO) {
         updateLocations().join()
         updateWeatherInfo()
     }

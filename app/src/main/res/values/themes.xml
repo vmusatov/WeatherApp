@@ -31,6 +31,13 @@
         <item name="android:padding">@dimen/app_padding</item>
     </style>
 
+    <style name="button" parent="formContentBlock">
+        <item name="android:background">@drawable/from_inverse</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:textSize">@dimen/small_text</item>
+        <item name="android:gravity">center</item>
+    </style>
+
     <style name="mainToolbar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">?attr/actionBarSize</item>

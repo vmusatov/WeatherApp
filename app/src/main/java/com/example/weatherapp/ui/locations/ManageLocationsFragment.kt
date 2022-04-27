@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentManageLocationsBinding
@@ -61,6 +62,8 @@ class ManageLocationsFragment : Fragment() {
         setupUi()
         setupObservers()
 
+        viewModel.updateData()
+
         return binding.root
     }
 
@@ -100,6 +103,8 @@ class ManageLocationsFragment : Fragment() {
             adapter = manageLocationAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+
+        (locationsList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
 
     private fun updateLocationsList(locations: List<Location>) = with(binding) {

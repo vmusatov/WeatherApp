@@ -13,6 +13,7 @@ import com.example.weatherapp.ui.about.AboutFragment
 import com.example.weatherapp.ui.home.HomeFragment
 import com.example.weatherapp.ui.locations.AddLocationFragment
 import com.example.weatherapp.ui.locations.ManageLocationsFragment
+import com.example.weatherapp.ui.locations.MapFragment
 import com.example.weatherapp.ui.settings.SettingsFragment
 
 class MainActivity : AppCompatActivity(), Navigator {
@@ -56,6 +57,10 @@ class MainActivity : AppCompatActivity(), Navigator {
         launchFragment(AboutFragment())
     }
 
+    override fun goToMap() {
+        launchFragment(MapFragment())
+    }
+
     override fun setToolbarTitle(title: String) {
         binding.toolbarTitle.visibility = View.VISIBLE
         binding.toolbarTitle.text = title
@@ -93,26 +98,30 @@ class MainActivity : AppCompatActivity(), Navigator {
         }
 
         transaction
-            .addToBackStack(null)
+            .addToBackStack(fragment::class.simpleName)
             .replace(R.id.container, fragment)
             .commit()
     }
 
     private fun launchFragmentFromLeft(fragment: Fragment) {
-        launchFragment(fragment, FragmentAnimation(
-            R.anim.enter_from_left,
-            R.anim.exit_to_right,
-            R.anim.enter_from_right,
-            R.anim.exit_to_left
-        ))
+        launchFragment(
+            fragment, FragmentAnimation(
+                R.anim.enter_from_left,
+                R.anim.exit_to_right,
+                R.anim.enter_from_right,
+                R.anim.exit_to_left
+            )
+        )
     }
 
     private fun launchFragmentFromRight(fragment: Fragment) {
-        launchFragment(fragment, FragmentAnimation(
-            R.anim.enter_from_right,
-            R.anim.exit_to_left,
-            R.anim.enter_from_left,
-            R.anim.exit_to_right
-        ))
+        launchFragment(
+            fragment, FragmentAnimation(
+                R.anim.enter_from_right,
+                R.anim.exit_to_left,
+                R.anim.enter_from_left,
+                R.anim.exit_to_right
+            )
+        )
     }
 }

@@ -6,17 +6,31 @@
     android:background="?attr/colorPrimary"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/location_search_text"
-        style="@style/formContentBlock"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/app_margin"
-        android:hint="@string/enter_location_name"
-        android:imeOptions="actionSearch"
-        android:inputType="textAutoComplete"
-        android:lines="1"
-        android:maxLines="1" />
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/location_search_text"
+            style="@style/formContentBlock"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginHorizontal="@dimen/app_margin"
+            android:hint="@string/enter_location_name"
+            android:imeOptions="actionSearch"
+            android:inputType="textAutoComplete"
+            android:layout_weight="1"
+            android:lines="1"
+            android:maxLines="1" />
+
+        <ImageView
+            android:id="@+id/map"
+            style="@style/formContentBlock"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/ic_location" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/error_text"

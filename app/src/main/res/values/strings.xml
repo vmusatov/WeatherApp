@@ -70,4 +70,7 @@
     <string name="show_last_saved_data">Show last saved data</string>
 
     <string name="location_alredy_added">Location already added</string>
+
+    <string name="add">ADD</string>
+    <string name="cancel">CANCEL</string>
 </resources>
