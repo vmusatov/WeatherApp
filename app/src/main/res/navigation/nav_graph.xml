@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.weatherapp.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_manageLocationsFragment"
+            app:destination="@id/manageLocationsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_addLocationFragment"
+            app:destination="@id/addLocationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addLocationFragment"
+        android:name="com.example.weatherapp.ui.locations.AddLocationFragment"
+        android:label="AddLocationFragment"
+        tools:layout="@layout/fragment_add_location">
+        <action
+            android:id="@+id/action_addLocationFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.weatherapp.ui.locations.MapFragment"
+        android:label="MapFragment"
+        tools:layout="@layout/fragment_map" />
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.example.weatherapp.ui.about.AboutFragment"
+        android:label="AboutFragment"
+        tools:layout="@layout/fragment_about" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.weatherapp.ui.settings.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/fragment_settings">
+
+        <action
+            android:id="@+id/action_settingsFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageLocationsFragment"
+        android:name="com.example.weatherapp.ui.locations.ManageLocationsFragment"
+        android:label="ManageLocationsFragment"
+        tools:layout="@layout/fragment_manage_locations">
+        <action
+            android:id="@+id/action_manageLocationsFragment_to_addLocationFragment"
+            app:destination="@id/addLocationFragment" />
+    </fragment>
+</navigation>

@@ -8,11 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.BuildConfig
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentAboutBinding
 import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.navigator
+import com.example.weatherapp.ui.toolbarManager
 
 class AboutFragment : Fragment() {
 
@@ -40,14 +41,17 @@ class AboutFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        navigator().setToolbarTitle(requireContext().getString(R.string.about))
-        navigator().setToolbarAction(
+        toolbarManager().clearToolbar()
+        toolbarManager().setToolbarTitle(requireContext().getString(R.string.about))
+        toolbarManager().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
-                onAction = { navigator().goBack() }
+                onAction = {
+                    findNavController().navigateUp()
+                }
             )
         )
-        navigator().setToolbarRightAction(
+        toolbarManager().setToolbarRightAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_info,
                 onAction = {

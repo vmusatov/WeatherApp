@@ -18,11 +18,12 @@
 ## Стек технологий
 * код написан на Kotlin
 * MVVM
+* навигация - Jetpack Navigation  
 * для асинхронных операций - Coroutines
 * сетевое взаимодействие - OkHttp, Retrofit
 * доступ к БД - Room
 * DI - Dagger2
-* OpenStreetMap (т.к. Google Play сервисы на данный момент не работают в России)
+* карта - OpenStreetMap
 
 ## Скриншоты
 <img src="screenshots/home_night.jpg" width="270"> <img src="screenshots/home_day.jpg" width="270">

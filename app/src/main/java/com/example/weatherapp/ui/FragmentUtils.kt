@@ -4,19 +4,10 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.annotation.AnimRes
-import androidx.annotation.AnimatorRes
 import androidx.fragment.app.Fragment
 
-data class FragmentAnimation(
-    @AnimatorRes @AnimRes val enter: Int,
-    @AnimatorRes @AnimRes val exit: Int,
-    @AnimatorRes @AnimRes val popEnter: Int,
-    @AnimatorRes @AnimRes val popExit: Int
-)
-
-fun Fragment.navigator(): Navigator {
-    return requireActivity() as Navigator
+fun Fragment.toolbarManager(): ToolbarManager {
+    return requireActivity() as ToolbarManager
 }
 
 fun Fragment.showSoftKeyboard(view: View) {

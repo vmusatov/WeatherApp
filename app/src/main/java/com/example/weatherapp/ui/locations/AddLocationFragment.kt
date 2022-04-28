@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
@@ -101,7 +102,7 @@ class AddLocationFragment : Fragment() {
         } else {
             coroutineScope.launch {
                 viewModel.saveLocation(location).join()
-                navigator().goBack()
+                findNavController().navigateUp()
             }
         }
     }
@@ -115,15 +116,18 @@ class AddLocationFragment : Fragment() {
         locationSearchText.addTextChangedListener(searchTextWatcher)
         locationSearchText.setOnEditorActionListener(editorActionListener)
 
-        map.setOnClickListener { navigator().goToMap() }
+        map.setOnClickListener {
+            findNavController().navigate(R.id.action_addLocationFragment_to_mapFragment)
+        }
     }
 
     private fun setupToolbar() {
-        navigator().setToolbarTitle(requireContext().getString(R.string.add_location))
-        navigator().setToolbarAction(
+        toolbarManager().clearToolbar()
+        toolbarManager().setToolbarTitle(requireContext().getString(R.string.add_location))
+        toolbarManager().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
-                onAction = { navigator().goBack() }
+                onAction = { findNavController().navigateUp() }
             )
         )
     }

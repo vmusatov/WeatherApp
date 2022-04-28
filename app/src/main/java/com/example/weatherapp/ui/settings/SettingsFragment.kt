@@ -14,12 +14,13 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentSettingsBinding
 import com.example.weatherapp.domain.model.TempUnit
 import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.navigator
+import com.example.weatherapp.ui.toolbarManager
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -68,7 +69,7 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
                 runBlocking { viewModel.getTempUnit().unitName }
             )
         }
-        about.setOnClickListener { navigator().goToAbout() }
+        about.setOnClickListener { findNavController().navigate(R.id.action_settingsFragment_to_aboutFragment) }
     }
 
     private fun showPopup(view: View, @MenuRes menuRes: Int, selectedItem: String? = null) {
@@ -110,11 +111,12 @@ class SettingsFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun setupToolbar() {
-        navigator().setToolbarTitle(requireContext().getString(R.string.options))
-        navigator().setToolbarAction(
+        toolbarManager().clearToolbar()
+        toolbarManager().setToolbarTitle(requireContext().getString(R.string.options))
+        toolbarManager().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
-                onAction = { navigator().goBack() }
+                onAction = { findNavController().navigateUp() }
             )
         )
     }

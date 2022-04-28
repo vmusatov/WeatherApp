@@ -7,18 +7,9 @@ class ToolbarAction(
     val onAction: Runnable
 )
 
-interface Navigator {
-    fun openSettings()
+interface ToolbarManager {
 
-    fun goBack()
-
-    fun goToManageLocations()
-
-    fun goToAddLocation()
-
-    fun goToAbout()
-
-    fun goToMap()
+    fun clearToolbar()
 
     fun setToolbarTitle(title: String)
 

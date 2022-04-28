@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.BuildConfig
 import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
@@ -20,8 +21,8 @@ import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.ShortWeatherData
 import com.example.weatherapp.ui.ToolbarAction
 import com.example.weatherapp.ui.UpdateFailType
-import com.example.weatherapp.ui.navigator
 import com.example.weatherapp.ui.showShortToast
+import com.example.weatherapp.ui.toolbarManager
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -172,7 +173,7 @@ class MapFragment : Fragment() {
         } else {
             coroutineScope.launch {
                 addViewModel.saveLocation(location).join()
-                navigator().goBack()
+                findNavController().popBackStack(R.id.addLocationFragment, true)
             }
         }
     }
@@ -204,18 +205,24 @@ class MapFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        navigator().setToolbarTitle(requireContext().getString(R.string.add_location))
-        navigator().setToolbarAction(
+        toolbarManager().clearToolbar()
+        toolbarManager().setToolbarTitle(requireContext().getString(R.string.add_location))
+        toolbarManager().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
-                onAction = { navigator().goBack() }
+                onAction = { findNavController().navigateUp() }
             )
         )
     }
 
     inner class MapEventsReceiverImpl : MapEventsReceiver {
         override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-            iconOverlay.set(p, ContextCompat.getDrawable(requireContext(), R.drawable.ic_location_selected))
+            val locationsIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_location_selected
+            )
+
+            iconOverlay.set(p, locationsIcon)
             iconOverlay.moveTo(p, binding.map)
 
             addViewModel.search("${p?.latitude} ${p?.longitude}")

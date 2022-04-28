@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,7 +21,7 @@ import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.locations.adapter.ManageLocationListAdapter
 import com.example.weatherapp.ui.locations.util.LocationsChangeCallback
 import com.example.weatherapp.ui.locations.util.LocationsItemTouchHelperCallback
-import com.example.weatherapp.ui.navigator
+import com.example.weatherapp.ui.toolbarManager
 import javax.inject.Inject
 
 class ManageLocationsFragment : Fragment() {
@@ -120,20 +121,23 @@ class ManageLocationsFragment : Fragment() {
     }
 
     private fun setupToolbar() {
-        navigator().setToolbarTitle(getString(R.string.manage_locations))
-        navigator().setToolbarAction(
+        toolbarManager().clearToolbar()
+        toolbarManager().setToolbarTitle(getString(R.string.manage_locations))
+        toolbarManager().setToolbarAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
                 onAction = {
                     homeViewModel.updateWeather()
-                    navigator().goBack()
+                    findNavController().navigateUp()
                 }
             )
         )
-        navigator().setToolbarRightAction(
+        toolbarManager().setToolbarRightAction(
             ToolbarAction(
                 iconRes = R.drawable.ic_search,
-                onAction = { navigator().goToAddLocation() }
+                onAction = {
+                    findNavController().navigate(R.id.action_manageLocationsFragment_to_addLocationFragment)
+                }
             )
         )
     }
@@ -143,7 +147,7 @@ class ManageLocationsFragment : Fragment() {
         override fun onSelectLocation(location: Location) {
             homeViewModel.updateWeather(location)
             viewModel.updateWeatherInfo(listOf(location))
-            navigator().goBack()
+            findNavController().navigateUp()
         }
 
         override fun onSwitchEditMode(editMode: Boolean) = with(binding) {

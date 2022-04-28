@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
@@ -22,7 +25,7 @@ import com.example.weatherapp.ui.home.adapter.DailyForecastListAdapter
 import com.example.weatherapp.ui.home.adapter.HourlyForecastItemDecorator
 import com.example.weatherapp.ui.home.adapter.HourlyForecastListAdapter
 import com.example.weatherapp.ui.home.adapter.NotificationsPagerAdapter
-import com.example.weatherapp.ui.navigator
+import com.example.weatherapp.ui.toolbarManager
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
@@ -98,7 +101,7 @@ class HomeFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.selectedLocation.observe(viewLifecycleOwner) {
-            navigator().setToolbarTitle(it?.name ?: "")
+            toolbarManager().setToolbarTitle(it?.name ?: "")
         }
         viewModel.weatherData.observe(viewLifecycleOwner) { updateWeather(it) }
         viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
@@ -133,7 +136,9 @@ class HomeFragment : Fragment() {
         ) { _, _ -> }.attach()
 
         refreshLayout.setOnRefreshListener { viewModel.updateWeather(force = true) }
-        errors.addLocation.setOnClickListener { navigator().goToAddLocation() }
+        errors.addLocation.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_addLocationFragment)
+        }
     }
 
     private fun updateWeather(data: WeatherData) = with(binding) {
@@ -228,21 +233,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupToolbar() {
-        navigator().setToolbarAction(
-            ToolbarAction(
-                iconRes = R.drawable.ic_hamburger_menu,
-                onAction = { navigator().goToManageLocations() }
-            )
-        )
-        navigator().setToolbarRightAction(
-            ToolbarAction(
-                iconRes = R.drawable.ic_settings,
-                onAction = { navigator().openSettings() }
-            )
-        )
-    }
-
     private fun handleError(type: UpdateFailType?) = with(binding) {
         refreshLayout.isEnabled = true
 
@@ -283,4 +273,51 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    private fun setupToolbar() {
+        toolbarManager().clearToolbar()
+        toolbarManager().setToolbarAction(
+            ToolbarAction(
+                iconRes = R.drawable.ic_hamburger_menu,
+                onAction = navigateToManageLocations
+            )
+        )
+        toolbarManager().setToolbarRightAction(
+            ToolbarAction(
+                iconRes = R.drawable.ic_settings,
+                onAction = navigateToSettings
+            )
+        )
+    }
+
+    private val navigateToManageLocations = {
+        findNavController().navigate(
+            R.id.action_homeFragment_to_manageLocationsFragment,
+            bundleOf(),
+            navOptions = navOptions {
+                anim {
+                    enter = R.anim.enter_from_left
+                    exit = R.anim.exit_to_right
+                    popEnter = R.anim.enter_from_right
+                    popExit = R.anim.exit_to_left
+                }
+            }
+        )
+    }
+
+    private val navigateToSettings = {
+        findNavController().navigate(
+            R.id.action_homeFragment_to_settingsFragment,
+            bundleOf(),
+            navOptions = navOptions {
+                anim {
+                    enter = R.anim.enter_from_right
+                    exit = R.anim.exit_to_left
+                    popEnter = R.anim.enter_from_left
+                    popExit = R.anim.exit_to_right
+                }
+            }
+        )
+    }
+
 }
