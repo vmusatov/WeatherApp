@@ -100,7 +100,11 @@ class MapFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.closePopup.setOnClickListener { binding.popup.visibility = View.GONE }
+        binding.closePopup.setOnClickListener {
+            binding.popup.visibility = View.GONE
+            binding.map.overlays.remove(iconOverlay)
+            binding.map.overlayManager.onResume()
+        }
         binding.addLocation.setOnClickListener { addLocation(it.tag as Location) }
     }
 
@@ -131,7 +135,6 @@ class MapFragment : Fragment() {
 
         map.overlays.add(locationOverlay)
         map.overlays.add(MapEventsOverlay(MapEventsReceiverImpl()))
-        map.overlays.add(iconOverlay)
 
         val controller = map.controller
         controller.setZoom(DEFAULT_MAP_ZOOM_VALUE)
@@ -222,6 +225,9 @@ class MapFragment : Fragment() {
                 R.drawable.ic_location_selected
             )
 
+            if (!binding.map.overlays.contains(iconOverlay)) {
+                binding.map.overlays.add(iconOverlay)
+            }
             iconOverlay.set(p, locationsIcon)
             iconOverlay.moveTo(p, binding.map)
 
