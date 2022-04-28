@@ -31,8 +31,8 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.IconOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import javax.inject.Inject
 
@@ -56,6 +56,8 @@ class MapFragment : Fragment() {
     lateinit var sharedPreferences: SharedPreferences
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
+
+    private val iconOverlay = IconOverlay()
 
     override fun onAttach(context: Context) {
         context.appComponent.inject(this)
@@ -102,14 +104,8 @@ class MapFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.weatherData.observe(viewLifecycleOwner) {
-            updateLocationWeather(it)
-        }
-
-        addViewModel.updateFail.observe(viewLifecycleOwner) {
-            handleError(it)
-        }
-
+        viewModel.weatherData.observe(viewLifecycleOwner) { updateLocationWeather(it) }
+        addViewModel.updateFail.observe(viewLifecycleOwner) { handleError(it) }
         addViewModel.searchResult.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 showPopup(it[0])
@@ -127,14 +123,14 @@ class MapFragment : Fragment() {
 
         map.setMultiTouchControls(true)
 
-        val gpsMyLocationProvider = GpsMyLocationProvider(activity)
-        val locationOverlay = MyLocationNewOverlay(gpsMyLocationProvider, map)
+        val locationOverlay = MyLocationNewOverlay(map)
 
         locationOverlay.enableMyLocation()
         locationOverlay.enableFollowLocation()
 
         map.overlays.add(locationOverlay)
         map.overlays.add(MapEventsOverlay(MapEventsReceiverImpl()))
+        map.overlays.add(iconOverlay)
 
         val controller = map.controller
         controller.setZoom(DEFAULT_MAP_ZOOM_VALUE)
@@ -219,6 +215,9 @@ class MapFragment : Fragment() {
 
     inner class MapEventsReceiverImpl : MapEventsReceiver {
         override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+            iconOverlay.set(p, ContextCompat.getDrawable(requireContext(), R.drawable.ic_location_selected))
+            iconOverlay.moveTo(p, binding.map)
+
             addViewModel.search("${p?.latitude} ${p?.longitude}")
             return true
         }
