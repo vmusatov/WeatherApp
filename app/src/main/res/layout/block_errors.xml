@@ -17,11 +17,11 @@
 
     <TextView
         android:id="@+id/add_location"
-        style="@style/formContentBlock"
-        android:layout_width="wrap_content"
+        style="@style/button_inverse"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/add_location"
+        android:text="@string/add"
         android:textSize="@dimen/small_text" />
 </LinearLayout>
