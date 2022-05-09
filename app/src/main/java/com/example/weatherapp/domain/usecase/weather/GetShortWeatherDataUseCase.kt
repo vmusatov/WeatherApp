@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class GetShortWeatherDataUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository
-) : BaseUseCase<Location, WorkResult<ShortWeatherData>>() {
+) : BaseUseCase<Location, WorkResult<ShortWeatherData>> {
 
     override suspend fun execute(data: Location): WorkResult<ShortWeatherData> {
         return weatherRepository.getShortWeatherInfo(data)

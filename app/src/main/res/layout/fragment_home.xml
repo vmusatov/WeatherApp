@@ -33,8 +33,10 @@
                 android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:constraint_referenced_ids="current, hourly_forecast, notifications, daily_forecast,
-                 additional_weather, astronomy, air_quality, footer" />
+                 additional_weather, astronomy, air_quality, footer"
+                tools:visibility="visible" />
 
             <include
                 android:id="@+id/current"

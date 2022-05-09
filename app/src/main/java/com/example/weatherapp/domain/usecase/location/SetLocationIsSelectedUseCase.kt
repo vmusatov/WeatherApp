@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class SetLocationIsSelectedUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository
-) : BaseUseCase<Location, Unit>() {
+) : BaseUseCase<Location, Unit> {
 
     override suspend fun execute(data: Location) {
         locationsRepository.getSelectedLocation()?.let { old ->

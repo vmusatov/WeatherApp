@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class GetLocationsByNameUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository
-) : BaseUseCase<String, WorkResult<List<Location>>>() {
+) : BaseUseCase<String, WorkResult<List<Location>>> {
 
     override suspend fun execute(data: String): WorkResult<List<Location>> {
         return locationsRepository.autocompleteLocationsByName(data)

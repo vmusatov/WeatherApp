@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class GetAllLocationsUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository
-) : BaseUseCase<Unit, List<Location>>() {
+) : BaseUseCase<Unit, List<Location>> {
 
     override suspend fun execute(data: Unit): List<Location> {
         return locationsRepository.getAllLocations()

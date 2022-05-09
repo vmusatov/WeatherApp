@@ -60,9 +60,9 @@ class HomeViewModel(
     }
 
     private suspend fun selectLocation(location: Location?): Location? {
-        val selectedLocation = location ?: getSelectedLocationUseCase.invoke(Unit)
+        val selectedLocation = location ?: getSelectedLocationUseCase.execute(Unit)
 
-        selectedLocation?.let { setLocationIsSelectedUseCase.invoke(it) }
+        selectedLocation?.let { setLocationIsSelectedUseCase.execute(it) }
         _selectedLocation.postValue(selectedLocation)
 
         return selectedLocation
@@ -72,7 +72,7 @@ class HomeViewModel(
         _isUpdateInProgress.postValue(true)
 
         val requestData = Data(location = location, forceLoad = force)
-        when (val result = getWeatherDataUseCase.invoke(requestData)) {
+        when (val result = getWeatherDataUseCase.execute(requestData)) {
             is Success -> {
                 updateNotifications(result.data)
                 _weatherData.postValue(result.data)
@@ -92,19 +92,19 @@ class HomeViewModel(
     }
 
     private fun updateNotifications(data: WeatherData) = viewModelScope.launch {
-        _weatherNotifications.postValue(createNotificationsListUseCase.invoke(data))
+        _weatherNotifications.postValue(createNotificationsListUseCase.execute(data))
     }
 
     fun getTempUnit(): TempUnit = runBlocking {
-        getTempUnitUseCase.invoke(Unit)
+        getTempUnitUseCase.execute(Unit)
     }
 
     fun parseUvIndex(context: Context, index: Int): String = runBlocking {
-        context.getString(parseUvIndexUseCase.invoke(index))
+        context.getString(parseUvIndexUseCase.execute(index))
     }
 
     fun parseEpaIndex(context: Context, index: Int): String = runBlocking {
-        context.getString(parseEpaIndexUseCase.invoke(index))
+        context.getString(parseEpaIndexUseCase.execute(index))
     }
 
     class Factory @Inject constructor(

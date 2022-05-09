@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class GetTempUnitUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository
-) : BaseUseCase<Unit, TempUnit>() {
+) : BaseUseCase<Unit, TempUnit> {
 
     override suspend fun execute(data: Unit): TempUnit {
         return settingsRepository.getTempUnit()

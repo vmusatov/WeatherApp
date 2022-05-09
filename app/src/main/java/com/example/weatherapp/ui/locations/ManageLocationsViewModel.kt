@@ -35,7 +35,7 @@ class ManageLocationsViewModel(
     }
 
     private fun updateLocations() = viewModelScope.launch {
-        val locations = getAllLocationsUseCase.invoke(Unit)
+        val locations = getAllLocationsUseCase.execute(Unit)
         _locations.postValue(locations.toMutableList())
     }
 
@@ -45,7 +45,7 @@ class ManageLocationsViewModel(
             val resultSet = _locationsShortWeatherData.value ?: mutableSetOf()
 
             locations.forEach { location ->
-                val result = getShortWeatherDataUseCase.invoke(location)
+                val result = getShortWeatherDataUseCase.execute(location)
                 if (result is Success) {
                     resultSet.add(result.data)
                 }
@@ -57,18 +57,18 @@ class ManageLocationsViewModel(
 
     fun removeLocations(locations: List<Location>) {
         for (location in locations) {
-            viewModelScope.launch { deleteLocationUseCase.invoke(location) }
+            viewModelScope.launch { deleteLocationUseCase.execute(location) }
         }
         _locations.value?.removeAll(locations)
     }
 
     fun updateLocationPositions(locations: List<Location>) = viewModelScope.launch {
-        updateLocationsPositionUseCase.invoke(locations)
+        updateLocationsPositionUseCase.execute(locations)
         updateLocations()
     }
 
     fun getTempUnit(): TempUnit = runBlocking {
-        getTempUnitUseCase.invoke(Unit)
+        getTempUnitUseCase.execute(Unit)
     }
 
     class Factory @Inject constructor(

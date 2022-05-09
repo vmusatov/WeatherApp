@@ -1,14 +1,18 @@
 package com.example.weatherapp.domain.usecase.notification
 
+import com.example.weatherapp.di.DefaultDispatcher
 import com.example.weatherapp.domain.model.Hour
 import com.example.weatherapp.domain.model.WeatherData
 import com.example.weatherapp.domain.model.WeatherNotification
 import com.example.weatherapp.util.DateUtils
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-class ExpectPrecipitationsEndUseCase @Inject constructor() : BaseWeatherNotificationUseCase() {
+class ExpectPrecipitationsEndUseCase @Inject constructor(
+    @DefaultDispatcher dispatcher: CoroutineDispatcher
+) : BaseWeatherNotificationUseCase(dispatcher) {
 
-    override fun createNotification(data: WeatherData): WeatherNotification? {
+    override suspend fun createNotification(data: WeatherData): WeatherNotification? {
 
         if (nowHour.isNotHavePrecipitation()) {
             return null

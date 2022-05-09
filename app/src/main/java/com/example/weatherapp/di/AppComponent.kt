@@ -12,16 +12,20 @@ import com.example.weatherapp.ui.locations.MapFragment
 import com.example.weatherapp.ui.settings.SettingsFragment
 import dagger.BindsInstance
 import dagger.Component
+import javax.inject.Singleton
 
+@Singleton
 @Component(
     modules = [
         AppModule::class,
         RetrofitModule::class,
         RoomModule::class,
         RepositoryModule::class,
-        DomainModule::class
+        DomainModule::class,
+        CoroutinesModule::class
     ]
 )
+
 interface AppComponent {
 
     fun inject(homeFragment: HomeFragment)

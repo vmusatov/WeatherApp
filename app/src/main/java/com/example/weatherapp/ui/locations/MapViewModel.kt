@@ -16,7 +16,7 @@ class MapViewModel(
     private val _weatherData = MutableLiveData<ShortWeatherData>()
 
     fun loadWeatherData(location: Location) = viewModelScope.launch {
-        val result = getShortWeatherDataUseCase.invoke(location)
+        val result = getShortWeatherDataUseCase.execute(location)
 
         if (result is WorkResult.Success) {
             _weatherData.postValue(result.data)

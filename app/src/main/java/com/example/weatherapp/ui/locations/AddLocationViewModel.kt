@@ -1,16 +1,15 @@
 package com.example.weatherapp.ui.locations
 
 import androidx.lifecycle.*
-import com.example.weatherapp.exception.NetworkException
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.usecase.location.GetAllLocationsUseCase
 import com.example.weatherapp.domain.usecase.location.GetLocationsByNameUseCase
 import com.example.weatherapp.domain.usecase.location.SaveLocationUseCase
 import com.example.weatherapp.domain.utils.WorkResult.Fail
 import com.example.weatherapp.domain.utils.WorkResult.Success
+import com.example.weatherapp.exception.NetworkException
 import com.example.weatherapp.ui.UpdateFailType
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class AddLocationViewModel(
@@ -29,19 +28,19 @@ class AddLocationViewModel(
 
     init {
         viewModelScope.launch {
-            savedLocations.addAll(getAllLocationsUseCase.invoke(Unit))
+            savedLocations.addAll(getAllLocationsUseCase.execute(Unit))
         }
     }
 
     fun search(q: String) = viewModelScope.launch {
-        when (val result = getLocationsByNameUseCase(q)) {
+        when (val result = getLocationsByNameUseCase.execute(q)) {
             is Success -> _searchResult.postValue(result.data)
             is Fail -> handleFailResult(result)
         }
     }
 
     fun saveLocation(location: Location) = viewModelScope.launch {
-        saveLocationUseCase.invoke(location)
+        saveLocationUseCase.execute(location)
         savedLocations.add(location)
     }
 

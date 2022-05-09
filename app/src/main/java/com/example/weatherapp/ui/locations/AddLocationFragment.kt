@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.R
@@ -19,9 +20,6 @@ import com.example.weatherapp.databinding.FragmentAddLocationBinding
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.ui.*
 import com.example.weatherapp.ui.locations.adapter.AddLocationListAdapter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,8 +33,6 @@ class AddLocationFragment : Fragment() {
     @Inject
     lateinit var addLocationsFactory: AddLocationViewModel.Factory
     private val viewModel: AddLocationViewModel by viewModels { addLocationsFactory }
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     private val searchTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
@@ -100,7 +96,7 @@ class AddLocationFragment : Fragment() {
         if (viewModel.isLocationExist(location)) {
             showShortToast(getString(R.string.location_alredy_added))
         } else {
-            coroutineScope.launch {
+            lifecycleScope.launch {
                 viewModel.saveLocation(location).join()
                 findNavController().navigateUp()
             }

@@ -7,13 +7,13 @@ import javax.inject.Inject
 
 class CreateNotificationsListUseCase @Inject constructor(
     private val notificationUseCases: Set<@JvmSuppressWildcards WeatherNotificationUseCase>
-) : BaseUseCase<WeatherData, List<WeatherNotification>>() {
+) : BaseUseCase<WeatherData, List<WeatherNotification>> {
 
     override suspend fun execute(data: WeatherData): List<WeatherNotification> {
         val notifications = mutableListOf<WeatherNotification>()
 
         notificationUseCases.forEach { createNotification ->
-            createNotification(data)?.let { notifications.add(it) }
+            createNotification.execute(data)?.let { notifications.add(it) }
         }
 
         return notifications

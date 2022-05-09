@@ -4,11 +4,13 @@ import com.example.weatherapp.domain.usecase.notification.*
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.ElementsIntoSet
+import javax.inject.Singleton
 
 @Module
 class DomainModule {
 
     @Provides
+    @Singleton
     @ElementsIntoSet
     fun provideNotificationsFactories(
         noPrecipitationsFactory: NoPrecipitationsUseCase,

@@ -20,7 +20,7 @@ class SettingsViewModel(
     }
 
     private fun loadTempUnit() = viewModelScope.launch {
-         _tempUnit.postValue(getTempUnitUseCase.invoke(Unit))
+         _tempUnit.postValue(getTempUnitUseCase.execute(Unit))
     }
 
     fun getTempUnit(): TempUnit {
@@ -29,7 +29,7 @@ class SettingsViewModel(
 
     fun saveTempUnit(tempUnit: TempUnit) = viewModelScope.launch {
         _tempUnit.value = tempUnit
-        saveTempUnitUseCase(tempUnit)
+        saveTempUnitUseCase.execute(tempUnit)
     }
 
     class Factory @Inject constructor(

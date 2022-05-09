@@ -4,7 +4,7 @@ import com.example.weatherapp.R
 import com.example.weatherapp.domain.usecase.BaseUseCase
 import javax.inject.Inject
 
-class ParseUvIndexUseCase @Inject constructor(): BaseUseCase<Int, Int>() {
+class ParseUvIndexUseCase @Inject constructor(): BaseUseCase<Int, Int> {
     override suspend fun execute(data: Int): Int {
         return when (data) {
             in 1..2 -> R.string.low

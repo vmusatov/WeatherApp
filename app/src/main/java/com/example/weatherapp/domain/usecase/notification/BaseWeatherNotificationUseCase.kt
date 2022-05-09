@@ -5,11 +5,15 @@ import com.example.weatherapp.domain.model.WeatherData
 import com.example.weatherapp.domain.model.WeatherNotification
 import com.example.weatherapp.domain.usecase.BaseUseCase
 import com.example.weatherapp.util.DateUtils
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import kotlin.properties.Delegates
 
 typealias WeatherNotificationUseCase = BaseUseCase<WeatherData, WeatherNotification?>
 
-abstract class BaseWeatherNotificationUseCase : WeatherNotificationUseCase() {
+abstract class BaseWeatherNotificationUseCase(
+    private val dispatcher: CoroutineDispatcher
+) : WeatherNotificationUseCase {
     protected lateinit var todayHours: List<Hour>
     protected lateinit var todayRemainingHours: List<Hour>
     protected lateinit var todayWithTomorrowHours: MutableList<Hour>
@@ -20,22 +24,23 @@ abstract class BaseWeatherNotificationUseCase : WeatherNotificationUseCase() {
 
     protected lateinit var localTime: String
 
-    override suspend fun execute(data: WeatherData): WeatherNotification? {
+    override suspend fun execute(data: WeatherData): WeatherNotification? =
+        withContext(dispatcher) {
 
-        localTime = data.location.localtime
-        todayHours = data.daysForecast.first().hours
+            localTime = data.location.localtime
+            todayHours = data.daysForecast.first().hours
 
-        nowHourAsInt = DateUtils.getHourFromDate(data.location.localtime)
-        nowHour = todayHours[nowHourAsInt]
+            nowHourAsInt = DateUtils.getHourFromDate(data.location.localtime)
+            nowHour = todayHours[nowHourAsInt]
 
-        todayRemainingHours = todayHours.subList(nowHourAsInt, todayHours.size)
-        tomorrowHours = data.daysForecast[1].hours
-        createTodayWithTomorrowHours()
+            todayRemainingHours = todayHours.subList(nowHourAsInt, todayHours.size)
+            tomorrowHours = data.daysForecast[1].hours
+            createTodayWithTomorrowHours()
 
-        return createNotification(data)
-    }
+            createNotification(data)
+        }
 
-    abstract fun createNotification(data: WeatherData): WeatherNotification?
+    protected abstract suspend fun createNotification(data: WeatherData): WeatherNotification?
 
     protected fun isTodayHour(hour: Hour): Boolean {
         return hour.dateTime.substring(0, hour.dateTime.indexOf(" ")) ==

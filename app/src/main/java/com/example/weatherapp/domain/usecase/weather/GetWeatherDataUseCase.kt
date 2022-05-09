@@ -1,5 +1,6 @@
 package com.example.weatherapp.domain.usecase.weather
 
+import com.example.weatherapp.di.DefaultDispatcher
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.WeatherData
 import com.example.weatherapp.domain.repository.LocationsRepository
@@ -7,19 +8,22 @@ import com.example.weatherapp.domain.repository.WeatherRepository
 import com.example.weatherapp.domain.usecase.BaseUseCase
 import com.example.weatherapp.domain.utils.WorkResult
 import com.example.weatherapp.util.DateUtils
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
 class GetWeatherDataUseCase @Inject constructor(
     private val locationsRepository: LocationsRepository,
-    private val weatherRepository: WeatherRepository
-) : BaseUseCase<GetWeatherDataUseCase.Data, WorkResult<WeatherData>>() {
+    private val weatherRepository: WeatherRepository,
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
+) : BaseUseCase<GetWeatherDataUseCase.Data, WorkResult<WeatherData>> {
 
-    override suspend fun execute(data: Data): WorkResult<WeatherData> {
+    override suspend fun execute(data: Data): WorkResult<WeatherData> = withContext(dispatcher) {
         val location = locationsRepository.getLocationByUrl(data.location.url) ?: data.location
 
         val needForceLoad = data.forceLoad || needForceLoad(location)
-        return weatherRepository.getWeatherDataByLocation(needForceLoad, location)
+        weatherRepository.getWeatherDataByLocation(needForceLoad, location)
     }
 
     private fun needForceLoad(location: Location): Boolean {
