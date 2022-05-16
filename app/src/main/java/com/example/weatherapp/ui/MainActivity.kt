@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.example.weatherapp.databinding.ActivityMainBinding
+import com.example.weatherapp.ui.utils.ToolbarAction
+import com.example.weatherapp.ui.utils.ToolbarManager
 
 class MainActivity : AppCompatActivity(), ToolbarManager {
 

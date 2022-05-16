@@ -7,7 +7,3 @@ data class WeatherData(
     val daysForecast: List<Day>,
     val lastUpdated: String?
 )
-
-
-
-

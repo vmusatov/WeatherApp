@@ -2,6 +2,8 @@ package com.example.weatherapp.domain.model
 
 import java.util.Date
 
+typealias LocationListener = (Location?) -> Unit
+
 data class Location(
     var name: String,
     var region: String,

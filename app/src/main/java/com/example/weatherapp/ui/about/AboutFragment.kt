@@ -12,8 +12,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.BuildConfig
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.FragmentAboutBinding
-import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.toolbarManager
+import com.example.weatherapp.ui.utils.ToolbarAction
+import com.example.weatherapp.ui.utils.toolbarManager
 
 class AboutFragment : Fragment() {
 

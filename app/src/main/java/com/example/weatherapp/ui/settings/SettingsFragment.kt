@@ -19,8 +19,8 @@ import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentSettingsBinding
 import com.example.weatherapp.domain.model.TempUnit
-import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.toolbarManager
+import com.example.weatherapp.ui.utils.ToolbarAction
+import com.example.weatherapp.ui.utils.toolbarManager
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 

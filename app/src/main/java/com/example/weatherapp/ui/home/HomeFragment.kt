@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,13 +19,16 @@ import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentHomeBinding
 import com.example.weatherapp.domain.model.*
-import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.UpdateFailType
 import com.example.weatherapp.ui.home.adapter.DailyForecastListAdapter
 import com.example.weatherapp.ui.home.adapter.HourlyForecastItemDecorator
 import com.example.weatherapp.ui.home.adapter.HourlyForecastListAdapter
 import com.example.weatherapp.ui.home.adapter.NotificationsPagerAdapter
-import com.example.weatherapp.ui.toolbarManager
+import com.example.weatherapp.ui.home.util.parseEpaIndex
+import com.example.weatherapp.ui.home.util.parseUvIndex
+import com.example.weatherapp.ui.utils.LoadErrorType
+import com.example.weatherapp.ui.utils.ToolbarAction
+import com.example.weatherapp.ui.utils.UiState
+import com.example.weatherapp.ui.utils.toolbarManager
 import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
@@ -37,7 +40,7 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var factory: HomeViewModel.Factory
-    private val viewModel: HomeViewModel by activityViewModels { factory }
+    private val viewModel: HomeViewModel by viewModels { factory }
 
     private var hourlyForecastAdapter: HourlyForecastListAdapter? = null
     private var dailyForecastAdapter: DailyForecastListAdapter? = null
@@ -71,6 +74,14 @@ class HomeFragment : Fragment() {
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        hourlyForecastAdapter = HourlyForecastListAdapter()
+        dailyForecastAdapter = DailyForecastListAdapter()
+        notificationsAdapter = NotificationsPagerAdapter()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,12 +89,8 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        setupObservers()
         setupUi()
-
-        if (viewModel.selectedLocation.value == null) {
-            viewModel.updateWeather()
-        }
+        setupObservers()
 
         return binding.root
     }
@@ -91,6 +98,10 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
 
         hourlyForecastAdapter = null
         dailyForecastAdapter = null
@@ -100,21 +111,33 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.selectedLocation.observe(viewLifecycleOwner) {
-            toolbarManager().setToolbarTitle(it?.name ?: "")
+        viewModel.uiState.observe(viewLifecycleOwner) { state ->
+            when (state.uiState) {
+                UiState.LOADING -> showIsUpdate(true)
+
+                UiState.LOAD_ERROR -> {
+                    handleError(state.loadErrorType ?: LoadErrorType.UNDEFINED)
+                    showIsUpdate(false)
+                }
+
+                UiState.READY_TO_SHOW -> {
+                    state.weatherData?.let { data ->
+                        updateWeather(data, state.tempUnit)
+                        updateNotifications(state.weatherNotifications)
+                    } ?: handleError(LoadErrorType.UNDEFINED)
+
+                    showIsUpdate(false)
+                }
+
+                else -> {
+                    showIsUpdate(false)
+                }
+            }
         }
-        viewModel.weatherData.observe(viewLifecycleOwner) { updateWeather(it) }
-        viewModel.weatherNotifications.observe(viewLifecycleOwner) { updateNotifications(it) }
-        viewModel.isUpdateInProgress.observe(viewLifecycleOwner) { showIsUpdate(it) }
-        viewModel.updateFail.observe(viewLifecycleOwner) { handleError(it) }
     }
 
     private fun setupUi() = with(binding) {
         setupToolbar()
-
-        hourlyForecastAdapter = HourlyForecastListAdapter()
-        dailyForecastAdapter = DailyForecastListAdapter()
-        notificationsAdapter = NotificationsPagerAdapter()
 
         hourlyForecast.adapter = hourlyForecastAdapter
         hourlyForecast.layoutManager = LinearLayoutManager(requireContext()).apply {
@@ -141,8 +164,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun updateWeather(data: WeatherData) = with(binding) {
-        val tempUnit = viewModel.getTempUnit()
+    private fun updateWeather(data: WeatherData, tempUnit: TempUnit) = with(binding) {
+        toolbarManager().setToolbarTitle(data.location.name)
 
         updateCurrentWeather(data.current, tempUnit)
         updateAdditionalWeather(data.current)
@@ -153,6 +176,9 @@ class HomeFragment : Fragment() {
         dailyForecastAdapter?.update(data.daysForecast, tempUnit)
 
         updateFooter(data)
+
+        errors.root.visibility = View.GONE
+        content.visibility = View.VISIBLE
     }
 
     private fun updateNotifications(notificationsList: List<WeatherNotification>) = with(binding) {
@@ -191,8 +217,7 @@ class HomeFragment : Fragment() {
     private fun updateAdditionalWeather(current: CurrentWeather) = with(binding) {
         additionalWeather.pressureText.text = getString(R.string.mbar, current.pressureMb.toInt())
         additionalWeather.windText.text = getString(R.string.kmh, current.windKph.toInt())
-        additionalWeather.uvIndexText.text =
-            viewModel.parseUvIndex(requireContext(), current.uvIndex)
+        additionalWeather.uvIndexText.text = parseUvIndex(requireContext(), current.uvIndex)
     }
 
     private fun updateAirQuality(current: CurrentWeather) = with(binding) {
@@ -200,8 +225,7 @@ class HomeFragment : Fragment() {
         airQuality.no2Value.text = current.no2.toInt().toString()
         airQuality.o3Value.text = current.o3.toInt().toString()
         airQuality.so2Value.text = current.so2.toInt().toString()
-        airQuality.usEpaIndexValue.text =
-            viewModel.parseEpaIndex(requireContext(), current.usEpaIndex)
+        airQuality.usEpaIndexValue.text = parseEpaIndex(requireContext(), current.usEpaIndex)
     }
 
     private fun updateHourlyForecast(data: WeatherData, tempUnit: TempUnit) = with(binding) {
@@ -233,28 +257,21 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun handleError(type: UpdateFailType?) = with(binding) {
-        refreshLayout.isEnabled = true
-
-        if (type == null) {
-            errors.root.visibility = View.GONE
-            return
-        }
-
+    private fun handleError(type: LoadErrorType) = with(binding) {
         content.visibility = View.GONE
         errors.root.visibility = View.VISIBLE
 
         errors.addLocation.visibility = View.GONE
 
         errors.errorText.text = when (type) {
-            UpdateFailType.FAIL_LOAD_FROM_DB -> getString(R.string.db_fail)
-            UpdateFailType.FAIL_LOAD_FROM_NETWORK -> getString(R.string.network_fail)
-            UpdateFailType.NO_LOCATION -> {
+            LoadErrorType.FAIL_LOAD_FROM_DB -> getString(R.string.db_fail)
+            LoadErrorType.FAIL_LOAD_FROM_NETWORK -> getString(R.string.network_fail)
+            LoadErrorType.NO_LOCATION -> {
                 refreshLayout.isEnabled = false
                 errors.addLocation.visibility = View.VISIBLE
                 getString(R.string.no_selected_location)
             }
-            UpdateFailType.UNDEFINED -> getString(R.string.undefined_fail)
+            LoadErrorType.UNDEFINED -> getString(R.string.undefined_fail)
         }
     }
 
@@ -263,14 +280,11 @@ class HomeFragment : Fragment() {
             errors.root.visibility = View.GONE
             refreshLayout.isRefreshing = true
 
-            if (viewModel.weatherData.value == null) {
+            if (viewModel.uiState.value?.weatherData == null) {
                 content.visibility = View.INVISIBLE
             }
         } else {
             refreshLayout.isRefreshing = false
-            if (viewModel.updateFail.value == null) {
-                content.visibility = View.VISIBLE
-            }
         }
     }
 
@@ -319,5 +333,4 @@ class HomeFragment : Fragment() {
             }
         )
     }
-
 }

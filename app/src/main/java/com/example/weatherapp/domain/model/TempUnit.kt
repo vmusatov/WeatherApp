@@ -1,5 +1,7 @@
 package com.example.weatherapp.domain.model
 
+typealias TempUnitListener = (TempUnit) -> Unit
+
 enum class TempUnit(
     val unitName: String,
     val code: Int

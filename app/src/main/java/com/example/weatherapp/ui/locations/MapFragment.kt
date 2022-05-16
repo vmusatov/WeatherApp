@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.BuildConfig
 import com.example.weatherapp.R
@@ -19,14 +20,11 @@ import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentMapBinding
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.ShortWeatherData
-import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.UpdateFailType
-import com.example.weatherapp.ui.showShortToast
-import com.example.weatherapp.ui.toolbarManager
+import com.example.weatherapp.ui.utils.LoadErrorType
+import com.example.weatherapp.ui.utils.ToolbarAction
+import com.example.weatherapp.ui.utils.showShortToast
+import com.example.weatherapp.ui.utils.toolbarManager
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -55,8 +53,6 @@ class MapFragment : Fragment() {
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     private val iconOverlay = IconOverlay()
 
@@ -110,7 +106,7 @@ class MapFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.weatherData.observe(viewLifecycleOwner) { updateLocationWeather(it) }
-        addViewModel.updateFail.observe(viewLifecycleOwner) { handleError(it) }
+        addViewModel.loadErrorType.observe(viewLifecycleOwner) { handleError(it) }
         addViewModel.searchResult.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 showPopup(it[0])
@@ -140,7 +136,7 @@ class MapFragment : Fragment() {
         controller.setZoom(DEFAULT_MAP_ZOOM_VALUE)
 
         locationOverlay.runOnFirstFix {
-            coroutineScope.launch {
+            lifecycleScope.launch {
                 controller.animateTo(locationOverlay.myLocation, DEFAULT_MAP_ZOOM_VALUE, 0)
             }
         }
@@ -174,7 +170,7 @@ class MapFragment : Fragment() {
         if (addViewModel.isLocationExist(location)) {
             showShortToast(getString(R.string.location_alredy_added))
         } else {
-            coroutineScope.launch {
+            lifecycleScope.launch {
                 addViewModel.saveLocation(location).join()
                 findNavController().popBackStack(R.id.addLocationFragment, true)
             }
@@ -193,9 +189,9 @@ class MapFragment : Fragment() {
         }
     }
 
-    private fun handleError(type: UpdateFailType?) = with(binding) {
+    private fun handleError(type: LoadErrorType?) = with(binding) {
         when (type) {
-            UpdateFailType.FAIL_LOAD_FROM_NETWORK -> {
+            LoadErrorType.FAIL_LOAD_FROM_NETWORK -> {
                 errorText.text = getString(R.string.network_fail)
             }
             else -> errorText.text = getString(R.string.undefined_fail)

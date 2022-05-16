@@ -11,11 +11,12 @@ class SaveLocationUseCase @Inject constructor(
 
     override suspend fun execute(data: Location): Long {
         data.position = locationsRepository.getLocationsCount()
+        val locationId = locationsRepository.saveLocation(data)
 
         if (data.position == 0) {
-            data.isSelected = true
+            locationsRepository.setLocationIsSelected(data)
         }
 
-        return locationsRepository.saveLocation(data)
+        return locationId
     }
 }

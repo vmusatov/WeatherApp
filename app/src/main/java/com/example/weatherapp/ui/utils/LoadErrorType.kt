@@ -1,6 +1,6 @@
-package com.example.weatherapp.ui
+package com.example.weatherapp.ui.utils
 
-enum class UpdateFailType {
+enum class LoadErrorType {
     NO_LOCATION,
     FAIL_LOAD_FROM_DB,
     FAIL_LOAD_FROM_NETWORK,

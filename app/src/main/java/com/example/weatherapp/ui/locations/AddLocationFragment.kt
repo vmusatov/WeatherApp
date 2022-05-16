@@ -18,8 +18,8 @@ import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentAddLocationBinding
 import com.example.weatherapp.domain.model.Location
-import com.example.weatherapp.ui.*
 import com.example.weatherapp.ui.locations.adapter.AddLocationListAdapter
+import com.example.weatherapp.ui.utils.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ class AddLocationFragment : Fragment() {
     private var _binding: FragmentAddLocationBinding? = null
     private val binding: FragmentAddLocationBinding get() = checkNotNull(_binding)
 
-    private lateinit var manageLocationAdapter: AddLocationListAdapter
+    private var addLocationAdapter: AddLocationListAdapter? = null
 
     @Inject
     lateinit var addLocationsFactory: AddLocationViewModel.Factory
@@ -66,7 +66,7 @@ class AddLocationFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        manageLocationAdapter = AddLocationListAdapter { addLocation(it) }
+        addLocationAdapter = AddLocationListAdapter { addLocation(it) }
     }
 
     override fun onCreateView(
@@ -85,6 +85,11 @@ class AddLocationFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        addLocationAdapter = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,7 +111,7 @@ class AddLocationFragment : Fragment() {
     private fun setupUi() = with(binding) {
         setupToolbar()
 
-        locationsList.adapter = manageLocationAdapter
+        locationsList.adapter = addLocationAdapter
         locationsList.layoutManager = LinearLayoutManager(requireContext())
 
         locationSearchText.addTextChangedListener(searchTextWatcher)
@@ -136,7 +141,7 @@ class AddLocationFragment : Fragment() {
                 errorText.visibility = View.VISIBLE
             } else {
                 val result = if (it.size > 10) it.subList(0, 10) else it
-                manageLocationAdapter.update(result)
+                addLocationAdapter?.update(result)
                 locationsList.scrollToPosition(0)
                 locationsList.visibility = View.VISIBLE
                 errorText.visibility = View.GONE
@@ -144,12 +149,12 @@ class AddLocationFragment : Fragment() {
             }
         }
 
-        viewModel.updateFail.observe(viewLifecycleOwner) {
+        viewModel.loadErrorType.observe(viewLifecycleOwner) {
             locationsList.visibility = View.GONE
             errorText.visibility = View.VISIBLE
 
             when (it) {
-                UpdateFailType.FAIL_LOAD_FROM_NETWORK -> {
+                LoadErrorType.FAIL_LOAD_FROM_NETWORK -> {
                     errorText.text = getString(R.string.network_fail)
                 }
                 else -> {

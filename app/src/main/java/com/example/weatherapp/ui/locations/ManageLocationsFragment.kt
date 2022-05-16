@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,12 +17,12 @@ import com.example.weatherapp.R
 import com.example.weatherapp.appComponent
 import com.example.weatherapp.databinding.FragmentManageLocationsBinding
 import com.example.weatherapp.domain.model.Location
-import com.example.weatherapp.ui.ToolbarAction
-import com.example.weatherapp.ui.home.HomeViewModel
 import com.example.weatherapp.ui.locations.adapter.ManageLocationListAdapter
 import com.example.weatherapp.ui.locations.util.LocationsChangeCallback
 import com.example.weatherapp.ui.locations.util.LocationsItemTouchHelperCallback
-import com.example.weatherapp.ui.toolbarManager
+import com.example.weatherapp.ui.utils.ToolbarAction
+import com.example.weatherapp.ui.utils.toolbarManager
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ManageLocationsFragment : Fragment() {
@@ -33,24 +34,20 @@ class ManageLocationsFragment : Fragment() {
     lateinit var manageViewModelFactory: ManageLocationsViewModel.Factory
     private val viewModel: ManageLocationsViewModel by activityViewModels { manageViewModelFactory }
 
-    @Inject
-    lateinit var homeViewModelFactory: HomeViewModel.Factory
-    private val homeViewModel: HomeViewModel by activityViewModels { homeViewModelFactory }
+    private var manageLocationAdapter: ManageLocationListAdapter? = null
+    private var touchHelper: ItemTouchHelper? = null
 
-    private lateinit var manageLocationAdapter: ManageLocationListAdapter
-    private lateinit var touchHelper: ItemTouchHelper
+    override fun onAttach(context: Context) {
+        context.appComponent.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         manageLocationAdapter = ManageLocationListAdapter(LocationsChangeCallbackImpl())
         touchHelper = ItemTouchHelper(
-            LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter)
+            LocationsItemTouchHelperCallback(requireContext(), manageLocationAdapter!!)
         )
-    }
-
-    override fun onAttach(context: Context) {
-        context.appComponent.inject(this)
-        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -63,8 +60,6 @@ class ManageLocationsFragment : Fragment() {
         setupUi()
         setupObservers()
 
-        viewModel.updateData()
-
         return binding.root
     }
 
@@ -73,32 +68,30 @@ class ManageLocationsFragment : Fragment() {
         _binding = null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        manageLocationAdapter = null
+        touchHelper = null
+    }
+
     private fun setupUi() {
         setupToolbar()
         setupRecyclerView()
     }
 
     private fun setupObservers() {
-        viewModel.locations.observe(viewLifecycleOwner) {
-            updateLocationsList(it)
-        }
-        viewModel.locationsShortWeatherData.observe(viewLifecycleOwner) {
-            manageLocationAdapter.updateLocationsInfo(it.toList())
+        viewModel.uiState.observe(viewLifecycleOwner) {
+            manageLocationAdapter?.tempUnit = it.tempUnit
+            updateLocationsList(it.locations)
+            manageLocationAdapter?.updateLocationsInfo(it.weatherData.toList())
         }
     }
 
     private fun setupRecyclerView() = with(binding) {
-        touchHelper.attachToRecyclerView(locationsList)
+        touchHelper?.attachToRecyclerView(locationsList)
 
-        delete.setOnClickListener {
-            manageLocationAdapter.deleteSelected()
-        }
-
-        apply.setOnClickListener {
-            manageLocationAdapter.switchEditMode()
-        }
-
-        manageLocationAdapter.tempUnit = viewModel.getTempUnit()
+        delete.setOnClickListener { manageLocationAdapter?.deleteSelected() }
+        apply.setOnClickListener { manageLocationAdapter?.switchEditMode() }
 
         with(locationsList) {
             adapter = manageLocationAdapter
@@ -116,7 +109,7 @@ class ManageLocationsFragment : Fragment() {
         } else {
             locationsList.visibility = View.VISIBLE
             emptyLocations.visibility = View.GONE
-            manageLocationAdapter.update(locations)
+            manageLocationAdapter?.update(locations)
         }
     }
 
@@ -127,7 +120,6 @@ class ManageLocationsFragment : Fragment() {
             ToolbarAction(
                 iconRes = R.drawable.ic_arrow_back,
                 onAction = {
-                    homeViewModel.updateWeather()
                     findNavController().navigateUp()
                 }
             )
@@ -145,9 +137,10 @@ class ManageLocationsFragment : Fragment() {
     inner class LocationsChangeCallbackImpl : LocationsChangeCallback {
 
         override fun onSelectLocation(location: Location) {
-            homeViewModel.updateWeather(location)
-            viewModel.updateWeatherInfo(listOf(location))
-            findNavController().navigateUp()
+            lifecycleScope.launch {
+                viewModel.setLocationIsSelected(location).join()
+                findNavController().navigateUp()
+            }
         }
 
         override fun onSwitchEditMode(editMode: Boolean) = with(binding) {
@@ -167,7 +160,7 @@ class ManageLocationsFragment : Fragment() {
         }
 
         override fun onDragStart(viewHolder: RecyclerView.ViewHolder) {
-            touchHelper.startDrag(viewHolder)
+            touchHelper?.startDrag(viewHolder)
         }
     }
 }

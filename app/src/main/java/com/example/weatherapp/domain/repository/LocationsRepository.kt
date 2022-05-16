@@ -2,6 +2,7 @@ package com.example.weatherapp.domain.repository
 
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.utils.WorkResult
+import kotlinx.coroutines.flow.Flow
 
 interface LocationsRepository {
 
@@ -26,4 +27,8 @@ interface LocationsRepository {
     suspend fun setLocationIsNotSelected(location: Location)
 
     suspend fun getLocationsCount(): Int
+
+    fun listenSelectedLocation(): Flow<Location?>
+
+    fun listenAddLocation(): Flow<Location>
 }

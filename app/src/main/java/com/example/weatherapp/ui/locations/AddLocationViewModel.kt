@@ -8,7 +8,7 @@ import com.example.weatherapp.domain.usecase.location.SaveLocationUseCase
 import com.example.weatherapp.domain.utils.WorkResult.Fail
 import com.example.weatherapp.domain.utils.WorkResult.Success
 import com.example.weatherapp.exception.NetworkException
-import com.example.weatherapp.ui.UpdateFailType
+import com.example.weatherapp.ui.utils.LoadErrorType
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,8 +21,8 @@ class AddLocationViewModel(
     val searchResult: LiveData<List<Location>> get() = _searchResult
     private val _searchResult = MutableLiveData<List<Location>>()
 
-    val updateFail: LiveData<UpdateFailType?> get() = _updateFail
-    private val _updateFail = MutableLiveData<UpdateFailType?>()
+    val loadErrorType: LiveData<LoadErrorType?> get() = _updateFail
+    private val _updateFail = MutableLiveData<LoadErrorType?>()
 
     private val savedLocations = mutableListOf<Location>()
 
@@ -48,8 +48,8 @@ class AddLocationViewModel(
 
     private fun handleFailResult(result: Fail<Any>) {
         when (result.exception) {
-            is NetworkException -> _updateFail.postValue(UpdateFailType.FAIL_LOAD_FROM_NETWORK)
-            else -> _updateFail.postValue(UpdateFailType.UNDEFINED)
+            is NetworkException -> _updateFail.postValue(LoadErrorType.FAIL_LOAD_FROM_NETWORK)
+            else -> _updateFail.postValue(LoadErrorType.UNDEFINED)
         }
     }
 

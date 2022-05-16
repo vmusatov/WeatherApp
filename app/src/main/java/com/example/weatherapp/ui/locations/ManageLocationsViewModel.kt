@@ -1,65 +1,90 @@
 package com.example.weatherapp.ui.locations
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.weatherapp.di.DefaultDispatcher
 import com.example.weatherapp.domain.model.Location
 import com.example.weatherapp.domain.model.ShortWeatherData
 import com.example.weatherapp.domain.model.TempUnit
-import com.example.weatherapp.domain.usecase.location.DeleteLocationUseCase
-import com.example.weatherapp.domain.usecase.location.GetAllLocationsUseCase
-import com.example.weatherapp.domain.usecase.location.UpdateLocationsPositionUseCase
-import com.example.weatherapp.domain.usecase.settings.GetTempUnitUseCase
+import com.example.weatherapp.domain.usecase.location.*
+import com.example.weatherapp.domain.usecase.settings.ListenTempUnitUseCase
 import com.example.weatherapp.domain.usecase.weather.GetShortWeatherDataUseCase
 import com.example.weatherapp.domain.utils.WorkResult.Success
-import kotlinx.coroutines.Dispatchers
+import com.example.weatherapp.ui.utils.ViewModelWithUiState
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+data class ManageScreenUiState(
+    val locations: MutableList<Location> = mutableListOf(),
+    val weatherData: MutableSet<ShortWeatherData> = mutableSetOf(),
+    val tempUnit: TempUnit = TempUnit.DEFAULT
+)
+
 class ManageLocationsViewModel(
-    private val getTempUnitUseCase: GetTempUnitUseCase,
+    private val listenTempUnitUseCase: ListenTempUnitUseCase,
     private val getAllLocationsUseCase: GetAllLocationsUseCase,
     private val updateLocationsPositionUseCase: UpdateLocationsPositionUseCase,
     private val deleteLocationUseCase: DeleteLocationUseCase,
-    private val getShortWeatherDataUseCase: GetShortWeatherDataUseCase
-) : ViewModel() {
+    private val getShortWeatherDataUseCase: GetShortWeatherDataUseCase,
+    private val setLocationIsSelectedUseCase: SetLocationIsSelectedUseCase,
+    private val listenAddLocationUseCase: ListenAddLocationUseCase,
+    private val dispatcher: CoroutineDispatcher
+) : ViewModelWithUiState<ManageScreenUiState>() {
 
-    val locations: LiveData<MutableList<Location>> get() = _locations
-    private val _locations = MutableLiveData<MutableList<Location>>()
+    override fun createDefaultState(): ManageScreenUiState = ManageScreenUiState()
 
-    val locationsShortWeatherData: LiveData<MutableSet<ShortWeatherData>> get() = _locationsShortWeatherData
-    private val _locationsShortWeatherData = MutableLiveData<MutableSet<ShortWeatherData>>()
+    init {
+        updateData()
+        setupListeners()
+    }
 
-    fun updateData() = viewModelScope.launch(Dispatchers.IO) {
+    private fun setupListeners() {
+        viewModelScope.launch {
+            listenAddLocationUseCase.execute(Unit).collect { updateData() }
+        }
+        viewModelScope.launch {
+            listenTempUnitUseCase.execute(Unit).collect { newTempUnit ->
+                updateUiState { it.copy(tempUnit = newTempUnit) }
+            }
+        }
+    }
+
+    private fun updateData() = viewModelScope.launch(dispatcher) {
         updateLocations().join()
         updateWeatherInfo()
     }
 
     private fun updateLocations() = viewModelScope.launch {
         val locations = getAllLocationsUseCase.execute(Unit)
-        _locations.postValue(locations.toMutableList())
+        updateUiState { it.copy(locations = locations.toMutableList()) }
     }
 
-    fun updateWeatherInfo(locationsToUpdate: List<Location>? = null) = viewModelScope.launch {
-        val queryLocations = locationsToUpdate ?: _locations.value
-        queryLocations?.let { locations ->
-            val resultSet = _locationsShortWeatherData.value ?: mutableSetOf()
+    private fun updateWeatherInfo(locationsToUpdate: List<Location>? = null) =
+        viewModelScope.launch {
+            val queryLocations = locationsToUpdate ?: uiStateValue?.locations
+            queryLocations?.let { locations ->
+                val resultSet = uiStateValue?.weatherData ?: mutableSetOf()
 
-            locations.forEach { location ->
-                val result = getShortWeatherDataUseCase.execute(location)
-                if (result is Success) {
-                    resultSet.add(result.data)
+                locations.forEach { location ->
+                    val result = getShortWeatherDataUseCase.execute(location)
+                    if (result is Success) {
+                        resultSet.add(result.data)
+                    }
                 }
-            }
 
-            _locationsShortWeatherData.postValue(resultSet)
+                updateUiState { it.copy(weatherData = resultSet) }
+            }
         }
-    }
 
     fun removeLocations(locations: List<Location>) {
         for (location in locations) {
             viewModelScope.launch { deleteLocationUseCase.execute(location) }
         }
-        _locations.value?.removeAll(locations)
+
+        uiStateValue?.locations?.removeAll(locations)
     }
 
     fun updateLocationPositions(locations: List<Location>) = viewModelScope.launch {
@@ -67,26 +92,33 @@ class ManageLocationsViewModel(
         updateLocations()
     }
 
-    fun getTempUnit(): TempUnit = runBlocking {
-        getTempUnitUseCase.execute(Unit)
+    fun setLocationIsSelected(location: Location) = viewModelScope.launch {
+        setLocationIsSelectedUseCase.execute(location)
+        updateWeatherInfo(listOf(location))
     }
 
     class Factory @Inject constructor(
-        private val getTempUnitUseCase: GetTempUnitUseCase,
+        private val listenTempUnitUseCase: ListenTempUnitUseCase,
         private val getAllLocationsUseCase: GetAllLocationsUseCase,
         private val updateLocationsPositionUseCase: UpdateLocationsPositionUseCase,
         private val deleteLocationUseCase: DeleteLocationUseCase,
-        private val getShortWeatherDataUseCase: GetShortWeatherDataUseCase
+        private val getShortWeatherDataUseCase: GetShortWeatherDataUseCase,
+        private val setLocationIsSelectedUseCase: SetLocationIsSelectedUseCase,
+        private val listenAddLocationUseCase: ListenAddLocationUseCase,
+        @DefaultDispatcher private val ioDispatcher: CoroutineDispatcher
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ManageLocationsViewModel(
-                getTempUnitUseCase,
+                listenTempUnitUseCase,
                 getAllLocationsUseCase,
                 updateLocationsPositionUseCase,
                 deleteLocationUseCase,
-                getShortWeatherDataUseCase
+                getShortWeatherDataUseCase,
+                setLocationIsSelectedUseCase,
+                listenAddLocationUseCase,
+                ioDispatcher
             ) as T
         }
     }

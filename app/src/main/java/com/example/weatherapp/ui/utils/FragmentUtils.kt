@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui
+package com.example.weatherapp.ui.utils
 
 import android.content.Context
 import android.view.View
